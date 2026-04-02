@@ -10,6 +10,7 @@ import {
 } from "../../core/constants";
 import {
   navigateByKey,
+  getCurrentCell,
   type GridBounds,
 } from "../../core/features/navigation";
 import {
@@ -23,6 +24,8 @@ import {
   hasColumnSelection,
   hasRowSelection,
   selectAllCells,
+  selectSingleColumn,
+  selectSingleRow,
 } from "../../core/state/selectionState";
 
 type UseKeyboardNavigationParams<T extends GridRow = GridRow> = {
@@ -54,6 +57,42 @@ function isTypingElement(target: EventTarget | null): boolean {
     tag === "TEXTAREA" ||
     (el as HTMLElement).isContentEditable === true
   );
+}
+
+function selectAxisByArrowShortcut(
+  state: GridSelectionState,
+  key: string,
+  bounds: GridBounds
+): GridSelectionState {
+  if (bounds.totalRows === 0 || bounds.totalCols === 0) {
+    return state;
+  }
+
+  const current = getCurrentCell(state);
+  const rowIndex = Math.min(Math.max(current.row, 0), bounds.totalRows - 1);
+  const colIndex = Math.min(Math.max(current.col, 0), bounds.totalCols - 1);
+
+  const activeCell = { row: rowIndex, col: colIndex };
+
+  if (key === KEYBOARD_KEYS.ARROW_LEFT || key === KEYBOARD_KEYS.ARROW_RIGHT) {
+    const nextSelection = selectSingleRow(state, rowIndex, bounds.totalCols);
+    return {
+      ...nextSelection,
+      anchor: activeCell,
+      cursor: activeCell,
+    };
+  }
+
+  if (key === KEYBOARD_KEYS.ARROW_UP || key === KEYBOARD_KEYS.ARROW_DOWN) {
+    const nextSelection = selectSingleColumn(state, colIndex, bounds.totalRows);
+    return {
+      ...nextSelection,
+      anchor: activeCell,
+      cursor: activeCell,
+    };
+  }
+
+  return state;
 }
 
 export function useKeyboardNavigation<T extends GridRow = GridRow>({
@@ -137,6 +176,19 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
       if (ctrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.A) {
         event.preventDefault();
         setSelection(selectAllCells(rows.length, columns.length));
+        return;
+      }
+
+      if (
+        ctrlOrMeta &&
+        event.shiftKey &&
+        (key === KEYBOARD_KEYS.ARROW_UP ||
+          key === KEYBOARD_KEYS.ARROW_DOWN ||
+          key === KEYBOARD_KEYS.ARROW_LEFT ||
+          key === KEYBOARD_KEYS.ARROW_RIGHT)
+      ) {
+        event.preventDefault();
+        setSelection((prev) => selectAxisByArrowShortcut(prev, key, bounds));
         return;
       }
 

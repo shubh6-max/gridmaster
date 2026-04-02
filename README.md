@@ -61,6 +61,12 @@ That is the intended happy path:
 - `showFormulaBar` and `showStatusBar` toggle spreadsheet chrome.
 - `mode="readonly"` disables editing without changing the rest of the surface.
 
+## Keyboard Shortcuts
+
+- `Ctrl + Shift + Left/Right` selects the full active row. On macOS, use `Cmd + Shift + Left/Right`.
+- `Ctrl + Shift + Up/Down` selects the full active column. On macOS, use `Cmd + Shift + Up/Down`.
+- Holding `Alt` on Windows/Linux or `Option` on macOS as an extra modifier also works for these row and column selection shortcuts.
+
 ## Presets
 
 ```tsx
