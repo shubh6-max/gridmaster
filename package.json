@@ -25,7 +25,8 @@
     "build": "npm run build:lib && npm run build:types",
     "build:lib": "vite build --configLoader native",
     "build:types": "tsc -p tsconfig.build.json",
-    "build:demo": "vite build --mode demo --configLoader native"
+    "build:demo": "vite build --mode demo --configLoader native",
+    "test": "npm run build && node tests/run.mjs"
   },
   "peerDependencies": {
     "react": ">=18",

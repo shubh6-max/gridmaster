@@ -371,6 +371,25 @@ export function cloneRows<T extends GridRow>(rows: T[]): T[] {
   return rows.map((row) => ({ ...row }));
 }
 
+export function resolveGridRowId<T extends GridRow>(
+  row: T,
+  index: number,
+  getRowId?: (row: T, index: number) => string
+): string {
+  if (getRowId) return getRowId(row, index);
+
+  const fallbackId = (row as { id?: unknown }).id;
+  if (
+    typeof fallbackId === "string" ||
+    typeof fallbackId === "number" ||
+    typeof fallbackId === "bigint"
+  ) {
+    return String(fallbackId);
+  }
+
+  return String(index);
+}
+
 export function clone2DArray<T>(input: T[][]): T[][] {
   return input.map((row) => [...row]);
 }

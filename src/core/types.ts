@@ -225,6 +225,11 @@ export type GridCellValidator<T extends GridRow = GridRow> = (
   row: T
 ) => string | null;
 
+export type GridRowIdGetter<T extends GridRow = GridRow> = (
+  row: T,
+  index: number
+) => string;
+
 export type GridColumnDef<T extends GridRow = GridRow> = {
   key: string;
   title: string;
@@ -357,6 +362,7 @@ export type GridState<T extends GridRow = GridRow> = {
 export type GridMasterProps<T extends GridRow = GridRow> = {
   rows: T[];
   columns: GridColumnDef<T>[];
+  getRowId?: GridRowIdGetter<T>;
 
   onRowsChange?: (rows: T[]) => void;
   onCellChange?: (event: GridCellChangeEvent<T>) => void;

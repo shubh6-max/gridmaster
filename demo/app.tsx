@@ -603,6 +603,7 @@ export default function App() {
           <GridMaster<DemoRow>
             rows={rows}
             columns={columns}
+            getRowId={(row) => String(row.id)}
             onRowsChange={setRows}
             frozenColumns={2}
             width="100%"

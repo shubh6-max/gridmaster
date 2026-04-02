@@ -27,6 +27,7 @@ export function BasicGridExample() {
     <GridMaster<CustomerRow>
       rows={rows}
       columns={columns}
+      getRowId={(row) => String(row.id)}
       onRowsChange={setRows}
       height={360}
     />

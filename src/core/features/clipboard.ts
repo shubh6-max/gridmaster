@@ -9,6 +9,7 @@ import {
   clipboardToText,
   getRowValue,
   normalizeRange,
+  parseCellValue,
   setRowValue,
   textToClipboardMatrix,
 } from "../utils";
@@ -276,7 +277,8 @@ export function pasteMatrixAt<T extends GridRow>(
       const column = columns[colIndex];
       if (!column || column.readonly || !column.editable) continue;
 
-      nextRows[rowIndex] = setRowValue(nextRows[rowIndex], column, matrix[r][c]);
+      const parsedValue = parseCellValue(matrix[r][c], nextRows[rowIndex], column);
+      nextRows[rowIndex] = setRowValue(nextRows[rowIndex], column, parsedValue);
       endRow = Math.max(endRow, rowIndex);
       endCol = Math.max(endCol, colIndex);
     }

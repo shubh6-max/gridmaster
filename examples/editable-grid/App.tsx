@@ -60,6 +60,7 @@ export function EditableGridExample() {
       {...gridProps}
       rows={rows}
       columns={columns}
+      getRowId={(row) => String(row.id)}
       onRowsChange={setRows}
       enableColumnVisibility
       height={420}

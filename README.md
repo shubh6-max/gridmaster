@@ -33,14 +33,21 @@ export function App() {
     { id: 2, name: "Rahul", age: 33, active: false },
   ]);
 
-  return <GridMaster rows={rows} columns={columns} onRowsChange={setRows} />;
+  return (
+    <GridMaster
+      rows={rows}
+      columns={columns}
+      getRowId={(row) => String(row.id)}
+      onRowsChange={setRows}
+    />
+  );
 }
 ```
 
 That is the intended happy path:
 
 ```tsx
-<GridMaster rows={rows} columns={columns} onRowsChange={setRows} />
+<GridMaster rows={rows} columns={columns} getRowId={(row) => String(row.id)} onRowsChange={setRows} />
 ```
 
 ## Built-In Column Types
@@ -56,6 +63,7 @@ That is the intended happy path:
 ## Useful Props
 
 - `height` and `width` control the grid container size.
+- `getRowId` provides a stable row identity and is recommended for sorted, filtered, or virtualized grids.
 - `frozenColumns` freezes leading visible columns.
 - `enableSorting`, `enableFiltering`, `enableColumnResize`, `enableColumnAutoFit`, and `enableColumnVisibility` control header power features.
 - `showFormulaBar` and `showStatusBar` toggle spreadsheet chrome.

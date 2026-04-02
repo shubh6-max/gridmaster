@@ -2,6 +2,7 @@ import React from "react";
 import { DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
 import { isCellActive, isCellSelected } from "../core/state/selectionState";
+import { resolveGridRowId } from "../core/utils";
 import { useFillHandle } from "./hooks/useFillHandle";
 import { useSelection } from "./hooks/useSelection";
 import { useGridContext } from "./context/GridContext";
@@ -9,6 +10,7 @@ import { GridCell } from "./GridCell";
 
 export function GridBody() {
   const {
+    props,
     displayRows,
     displayRowIndexes,
     visibleColumns,
@@ -63,9 +65,11 @@ export function GridBody() {
     <tbody>
       {displayRows.map((row, rowIndex: number) => {
         const isRowActive = selection.selectedRows?.has?.(rowIndex);
+        const sourceRowIndex = displayRowIndexes[rowIndex] ?? rowIndex;
+        const rowKey = resolveGridRowId(row, sourceRowIndex, props.getRowId);
 
         return (
-          <tr key={row?.id ?? rowIndex} style={{ height: rowHeight }}>
+          <tr key={rowKey} style={{ height: rowHeight }}>
             <td
               className="gm-rh"
               onClick={(e) =>
@@ -107,7 +111,7 @@ export function GridBody() {
 
               return (
                 <td
-                  key={`${row?.id ?? rowIndex}-${column.key}`}
+                  key={`${rowKey}-${column.key}`}
                   className={[
                     "gm-td",
                     selected && !active ? "gm-selected" : "",
@@ -159,7 +163,7 @@ export function GridBody() {
                   <GridCell
                     row={row}
                     rowIndex={rowIndex}
-                    sourceRowIndex={displayRowIndexes[rowIndex] ?? -1}
+                    sourceRowIndex={sourceRowIndex}
                     column={column}
                     columnIndex={colIndex}
                     isSelected={selected}
