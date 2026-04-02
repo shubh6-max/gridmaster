@@ -59,6 +59,68 @@ export function GridViewport() {
     isEditing: Boolean(editingCell),
   });
 
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      const activeCell = container.querySelector<HTMLElement>(".gm-td.gm-active");
+      if (!activeCell) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const cellRect = activeCell.getBoundingClientRect();
+      const rowCells = activeCell.parentElement
+        ? Array.from(activeCell.parentElement.children)
+        : [];
+
+      let leftInset = 0;
+      for (const cell of rowCells) {
+        if (!(cell instanceof HTMLElement)) continue;
+
+        if (window.getComputedStyle(cell).position === "sticky") {
+          const stickyRect = cell.getBoundingClientRect();
+          leftInset = Math.max(leftInset, stickyRect.right - containerRect.left);
+        }
+      }
+
+      const header = container.querySelector("thead");
+      const headerRect = header?.getBoundingClientRect();
+      const topInset = headerRect ? Math.max(0, headerRect.bottom - containerRect.top) : 0;
+
+      const visibleLeft = containerRect.left + leftInset;
+      const visibleRight = containerRect.left + container.clientWidth;
+      const visibleTop = containerRect.top + topInset;
+      const visibleBottom = containerRect.top + container.clientHeight;
+
+      let nextScrollLeft = container.scrollLeft;
+      let nextScrollTop = container.scrollTop;
+
+      if (cellRect.left < visibleLeft) {
+        nextScrollLeft -= visibleLeft - cellRect.left;
+      } else if (cellRect.right > visibleRight) {
+        nextScrollLeft += cellRect.right - visibleRight;
+      }
+
+      if (cellRect.top < visibleTop) {
+        nextScrollTop -= visibleTop - cellRect.top;
+      } else if (cellRect.bottom > visibleBottom) {
+        nextScrollTop += cellRect.bottom - visibleBottom;
+      }
+
+      if (
+        nextScrollLeft !== container.scrollLeft ||
+        nextScrollTop !== container.scrollTop
+      ) {
+        container.scrollTo({
+          left: Math.max(nextScrollLeft, 0),
+          top: Math.max(nextScrollTop, 0),
+        });
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [selection.cursor?.row, selection.cursor?.col, selection.mode]);
+
   return (
     <div
       ref={containerRef}

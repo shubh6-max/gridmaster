@@ -340,6 +340,110 @@ const initialRows: DemoRow[] = [
     health: "Watch",
     notes: "Notes column becomes handy once it is restored from the visibility manager.",
   },
+  {
+    id: 11,
+    account: "Cobalt Security",
+    owner: "Arjun",
+    priority: "High",
+    status: "Build",
+    budgetK: 285,
+    active: true,
+    launchDate: "2026-05-28",
+    website: "cobaltsecurity.io",
+    health: "On Track",
+    notes: "Useful row when testing horizontal keyboard movement into off-screen cells.",
+  },
+  {
+    id: 12,
+    account: "Maple Insurance",
+    owner: "Sneha",
+    priority: "Medium",
+    status: "Pilot",
+    budgetK: 235,
+    active: false,
+    launchDate: "2026-06-02",
+    website: "mapleinsurance.com",
+    health: "Watch",
+    notes: "Good candidate for row selection followed by downward expansion.",
+  },
+  {
+    id: 13,
+    account: "Nova Manufacturing",
+    owner: "Aditya",
+    priority: "Critical",
+    status: "Discovery",
+    budgetK: 390,
+    active: false,
+    launchDate: "2026-06-09",
+    website: "novamfg.ai",
+    health: "Risk",
+    notes: "Use this lower row to verify the viewport follows vertical keyboard navigation.",
+  },
+  {
+    id: 14,
+    account: "Riverbank Media",
+    owner: "Tanvi",
+    priority: "Low",
+    status: "Live",
+    budgetK: 115,
+    active: true,
+    launchDate: "2026-04-03",
+    website: "riverbankmedia.co",
+    health: "On Track",
+    notes: "Stable account that works well for clipboard checks across larger selections.",
+  },
+  {
+    id: 15,
+    account: "Vertex Mining",
+    owner: "Kabir",
+    priority: "High",
+    status: "Pilot",
+    budgetK: 330,
+    active: true,
+    launchDate: "2026-06-14",
+    website: "vertexmining.net",
+    health: "Watch",
+    notes: "Another row near the bottom so keyboard scrolling is easier to spot in the demo.",
+  },
+  {
+    id: 16,
+    account: "Pioneer Aerospace",
+    owner: "Meera",
+    priority: "Critical",
+    status: "Build",
+    budgetK: 580,
+    active: false,
+    launchDate: "2026-06-21",
+    website: "pioneeraerospace.com",
+    health: "Risk",
+    notes: "Strong sample for validation, filters, and long-distance arrow movement together.",
+  },
+  {
+    id: 17,
+    account: "Beacon Hospitality",
+    owner: "Nikhil",
+    priority: "Medium",
+    status: "Discovery",
+    budgetK: 175,
+    active: false,
+    launchDate: "2026-06-27",
+    website: "beaconhospitality.org",
+    health: "Watch",
+    notes: "Lets the viewport demonstrate downward movement after the first screenful of rows.",
+  },
+  {
+    id: 18,
+    account: "Granite Supply",
+    owner: "Pooja",
+    priority: "Low",
+    status: "Live",
+    budgetK: 105,
+    active: true,
+    launchDate: "2026-07-01",
+    website: "granitesupply.com",
+    health: "On Track",
+    notes: "Bottom-row account intended for scroll-follow and range-selection demos.",
+  },
 ];
 
 const availableFeatures = [
@@ -351,9 +455,29 @@ const availableFeatures = [
   "Hide and show columns, including the Notes column that starts hidden.",
   "Edit text, number, select, checkbox, link, date, and custom cells.",
   "See validation markers on invalid values while editing.",
+  "Use Ctrl/Cmd + Shift + Arrow to grow selection by row, column, or both axes.",
+  "Move with arrow keys and let the viewport follow when the active cell goes off-screen.",
 ];
 
 const demoTypes = ["text", "number", "select", "checkbox", "link", "date", "custom"];
+
+const keyboardShortcuts = [
+  {
+    windows: ["Ctrl", "Shift", "Right"],
+    mac: ["Cmd", "Shift", "Right"],
+    description: "Select the active row across all visible columns.",
+  },
+  {
+    windows: ["Ctrl", "Shift", "Down"],
+    mac: ["Cmd", "Shift", "Down"],
+    description: "Expand that selection downward, similar to Excel-style axis growth.",
+  },
+  {
+    windows: ["Alt"],
+    mac: ["Option"],
+    description: "Can be held as an extra modifier with the same row and column shortcuts.",
+  },
+];
 
 export default function App() {
   const [rows, setRows] = useState<DemoRow[]>(initialRows);
@@ -362,12 +486,12 @@ export default function App() {
     <div className="demo-shell">
       <section className="demo-hero">
         <div>
-          <p className="demo-eyebrow">Phase 3 + Phase 4 demo</p>
-          <h1 className="demo-title">Premium columns, full editors, and richer sample data</h1>
+          <p className="demo-eyebrow">Keyboard navigation demo</p>
+          <h1 className="demo-title">Selection shortcuts, auto-scroll, and richer grid movement</h1>
           <p className="demo-copy">
-            One column starts hidden on purpose, so the new visibility recovery flow is easy to verify.
-            Use the <strong>+1</strong> badge in the top-left grid corner or any column menu to bring the
-            hidden Notes column back.
+            This sandbox now highlights keyboard-driven row and column selection plus viewport follow.
+            Use arrow keys to move into cells that start off-screen, and try <strong>Ctrl/Cmd + Shift</strong>
+            with the arrow keys to grow the selection across one axis and then the other.
           </p>
         </div>
 
@@ -417,11 +541,38 @@ export default function App() {
           </section>
 
           <section className="demo-card">
+            <h2>Keyboard shortcuts to try</h2>
+            <div className="demo-shortcut-list">
+              {keyboardShortcuts.map((shortcut) => (
+                <div key={`${shortcut.windows.join("+")}-${shortcut.mac.join("+")}`} className="demo-shortcut-row">
+                  <div className="demo-shortcut-combos">
+                    <div className="demo-shortcut-combo">
+                      {shortcut.windows.map((key) => (
+                        <kbd key={`win-${shortcut.description}-${key}`} className="demo-kbd">
+                          {key}
+                        </kbd>
+                      ))}
+                    </div>
+                    <div className="demo-shortcut-combo demo-shortcut-combo-secondary">
+                      {shortcut.mac.map((key) => (
+                        <kbd key={`mac-${shortcut.description}-${key}`} className="demo-kbd">
+                          {key}
+                        </kbd>
+                      ))}
+                    </div>
+                  </div>
+                  <p>{shortcut.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="demo-card">
             <h2>Quick things to try</h2>
             <ol className="demo-steps">
-              <li>Open the top-left <strong>+1</strong> badge and restore the hidden Notes column.</li>
-              <li>Double-click a resize handle on Account or Website to auto-fit the content.</li>
-              <li>Edit Budget or Website with an invalid value to see the validation marker.</li>
+              <li>Click Account in the first row, press <strong>Ctrl/Cmd + Shift + Right</strong>, then press <strong>Ctrl/Cmd + Shift + Down</strong>.</li>
+              <li>Keep pressing the right arrow until the active cell reaches Website or Health and watch the grid scroll with it.</li>
+              <li>Open the top-left <strong>+1</strong> badge and restore the hidden Notes column, then continue navigating into it with the keyboard.</li>
             </ol>
           </section>
         </aside>
@@ -431,8 +582,8 @@ export default function App() {
             <div>
               <h2>Program portfolio sandbox</h2>
               <p>
-                Sorting, filtering, freezing, column visibility, and all editor types are wired into this one
-                data set.
+                Sorting, filtering, freezing, keyboard shortcuts, and viewport auto-scroll are all wired into
+                this one data set.
               </p>
             </div>
           </div>
@@ -442,7 +593,8 @@ export default function App() {
             columns={columns}
             onRowsChange={setRows}
             frozenColumns={2}
-            height="70vh"
+            width="100%"
+            height={460}
           />
         </main>
       </div>
