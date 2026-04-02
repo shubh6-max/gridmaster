@@ -1,7 +1,7 @@
 import React from "react";
 import { updateCellValue, validateCell } from "../core/features/editing";
 import type { GridResolvedColumnDef, GridRow } from "../core/types";
-import { formatCellValue, getRowValue, parseCellValue } from "../core/utils";
+import { formatCellValue, getRowValue, isFormulaValue, parseCellValue } from "../core/utils";
 import { getDefaultCellEditor } from "../editors";
 import { getDefaultCellRenderer } from "../renderers";
 import { useGridContext } from "./context/GridContext";
@@ -28,6 +28,7 @@ export function GridCell<T extends GridRow = GridRow>({
   const {
     mode,
     rows,
+    formulaEvaluator,
     updateRows,
     emitCellChange,
     editingCell,
@@ -38,14 +39,22 @@ export function GridCell<T extends GridRow = GridRow>({
     cancelEditing,
   } = useGridContext<T>();
 
-  const value = getRowValue(row, column);
-  const formattedValue = formatCellValue(value, row, column);
+  const rawValue = getRowValue(row, column);
+  const formulaResult = formulaEvaluator.evaluateCell(sourceRowIndex, column.key);
+  const value = formulaResult.value;
+  const formattedValue = formulaResult.error
+    ? formulaResult.error
+    : formatCellValue(value, row, column);
   const isReadonly = mode === "readonly" || column.readonly || !column.editable;
   const isEditing = editingCell?.row === rowIndex && editingCell?.col === columnIndex;
-  const draftValue = isEditing ? editingValue : value;
+  const draftValue = isEditing ? editingValue : rawValue;
   const parsedDraftValue = isEditing ? parseCellValue(draftValue, row, column) : value;
-  const validationError = validateCell(row, column, parsedDraftValue);
-  const meta = validationError ? { error: validationError } : undefined;
+  const validationError =
+    formulaResult.error || isFormulaValue(parsedDraftValue)
+      ? null
+      : validateCell(row, column, parsedDraftValue);
+  const cellError = formulaResult.error ?? validationError;
+  const meta = cellError ? { error: cellError } : undefined;
 
   const startEdit = React.useCallback(() => {
     if (isReadonly) return;
@@ -79,11 +88,11 @@ export function GridCell<T extends GridRow = GridRow>({
     [column, columnIndex, emitCellChange, isReadonly, rows, sourceRowIndex, updateRows]
   );
 
-  const wrapperClassName = ["gm-cell-shell", validationError ? "is-invalid" : ""]
+  const wrapperClassName = ["gm-cell-shell", cellError ? "is-invalid" : ""]
     .filter(Boolean)
     .join(" ");
-  const wrapperTitle = validationError
-    ? [formattedValue, validationError].filter(Boolean).join("\n")
+  const wrapperTitle = cellError
+    ? [formattedValue, cellError].filter(Boolean).join("\n")
     : formattedValue || undefined;
 
   if (isEditing) {
@@ -109,10 +118,10 @@ export function GridCell<T extends GridRow = GridRow>({
       <div
         className={wrapperClassName}
         style={{ overflow: column.wrap ? "visible" : "hidden" }}
-        title={validationError ?? undefined}
+        title={cellError ?? undefined}
       >
         {column.renderEditor ? <>{column.renderEditor(editorProps)}</> : <DefaultEditor {...editorProps} />}
-        {validationError ? <span className="gm-cell-error-indicator" aria-label={validationError} /> : null}
+        {cellError ? <span className="gm-cell-error-indicator" aria-label={cellError} /> : null}
       </div>
     );
   }
@@ -141,7 +150,7 @@ export function GridCell<T extends GridRow = GridRow>({
       title={wrapperTitle}
     >
       {column.renderCell ? <>{column.renderCell(rendererProps)}</> : <DefaultRenderer {...rendererProps} />}
-      {validationError ? <span className="gm-cell-error-indicator" aria-label={validationError} /> : null}
+      {cellError ? <span className="gm-cell-error-indicator" aria-label={cellError} /> : null}
     </div>
   );
 }

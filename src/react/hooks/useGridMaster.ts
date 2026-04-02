@@ -43,6 +43,10 @@ import {
 } from "../../core/constants";
 import { clearFillState, type GridFillState } from "../../core/features/fill";
 import {
+  createFormulaEvaluator,
+  type GridFormulaEvaluator,
+} from "../../core/features/formulas";
+import {
   createInitialColumnWidths,
   getVisibleColumns,
   syncWidthMapWithColumns,
@@ -66,6 +70,7 @@ export type UseGridMasterResult<T extends GridRow = GridRow> = {
   visibleColumns: GridResolvedColumnDef<T>[];
   displayRowIndexes: number[];
   hiddenColumnKeys: Set<string>;
+  formulaEvaluator: GridFormulaEvaluator<T>;
 
   history: GridHistoryState;
   setHistory: React.Dispatch<React.SetStateAction<GridHistoryState>>;
@@ -300,6 +305,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
     () => getDisplayRows(rows, displayRowIndexes),
     [rows, displayRowIndexes]
   );
+  const formulaEvaluator = useMemo(() => createFormulaEvaluator(rows, columns), [columns, rows]);
 
   const visibleRowCount = displayRows.length;
 
@@ -439,6 +445,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
     visibleColumns,
     displayRowIndexes,
     hiddenColumnKeys,
+    formulaEvaluator,
 
     history,
     setHistory,

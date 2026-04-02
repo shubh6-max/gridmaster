@@ -14,6 +14,7 @@ import type {
 } from "../../core/types";
 import type { GridColumnWidths } from "../../core/features/sizing";
 import type { GridFillState } from "../../core/features/fill";
+import type { GridFormulaEvaluator } from "../../core/features/formulas";
 
 export type GridContextValue<T extends GridRow = GridRow> = {
   props: GridMasterProps<T>;
@@ -26,6 +27,7 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   columns: GridResolvedColumnDef<T>[];
   rawColumns: GridColumnDef<T>[];
   visibleColumns: GridResolvedColumnDef<T>[];
+  formulaEvaluator: GridFormulaEvaluator<T>;
 
   history: GridHistoryState;
   selection: GridSelectionState;

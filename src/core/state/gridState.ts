@@ -5,6 +5,7 @@ import type {
   GridSort,
 } from "../types";
 import { rowMatchesFilters } from "../features/filtering";
+import { createFormulaEvaluator } from "../features/formulas";
 import { findSortableColumn } from "../features/sorting";
 import { compareValues, getRowValue } from "../utils";
 
@@ -26,9 +27,12 @@ export function getDisplayRowIndexes<T extends GridRow>(
   const enableSorting = options?.enableSorting ?? true;
 
   let indexes = rows.map((_, index) => index);
+  const evaluator = createFormulaEvaluator(rows, columns);
 
   if (enableFiltering) {
-    indexes = indexes.filter((index) => rowMatchesFilters(rows[index], columns, filters));
+    indexes = indexes.filter((index) =>
+      rowMatchesFilters(rows[index], columns, filters, { rows, rowIndex: index, evaluator })
+    );
   }
 
   if (enableSorting && sort) {
@@ -38,8 +42,8 @@ export function getDisplayRowIndexes<T extends GridRow>(
       const directionMultiplier = sort.direction === "asc" ? 1 : -1;
 
       indexes.sort((indexA, indexB) => {
-        const valueA = getRowValue(rows[indexA], column);
-        const valueB = getRowValue(rows[indexB], column);
+        const valueA = evaluator.getCellValue(indexA, column.key);
+        const valueB = evaluator.getCellValue(indexB, column.key);
         return compareValues(valueA, valueB) * directionMultiplier;
       });
     }

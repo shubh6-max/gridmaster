@@ -22,7 +22,8 @@ export function NumberEditor<T extends GridRow = GridRow>({
   return (
     <input
       ref={inputRef}
-      type="number"
+      type="text"
+      inputMode="decimal"
       value={localValue}
       onChange={(event) => {
         const nextValue = event.target.value;

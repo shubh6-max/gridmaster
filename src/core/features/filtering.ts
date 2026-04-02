@@ -5,6 +5,7 @@ import type {
   GridRow,
 } from "../types";
 import { getRowValue, normalizeValue, toNumber } from "../utils";
+import { createFormulaEvaluator, type GridFormulaEvaluator } from "./formulas";
 
 /* =========================================================
    Filter creators
@@ -156,10 +157,18 @@ export function matchesFilter(rawValue: unknown, filter: GridColumnFilter): bool
 export function rowMatchesFilters<T extends GridRow>(
   row: T,
   columns: GridResolvedColumnDef<T>[],
-  filters: GridFilters
+  filters: GridFilters,
+  options?: {
+    rows?: T[];
+    rowIndex?: number;
+    evaluator?: GridFormulaEvaluator<T>;
+  }
 ): boolean {
   const keys = Object.keys(filters);
   if (!keys.length) return true;
+  const rowIndex = options?.rowIndex ?? options?.rows?.indexOf(row) ?? -1;
+  const evaluator =
+    options?.evaluator ?? (options?.rows ? createFormulaEvaluator(options.rows, columns) : null);
 
   for (const columnKey of keys) {
     const filter = filters[columnKey];
@@ -168,7 +177,8 @@ export function rowMatchesFilters<T extends GridRow>(
     const column = columns.find((col) => col.key === columnKey);
     if (!column) continue;
 
-    const value = getRowValue(row, column);
+    const value =
+      evaluator && rowIndex >= 0 ? evaluator.getCellValue(rowIndex, column.key) : getRowValue(row, column);
     if (!matchesFilter(value, filter)) return false;
   }
 
@@ -181,7 +191,10 @@ export function filterRows<T extends GridRow>(
   filters: GridFilters
 ): T[] {
   if (!hasActiveFilters(filters)) return [...rows];
-  return rows.filter((row) => rowMatchesFilters(row, columns, filters));
+  const evaluator = createFormulaEvaluator(rows, columns);
+  return rows.filter((row, rowIndex) =>
+    rowMatchesFilters(row, columns, filters, { rows, rowIndex, evaluator })
+  );
 }
 
 export function filterRowIndexes<T extends GridRow>(
@@ -192,9 +205,10 @@ export function filterRowIndexes<T extends GridRow>(
   if (!hasActiveFilters(filters)) return rows.map((_, index) => index);
 
   const result: number[] = [];
+  const evaluator = createFormulaEvaluator(rows, columns);
 
   for (let index = 0; index < rows.length; index++) {
-    if (rowMatchesFilters(rows[index], columns, filters)) {
+    if (rowMatchesFilters(rows[index], columns, filters, { rows, rowIndex: index, evaluator })) {
       result.push(index);
     }
   }
@@ -208,12 +222,14 @@ export function filterRowIndexes<T extends GridRow>(
 
 export function getFilterValuesForColumn<T extends GridRow>(
   rows: T[],
-  column: GridResolvedColumnDef<T>
+  column: GridResolvedColumnDef<T>,
+  columns?: GridResolvedColumnDef<T>[]
 ): string[] {
   const set = new Set<string>();
+  const evaluator = createFormulaEvaluator(rows, columns ?? [column]);
 
-  for (const row of rows) {
-    set.add(normalizeValue(getRowValue(row, column)));
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    set.add(normalizeValue(evaluator.getCellValue(rowIndex, column.key)));
   }
 
   return [...set].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
@@ -232,5 +248,5 @@ export function getFilteredUniqueValuesForColumn<T extends GridRow>(
   delete otherFilters[targetColumnKey];
 
   const visibleRows = filterRows(rows, columns, otherFilters);
-  return getFilterValuesForColumn(visibleRows, targetColumn);
+  return getFilterValuesForColumn(visibleRows, targetColumn, columns);
 }

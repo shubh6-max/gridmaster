@@ -19,6 +19,7 @@ type DemoRow = {
   priority: Priority;
   status: Status;
   budgetK: number;
+  forecastK: number | string | null;
   active: boolean;
   launchDate: string;
   website: string;
@@ -186,6 +187,11 @@ const columns = [
       return null;
     },
   }),
+  createColumn.number<DemoRow>("forecastK", {
+    title: "Forecast (K)",
+    width: 148,
+    formatValue: (value) => (value == null || value === "" ? "" : `$${budgetFormatter.format(Number(value))}K`),
+  }),
   createColumn.checkbox<DemoRow>("active", {
     title: "Live",
     width: 100,
@@ -222,6 +228,7 @@ const initialRows = [
     priority: "Critical",
     status: "Build",
     budgetK: 420,
+    forecastK: "=F1*1.1",
     active: true,
     launchDate: "2026-04-08",
     website: "northwindretail.com",
@@ -235,6 +242,7 @@ const initialRows = [
     priority: "High",
     status: "Pilot",
     budgetK: 260,
+    forecastK: "=IF(H2,F2,0)",
     active: true,
     launchDate: "2026-04-15",
     website: "bluepeakhealth.io",
@@ -248,6 +256,7 @@ const initialRows = [
     priority: "Medium",
     status: "Discovery",
     budgetK: 140,
+    forecastK: "=SUM(F1:F3)",
     active: false,
     launchDate: "2026-05-03",
     website: "atlasmobility.ai",
@@ -261,6 +270,7 @@ const initialRows = [
     priority: "High",
     status: "Build",
     budgetK: 310,
+    forecastK: null,
     active: true,
     launchDate: "2026-04-22",
     website: "harborenergy.co",
@@ -274,6 +284,7 @@ const initialRows = [
     priority: "Low",
     status: "Live",
     budgetK: 120,
+    forecastK: null,
     active: true,
     launchDate: "2026-03-27",
     website: "summitfoods.com",
@@ -287,6 +298,7 @@ const initialRows = [
     priority: "Critical",
     status: "Pilot",
     budgetK: 500,
+    forecastK: null,
     active: false,
     launchDate: "2026-04-29",
     website: "lumenlogistics.net",
@@ -300,6 +312,7 @@ const initialRows = [
     priority: "Medium",
     status: "Build",
     budgetK: 210,
+    forecastK: null,
     active: true,
     launchDate: "2026-05-12",
     website: "verdefinance.com",
@@ -313,6 +326,7 @@ const initialRows = [
     priority: "High",
     status: "Discovery",
     budgetK: 160,
+    forecastK: null,
     active: false,
     launchDate: "2026-05-18",
     website: "orbittelecom.org",
@@ -326,6 +340,7 @@ const initialRows = [
     priority: "Critical",
     status: "Live",
     budgetK: 540,
+    forecastK: null,
     active: true,
     launchDate: "2026-03-31",
     website: "crescentpharma.com",
@@ -339,6 +354,7 @@ const initialRows = [
     priority: "Low",
     status: "Pilot",
     budgetK: 90,
+    forecastK: null,
     active: false,
     launchDate: "2026-05-25",
     website: "auroratravel.co",
@@ -352,6 +368,7 @@ const initialRows = [
     priority: "High",
     status: "Build",
     budgetK: 285,
+    forecastK: null,
     active: true,
     launchDate: "2026-05-28",
     website: "cobaltsecurity.io",
@@ -365,6 +382,7 @@ const initialRows = [
     priority: "Medium",
     status: "Pilot",
     budgetK: 235,
+    forecastK: null,
     active: false,
     launchDate: "2026-06-02",
     website: "mapleinsurance.com",
@@ -378,6 +396,7 @@ const initialRows = [
     priority: "Critical",
     status: "Discovery",
     budgetK: 390,
+    forecastK: null,
     active: false,
     launchDate: "2026-06-09",
     website: "novamfg.ai",
@@ -391,6 +410,7 @@ const initialRows = [
     priority: "Low",
     status: "Live",
     budgetK: 115,
+    forecastK: null,
     active: true,
     launchDate: "2026-04-03",
     website: "riverbankmedia.co",
@@ -404,6 +424,7 @@ const initialRows = [
     priority: "High",
     status: "Pilot",
     budgetK: 330,
+    forecastK: null,
     active: true,
     launchDate: "2026-06-14",
     website: "vertexmining.net",
@@ -417,6 +438,7 @@ const initialRows = [
     priority: "Critical",
     status: "Build",
     budgetK: 580,
+    forecastK: null,
     active: false,
     launchDate: "2026-06-21",
     website: "pioneeraerospace.com",
@@ -430,6 +452,7 @@ const initialRows = [
     priority: "Medium",
     status: "Discovery",
     budgetK: 175,
+    forecastK: null,
     active: false,
     launchDate: "2026-06-27",
     website: "beaconhospitality.org",
@@ -443,6 +466,7 @@ const initialRows = [
     priority: "Low",
     status: "Live",
     budgetK: 105,
+    forecastK: null,
     active: true,
     launchDate: "2026-07-01",
     website: "granitesupply.com",
@@ -466,6 +490,7 @@ const availableFeatures = [
   "Use Ctrl/Cmd + Shift + Arrow to grow selection by row, column, or both axes.",
   "Move with arrow keys and let the viewport follow when the active cell goes off-screen.",
   "Drag the fill handle or double-click it to continue a numeric series down the grid.",
+  "Type spreadsheet formulas like =F1*1.1, =SUM(F1:F3), and =IF(H2,F2,0).",
 ];
 
 const demoTypes = ["text", "number", "select", "checkbox", "link", "date", "custom"];
@@ -503,6 +528,8 @@ export default function App() {
             with the arrow keys to grow the selection across one axis and then the other. The
             <strong> Series </strong>
             column starts with <strong>1</strong> and <strong>2</strong> so drag-fill and double-click fill-down are easy to test.
+            The <strong>Forecast</strong> column also includes live formulas, so selecting one of those cells in the
+            formula bar shows the raw expression while the grid keeps showing the computed result.
           </p>
         </div>
 
@@ -584,6 +611,7 @@ export default function App() {
               <li>Click Account in the first row, press <strong>Ctrl/Cmd + Shift + Right</strong>, then press <strong>Ctrl/Cmd + Shift + Down</strong>.</li>
               <li>Keep pressing the right arrow until the active cell reaches Website or Health and watch the grid scroll with it.</li>
               <li>Select the first two cells in the <strong>Series</strong> column, then drag the fill handle or double-click it to continue <strong>1, 2, 3, 4...</strong>.</li>
+              <li>Select a cell in <strong>Forecast (K)</strong> and confirm the formula bar shows raw entries like <strong>=SUM(F1:F3)</strong> while the cell shows the computed total.</li>
               <li>Open the top-left <strong>+1</strong> badge and restore the hidden Notes column, then continue navigating into it with the keyboard.</li>
             </ol>
           </section>
@@ -594,8 +622,8 @@ export default function App() {
             <div>
               <h2>Program portfolio sandbox</h2>
               <p>
-                Sorting, filtering, freezing, keyboard shortcuts, and viewport auto-scroll are all wired into
-                this one data set.
+                Sorting, filtering, freezing, formulas, keyboard shortcuts, and viewport auto-scroll are all
+                wired into this one data set.
               </p>
             </div>
           </div>

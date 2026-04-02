@@ -5,6 +5,7 @@ import type {
   GridSortDirection,
 } from "../types";
 import { compareValues, getRowValue } from "../utils";
+import { createFormulaEvaluator } from "./formulas";
 
 /* =========================================================
    Sort state helpers
@@ -74,10 +75,20 @@ export function sortRows<T extends GridRow>(
   if (!column) return [...rows];
 
   const directionMultiplier = sort.direction === "asc" ? 1 : -1;
+  const evaluator = createFormulaEvaluator(rows, columns);
+  const rowIndexes = new Map<T, number>();
+
+  rows.forEach((row, index) => {
+    rowIndexes.set(row, index);
+  });
 
   return [...rows].sort((rowA, rowB) => {
-    const valueA = getRowValue(rowA, column);
-    const valueB = getRowValue(rowB, column);
+    const indexA = rowIndexes.get(rowA) ?? -1;
+    const indexB = rowIndexes.get(rowB) ?? -1;
+    const valueA =
+      indexA >= 0 ? evaluator.getCellValue(indexA, column.key) : getRowValue(rowA, column);
+    const valueB =
+      indexB >= 0 ? evaluator.getCellValue(indexB, column.key) : getRowValue(rowB, column);
 
     const result = compareValues(valueA, valueB);
     return result * directionMultiplier;
@@ -101,10 +112,11 @@ export function sortRowIndexes<T extends GridRow>(
   if (!column) return indexes;
 
   const directionMultiplier = sort.direction === "asc" ? 1 : -1;
+  const evaluator = createFormulaEvaluator(rows, columns);
 
   indexes.sort((indexA, indexB) => {
-    const valueA = getRowValue(rows[indexA], column);
-    const valueB = getRowValue(rows[indexB], column);
+    const valueA = evaluator.getCellValue(indexA, column.key);
+    const valueB = evaluator.getCellValue(indexB, column.key);
 
     const result = compareValues(valueA, valueB);
     return result * directionMultiplier;

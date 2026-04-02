@@ -1,5 +1,4 @@
 import React from "react";
-import { updateCellValue } from "../core/features/editing";
 import { cellAddress, getRowValue } from "../core/utils";
 import { useGridContext } from "./context/GridContext";
 

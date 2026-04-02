@@ -34,6 +34,7 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         columns: grid.columns,
         rawColumns: grid.props.columns,
         visibleColumns: grid.visibleColumns,
+        formulaEvaluator: grid.formulaEvaluator,
 
         history: grid.history,
         selection: grid.selection,

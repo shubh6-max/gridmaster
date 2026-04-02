@@ -36,6 +36,7 @@ export {
   updateFillState,
 } from "./core/features/fill";
 export * from "./core/features/filtering";
+export * from "./core/features/formulas";
 export * from "./core/features/freezing";
 export * from "./core/features/navigation";
 export * from "./core/features/sizing";

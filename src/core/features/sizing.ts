@@ -4,7 +4,8 @@ import {
   DEFAULT_MAX_COLUMN_WIDTH,
   DEFAULT_MIN_COLUMN_WIDTH,
 } from "../constants";
-import { calculateAutoFitWidth, clamp, formatCellValue, getRowValue } from "../utils";
+import { calculateAutoFitWidth, clamp } from "../utils";
+import { createFormulaEvaluator } from "./formulas";
 
 /* =========================================================
    Width map helpers
@@ -140,13 +141,15 @@ export function autoFitColumn<T extends GridRow>(
     charWidth?: number;
     padding?: number;
     sampleSize?: number;
+    columns?: GridResolvedColumnDef<T>[];
   }
 ): GridColumnWidths {
   const sampleSize = options?.sampleSize ?? 500;
   const sampledRows = rows.slice(0, sampleSize);
+  const evaluator = createFormulaEvaluator(rows, options?.columns ?? [column]);
 
-  const values = sampledRows.map((row) =>
-    formatCellValue(getRowValue(row, column), row, column)
+  const values = sampledRows.map((_, rowIndex) =>
+    evaluator.getCellDisplayString(rowIndex, column.key)
   );
 
   const fittedWidth = calculateAutoFitWidth(column.title, values, {
@@ -176,7 +179,7 @@ export function autoFitManyColumns<T extends GridRow>(
 
   for (const column of columns) {
     if (column.hidden) continue;
-    next = autoFitColumn(next, column, rows, options);
+    next = autoFitColumn(next, column, rows, { ...options, columns });
   }
 
   return next;

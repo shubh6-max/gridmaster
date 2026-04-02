@@ -33,6 +33,10 @@ export function isPlainObject(value: unknown): value is Record<string, any> {
   return Object.prototype.toString.call(value) === "[object Object]";
 }
 
+export function isFormulaValue(value: unknown): value is string {
+  return typeof value === "string" && value.trimStart().startsWith("=");
+}
+
 export function toSafeString(value: unknown): string {
   if (isNil(value)) return "";
   if (typeof value === "string") return value;
@@ -276,6 +280,7 @@ export function parseCellValue<T extends GridRow>(
   row: T,
   column: GridColumnDef<T> | GridResolvedColumnDef<T>
 ): any {
+  if (isFormulaValue(value)) return String(value);
   if (column.parseValue) return column.parseValue(value, row);
 
   switch (column.type) {
