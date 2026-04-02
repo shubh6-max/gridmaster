@@ -2,6 +2,7 @@ import React from "react";
 import { DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
 import { isCellActive, isCellSelected } from "../core/state/selectionState";
+import { useFillHandle } from "./hooks/useFillHandle";
 import { useSelection } from "./hooks/useSelection";
 import { useGridContext } from "./context/GridContext";
 import { GridCell } from "./GridCell";
@@ -11,11 +12,17 @@ export function GridBody() {
     displayRows,
     displayRowIndexes,
     visibleColumns,
+    rows,
     selection,
     setSelection,
+    fill,
+    setFill,
+    updateRows,
     columnWidths,
     frozenColumns,
     rowHeight,
+    editingCell,
+    enableFillHandle,
   } = useGridContext();
 
   const { onCellMouseDown, onCellMouseEnter, onRowHeaderClick } = useSelection({
@@ -26,6 +33,25 @@ export function GridBody() {
     enableRangeSelection: true,
     enableRowSelection: true,
     enableColumnSelection: true,
+  });
+
+  const {
+    isFillHandleCell,
+    isPreviewCell,
+    onFillHandleMouseDown,
+    onFillHandleDoubleClick,
+    onCellMouseEnter: onFillMouseEnter,
+  } = useFillHandle({
+    rows,
+    displayRows,
+    displayRowIndexes,
+    columns: visibleColumns,
+    selection,
+    setSelection,
+    fill,
+    setFill,
+    updateRows,
+    enableFillHandle: enableFillHandle && !editingCell,
   });
 
   const colOffsets = React.useMemo(
@@ -76,6 +102,8 @@ export function GridBody() {
               const width = getColumnWidth(column, columnWidths);
               const selected = isCellSelected(selection, rowIndex, colIndex);
               const active = isCellActive(selection, rowIndex, colIndex);
+              const preview = isPreviewCell(rowIndex, colIndex);
+              const showFillHandle = isFillHandleCell(rowIndex, colIndex);
 
               return (
                 <td
@@ -84,6 +112,7 @@ export function GridBody() {
                     "gm-td",
                     selected && !active ? "gm-selected" : "",
                     active ? "gm-active" : "",
+                    preview ? "gm-fill-preview" : "",
                     column.readonly ? "gm-readonly" : "",
                     column.wrap ? "gm-wrap" : "",
                   ]
@@ -96,7 +125,10 @@ export function GridBody() {
                       metaKey: e.metaKey,
                     })
                   }
-                  onMouseEnter={() => onCellMouseEnter(rowIndex, colIndex)}
+                  onMouseEnter={() => {
+                    onCellMouseEnter(rowIndex, colIndex);
+                    onFillMouseEnter(rowIndex, colIndex);
+                  }}
                   style={{
                     width,
                     minWidth: width,
@@ -133,6 +165,16 @@ export function GridBody() {
                     isSelected={selected}
                     isActive={active}
                   />
+                  {showFillHandle ? (
+                    <button
+                      type="button"
+                      className="gm-fill-handle"
+                      aria-label="Drag to fill selection"
+                      onMouseDown={onFillHandleMouseDown}
+                      onDoubleClick={onFillHandleDoubleClick}
+                      tabIndex={-1}
+                    />
+                  ) : null}
                 </td>
               );
             })}

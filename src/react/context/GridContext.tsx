@@ -68,6 +68,7 @@ export type GridContextValue<T extends GridRow = GridRow> = {
 
   enableSorting: boolean;
   enableFiltering: boolean;
+  enableFillHandle: boolean;
   enableColumnResize: boolean;
   enableColumnAutoFit: boolean;
   enableColumnVisibility: boolean;

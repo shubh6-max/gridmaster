@@ -15,6 +15,7 @@ type DemoRow = {
   id: number;
   account: string;
   owner: string;
+  series: number | null;
   priority: Priority;
   status: Status;
   budgetK: number;
@@ -158,6 +159,10 @@ const columns = [
     title: "Owner",
     width: 150,
   }),
+  createColumn.number<DemoRow>("series", {
+    title: "Series",
+    width: 96,
+  }),
   createColumn.select<DemoRow>("priority", {
     title: "Priority",
     width: 130,
@@ -209,7 +214,7 @@ const columns = [
   }),
 ];
 
-const initialRows: DemoRow[] = [
+const initialRows = [
   {
     id: 1,
     account: "Northwind Retail",
@@ -444,7 +449,10 @@ const initialRows: DemoRow[] = [
     health: "On Track",
     notes: "Bottom-row account intended for scroll-follow and range-selection demos.",
   },
-];
+].map<DemoRow>((row, index) => ({
+  ...row,
+  series: index === 0 ? 1 : index === 1 ? 2 : null,
+}));
 
 const availableFeatures = [
   "Resize columns from the header handle.",
@@ -457,6 +465,7 @@ const availableFeatures = [
   "See validation markers on invalid values while editing.",
   "Use Ctrl/Cmd + Shift + Arrow to grow selection by row, column, or both axes.",
   "Move with arrow keys and let the viewport follow when the active cell goes off-screen.",
+  "Drag the fill handle or double-click it to continue a numeric series down the grid.",
 ];
 
 const demoTypes = ["text", "number", "select", "checkbox", "link", "date", "custom"];
@@ -491,7 +500,9 @@ export default function App() {
           <p className="demo-copy">
             This sandbox now highlights keyboard-driven row and column selection plus viewport follow.
             Use arrow keys to move into cells that start off-screen, and try <strong>Ctrl/Cmd + Shift</strong>
-            with the arrow keys to grow the selection across one axis and then the other.
+            with the arrow keys to grow the selection across one axis and then the other. The
+            <strong> Series </strong>
+            column starts with <strong>1</strong> and <strong>2</strong> so drag-fill and double-click fill-down are easy to test.
           </p>
         </div>
 
@@ -502,7 +513,7 @@ export default function App() {
           </article>
           <article className="demo-stat-card">
             <span className="demo-stat-label">Visible at start</span>
-            <strong>9</strong>
+            <strong>10</strong>
           </article>
           <article className="demo-stat-card">
             <span className="demo-stat-label">Hidden at start</span>
@@ -572,6 +583,7 @@ export default function App() {
             <ol className="demo-steps">
               <li>Click Account in the first row, press <strong>Ctrl/Cmd + Shift + Right</strong>, then press <strong>Ctrl/Cmd + Shift + Down</strong>.</li>
               <li>Keep pressing the right arrow until the active cell reaches Website or Health and watch the grid scroll with it.</li>
+              <li>Select the first two cells in the <strong>Series</strong> column, then drag the fill handle or double-click it to continue <strong>1, 2, 3, 4...</strong>.</li>
               <li>Open the top-left <strong>+1</strong> badge and restore the hidden Notes column, then continue navigating into it with the keyboard.</li>
             </ol>
           </section>

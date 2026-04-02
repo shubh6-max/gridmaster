@@ -76,6 +76,7 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
 
         enableSorting: grid.enableSorting,
         enableFiltering: grid.enableFiltering,
+        enableFillHandle: grid.enableFillHandle,
         enableColumnResize: grid.enableColumnResize,
         enableColumnAutoFit: grid.enableColumnAutoFit,
         enableColumnVisibility: grid.enableColumnVisibility,
