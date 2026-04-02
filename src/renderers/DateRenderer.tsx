@@ -1,32 +1,25 @@
 import React from "react";
 import type { GridCellRendererProps, GridRow } from "../core/types";
-import { ensureHttps } from "../core/utils";
 
-export function LinkRenderer<T extends GridRow = GridRow>({
+export function DateRenderer<T extends GridRow = GridRow>({
   formattedValue,
   column,
 }: GridCellRendererProps<T>) {
-  if (!formattedValue) return null;
-
   return (
-    <a
-      href={ensureHttps(formattedValue)}
-      target="_blank"
-      rel="noreferrer"
-      onClick={(event) => event.stopPropagation()}
+    <span
       style={{
         display: "block",
+        width: "100%",
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: column.wrap ? "pre-wrap" : "nowrap",
-        color: "#2563eb",
-        textDecoration: "none",
+        textAlign: column.align ?? "left",
       }}
       title={formattedValue}
     >
       {formattedValue}
-    </a>
+    </span>
   );
 }
 
-export default LinkRenderer;
+export default DateRenderer;

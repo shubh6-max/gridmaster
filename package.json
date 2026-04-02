@@ -1,0 +1,45 @@
+{
+  "name": "gridmaster",
+  "version": "0.1.0",
+  "description": "Excel-like React grid library with selection, editing, sorting, filtering, clipboard, and spreadsheet-style UX.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "dev": "vite --mode demo --configLoader native",
+    "build": "npm run build:lib && npm run build:types",
+    "build:lib": "vite build --configLoader native",
+    "build:types": "tsc -p tsconfig.build.json",
+    "build:demo": "vite build --mode demo --configLoader native"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "lucide-react": "^1.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3"
+  }
+}

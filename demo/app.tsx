@@ -1,0 +1,451 @@
+import React, { useEffect, useRef, useState } from "react";
+import {
+  GridMaster,
+  createColumn,
+  type GridCellEditorProps,
+  type GridCellRendererProps,
+} from "../src";
+import "./demo.css";
+
+type Priority = "Critical" | "High" | "Medium" | "Low";
+type Status = "Discovery" | "Build" | "Pilot" | "Live";
+type Health = "On Track" | "Watch" | "Risk";
+
+type DemoRow = {
+  id: number;
+  account: string;
+  owner: string;
+  priority: Priority;
+  status: Status;
+  budgetK: number;
+  active: boolean;
+  launchDate: string;
+  website: string;
+  health: Health;
+  notes: string;
+};
+
+const HEALTH_OPTIONS: Health[] = ["On Track", "Watch", "Risk"];
+const PRIORITY_OPTIONS: Priority[] = ["Critical", "High", "Medium", "Low"];
+const STATUS_OPTIONS: Status[] = ["Discovery", "Build", "Pilot", "Live"];
+
+const healthStyles: Record<Health, { background: string; color: string; borderColor: string }> = {
+  "On Track": {
+    background: "#dcfce7",
+    color: "#166534",
+    borderColor: "#86efac",
+  },
+  Watch: {
+    background: "#fef3c7",
+    color: "#92400e",
+    borderColor: "#fcd34d",
+  },
+  Risk: {
+    background: "#fee2e2",
+    color: "#b91c1c",
+    borderColor: "#fca5a5",
+  },
+};
+
+const budgetFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
+
+function HealthBadge<T extends DemoRow = DemoRow>({
+  value,
+}: GridCellRendererProps<T>) {
+  const health = (value as Health) ?? "Watch";
+  const style = healthStyles[health] ?? healthStyles.Watch;
+
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minWidth: 88,
+        padding: "4px 10px",
+        borderRadius: 999,
+        border: `1px solid ${style.borderColor}`,
+        background: style.background,
+        color: style.color,
+        fontSize: 11,
+        fontWeight: 700,
+        lineHeight: 1,
+      }}
+    >
+      {health}
+    </span>
+  );
+}
+
+function HealthEditor<T extends DemoRow = DemoRow>({
+  value,
+  updateValue,
+  commit,
+  cancel,
+}: GridCellEditorProps<T>) {
+  const [localValue, setLocalValue] = useState<Health>((value as Health) ?? "Watch");
+  const selectRef = useRef<HTMLSelectElement>(null);
+
+  useEffect(() => {
+    setLocalValue((value as Health) ?? "Watch");
+  }, [value]);
+
+  useEffect(() => {
+    selectRef.current?.focus();
+  }, []);
+
+  return (
+    <select
+      ref={selectRef}
+      value={localValue}
+      onChange={(event) => {
+        const nextValue = event.target.value as Health;
+        setLocalValue(nextValue);
+        updateValue(nextValue);
+      }}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          commit();
+          return;
+        }
+
+        if (event.key === "Escape") {
+          event.preventDefault();
+          cancel();
+          return;
+        }
+
+        if (event.key === "Tab") {
+          event.preventDefault();
+          commit();
+          return;
+        }
+
+        event.stopPropagation();
+      }}
+      style={{
+        width: "100%",
+        height: "100%",
+        border: "none",
+        outline: "none",
+        background: "transparent",
+        fontSize: 12,
+        fontFamily: "inherit",
+        color: "inherit",
+      }}
+    >
+      {HEALTH_OPTIONS.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+const columns = [
+  createColumn.text<DemoRow>("account", {
+    title: "Account",
+    width: 220,
+    validate: (value) =>
+      String(value ?? "").trim().length >= 3 ? null : "Account name should be at least 3 characters.",
+  }),
+  createColumn.text<DemoRow>("owner", {
+    title: "Owner",
+    width: 150,
+  }),
+  createColumn.select<DemoRow>("priority", {
+    title: "Priority",
+    width: 130,
+    options: PRIORITY_OPTIONS,
+  }),
+  createColumn.select<DemoRow>("status", {
+    title: "Status",
+    width: 140,
+    options: STATUS_OPTIONS,
+  }),
+  createColumn.number<DemoRow>("budgetK", {
+    title: "Budget (K)",
+    width: 140,
+    formatValue: (value) => (value == null ? "" : `$${budgetFormatter.format(Number(value))}K`),
+    validate: (value) => {
+      if (value == null) return "Budget is required.";
+      if (Number(value) < 50 || Number(value) > 600) {
+        return "Budget must stay between 50K and 600K.";
+      }
+
+      return null;
+    },
+  }),
+  createColumn.checkbox<DemoRow>("active", {
+    title: "Live",
+    width: 100,
+  }),
+  createColumn.date<DemoRow>("launchDate", {
+    title: "Launch",
+    width: 138,
+  }),
+  createColumn.link<DemoRow>("website", {
+    title: "Website",
+    width: 220,
+    validate: (value) =>
+      String(value ?? "").includes(".") ? null : "Website should include a valid domain.",
+  }),
+  createColumn.custom<DemoRow>("health", {
+    title: "Health",
+    width: 132,
+    renderCell: (props) => <HealthBadge {...props} />,
+    renderEditor: (props) => <HealthEditor {...props} />,
+  }),
+  createColumn.text<DemoRow>("notes", {
+    title: "Notes",
+    width: 280,
+    wrap: true,
+    hidden: true,
+  }),
+];
+
+const initialRows: DemoRow[] = [
+  {
+    id: 1,
+    account: "Northwind Retail",
+    owner: "Asha",
+    priority: "Critical",
+    status: "Build",
+    budgetK: 420,
+    active: true,
+    launchDate: "2026-04-08",
+    website: "northwindretail.com",
+    health: "On Track",
+    notes: "Pricing workbook is hidden by default so the unhide flow can be tested immediately.",
+  },
+  {
+    id: 2,
+    account: "BluePeak Health",
+    owner: "Rahul",
+    priority: "High",
+    status: "Pilot",
+    budgetK: 260,
+    active: true,
+    launchDate: "2026-04-15",
+    website: "bluepeakhealth.io",
+    health: "Watch",
+    notes: "Pilot feedback is positive, but mobile approvals still need sign-off.",
+  },
+  {
+    id: 3,
+    account: "Atlas Mobility",
+    owner: "Neha",
+    priority: "Medium",
+    status: "Discovery",
+    budgetK: 140,
+    active: false,
+    launchDate: "2026-05-03",
+    website: "atlasmobility.ai",
+    health: "On Track",
+    notes: "Requirements workshop is scheduled for next week.",
+  },
+  {
+    id: 4,
+    account: "Harbor Energy",
+    owner: "Dev",
+    priority: "High",
+    status: "Build",
+    budgetK: 310,
+    active: true,
+    launchDate: "2026-04-22",
+    website: "harborenergy.co",
+    health: "Watch",
+    notes: "Finance wants one additional approval column before go-live.",
+  },
+  {
+    id: 5,
+    account: "Summit Foods",
+    owner: "Priya",
+    priority: "Low",
+    status: "Live",
+    budgetK: 120,
+    active: true,
+    launchDate: "2026-03-27",
+    website: "summitfoods.com",
+    health: "On Track",
+    notes: "This program is stable and useful for sorting plus filter demos.",
+  },
+  {
+    id: 6,
+    account: "Lumen Logistics",
+    owner: "Ishaan",
+    priority: "Critical",
+    status: "Pilot",
+    budgetK: 500,
+    active: false,
+    launchDate: "2026-04-29",
+    website: "lumenlogistics.net",
+    health: "Risk",
+    notes: "Data mapping is blocked on warehouse partner extracts.",
+  },
+  {
+    id: 7,
+    account: "Verde Finance",
+    owner: "Kriti",
+    priority: "Medium",
+    status: "Build",
+    budgetK: 210,
+    active: true,
+    launchDate: "2026-05-12",
+    website: "verdefinance.com",
+    health: "Watch",
+    notes: "Good candidate for freeze, resize, and column visibility checks.",
+  },
+  {
+    id: 8,
+    account: "Orbit Telecom",
+    owner: "Rohan",
+    priority: "High",
+    status: "Discovery",
+    budgetK: 160,
+    active: false,
+    launchDate: "2026-05-18",
+    website: "orbittelecom.org",
+    health: "Risk",
+    notes: "Stakeholders are still aligning on the scorecard definition.",
+  },
+  {
+    id: 9,
+    account: "Crescent Pharma",
+    owner: "Mira",
+    priority: "Critical",
+    status: "Live",
+    budgetK: 540,
+    active: true,
+    launchDate: "2026-03-31",
+    website: "crescentpharma.com",
+    health: "On Track",
+    notes: "Use this row for fast link, checkbox, and status edits.",
+  },
+  {
+    id: 10,
+    account: "Aurora Travel",
+    owner: "Vikram",
+    priority: "Low",
+    status: "Pilot",
+    budgetK: 90,
+    active: false,
+    launchDate: "2026-05-25",
+    website: "auroratravel.co",
+    health: "Watch",
+    notes: "Notes column becomes handy once it is restored from the visibility manager.",
+  },
+];
+
+const availableFeatures = [
+  "Resize columns from the header handle.",
+  "Double-click a resize handle to auto-fit width.",
+  "Sort or clear sort from any column menu.",
+  "Filter by visible values and clear filters.",
+  "Freeze or unfreeze columns through a chosen header.",
+  "Hide and show columns, including the Notes column that starts hidden.",
+  "Edit text, number, select, checkbox, link, date, and custom cells.",
+  "See validation markers on invalid values while editing.",
+];
+
+const demoTypes = ["text", "number", "select", "checkbox", "link", "date", "custom"];
+
+export default function App() {
+  const [rows, setRows] = useState<DemoRow[]>(initialRows);
+
+  return (
+    <div className="demo-shell">
+      <section className="demo-hero">
+        <div>
+          <p className="demo-eyebrow">Phase 3 + Phase 4 demo</p>
+          <h1 className="demo-title">Premium columns, full editors, and richer sample data</h1>
+          <p className="demo-copy">
+            One column starts hidden on purpose, so the new visibility recovery flow is easy to verify.
+            Use the <strong>+1</strong> badge in the top-left grid corner or any column menu to bring the
+            hidden Notes column back.
+          </p>
+        </div>
+
+        <div className="demo-stat-grid">
+          <article className="demo-stat-card">
+            <span className="demo-stat-label">Rows</span>
+            <strong>{rows.length}</strong>
+          </article>
+          <article className="demo-stat-card">
+            <span className="demo-stat-label">Visible at start</span>
+            <strong>9</strong>
+          </article>
+          <article className="demo-stat-card">
+            <span className="demo-stat-label">Hidden at start</span>
+            <strong>1</strong>
+          </article>
+          <article className="demo-stat-card">
+            <span className="demo-stat-label">Frozen by default</span>
+            <strong>2</strong>
+          </article>
+        </div>
+      </section>
+
+      <div className="demo-layout">
+        <aside className="demo-sidebar">
+          <section className="demo-card">
+            <h2>Available features</h2>
+            <ul className="demo-checklist">
+              {availableFeatures.map((item) => (
+                <li key={item}>
+                  <input type="checkbox" checked readOnly />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="demo-card">
+            <h2>Column types in this demo</h2>
+            <div className="demo-pill-list">
+              {demoTypes.map((type) => (
+                <span key={type} className="demo-pill">
+                  {type}
+                </span>
+              ))}
+            </div>
+          </section>
+
+          <section className="demo-card">
+            <h2>Quick things to try</h2>
+            <ol className="demo-steps">
+              <li>Open the top-left <strong>+1</strong> badge and restore the hidden Notes column.</li>
+              <li>Double-click a resize handle on Account or Website to auto-fit the content.</li>
+              <li>Edit Budget or Website with an invalid value to see the validation marker.</li>
+            </ol>
+          </section>
+        </aside>
+
+        <main className="demo-card demo-grid-card">
+          <div className="demo-grid-header">
+            <div>
+              <h2>Program portfolio sandbox</h2>
+              <p>
+                Sorting, filtering, freezing, column visibility, and all editor types are wired into this one
+                data set.
+              </p>
+            </div>
+          </div>
+
+          <GridMaster<DemoRow>
+            rows={rows}
+            columns={columns}
+            onRowsChange={setRows}
+            frozenColumns={2}
+            height="70vh"
+          />
+        </main>
+      </div>
+    </div>
+  );
+}

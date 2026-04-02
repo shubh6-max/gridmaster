@@ -1,0 +1,13 @@
+:root {
+  --gm-color-bg: #ffffff;
+  --gm-color-bg-subtle: #f8fafc;
+  --gm-color-border: #e2e8f0;
+  --gm-color-border-strong: #cbd5e1;
+  --gm-color-header: #dbeafe;
+  --gm-color-header-hover: #bfdbfe;
+  --gm-color-text: #0f172a;
+  --gm-color-text-muted: #64748b;
+  --gm-color-primary: #2563eb;
+  --gm-color-selection: #dbeafe;
+  --gm-color-status-bg: #0f172a;
+}
