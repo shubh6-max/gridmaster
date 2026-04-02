@@ -6,6 +6,7 @@ export function CheckboxEditor<T extends GridRow = GridRow>({
   commit,
   cancel,
   updateValue,
+  requestViewportFocusAfterEdit,
 }: GridCellEditorProps<T>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const checked = Boolean(value);
@@ -36,12 +37,14 @@ export function CheckboxEditor<T extends GridRow = GridRow>({
         onKeyDown={(e) => {
           if (e.key === "Escape") {
             e.preventDefault();
+            requestViewportFocusAfterEdit?.();
             cancel();
             return;
           }
 
           if (e.key === "Enter" || e.key === "Tab") {
             e.preventDefault();
+            requestViewportFocusAfterEdit?.();
             commit();
             return;
           }

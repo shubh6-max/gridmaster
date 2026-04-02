@@ -3,15 +3,23 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const {
+  createFormulaCellReference,
   createColumn,
   createConditionFilter,
   createFormulaEvaluator,
   evaluateGridCell,
   getDisplayRowIndexes,
+  insertCellReferenceIntoFormula,
   resolveColumns,
 } = require("../dist/index.cjs");
 
 export function runFormulaTests() {
+  assert.equal(createFormulaCellReference(0, 0), "A1");
+  assert.equal(insertCellReferenceIntoFormula("=", "A1"), "=A1");
+  assert.equal(insertCellReferenceIntoFormula("=A1+", "B1"), "=A1+B1");
+  assert.equal(insertCellReferenceIntoFormula("=A1", "B1"), "=B1");
+  assert.equal(insertCellReferenceIntoFormula("=SUM(", "A1"), "=SUM(A1");
+
   const columns = resolveColumns([
     createColumn.number("base", { title: "Base" }),
     createColumn.number("delta", { title: "Delta" }),

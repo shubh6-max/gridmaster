@@ -5,6 +5,8 @@ export function TextRenderer<T extends GridRow = GridRow>({
   formattedValue,
   column,
 }: GridCellRendererProps<T>) {
+  const shouldWrap = column.wrap || formattedValue.includes("\n");
+
   return (
     <span
       style={{
@@ -12,7 +14,7 @@ export function TextRenderer<T extends GridRow = GridRow>({
         width: "100%",
         overflow: "hidden",
         textOverflow: "ellipsis",
-        whiteSpace: column.wrap ? "pre-wrap" : "nowrap",
+        whiteSpace: shouldWrap ? "pre-wrap" : "nowrap",
         textAlign: column.align ?? "left",
       }}
       title={formattedValue}

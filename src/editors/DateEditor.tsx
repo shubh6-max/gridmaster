@@ -12,6 +12,7 @@ export function DateEditor<T extends GridRow = GridRow>({
   commit,
   cancel,
   updateValue,
+  requestViewportFocusAfterEdit,
 }: GridCellEditorProps<T>) {
   const [localValue, setLocalValue] = useState<string>(getEditorDateValue(value));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -39,18 +40,21 @@ export function DateEditor<T extends GridRow = GridRow>({
       onKeyDown={(event) => {
         if (event.key === "Enter") {
           event.preventDefault();
+          requestViewportFocusAfterEdit?.();
           commit();
           return;
         }
 
         if (event.key === "Escape") {
           event.preventDefault();
+          requestViewportFocusAfterEdit?.();
           cancel();
           return;
         }
 
         if (event.key === "Tab") {
           event.preventDefault();
+          requestViewportFocusAfterEdit?.();
           commit();
           return;
         }

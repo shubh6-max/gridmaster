@@ -491,6 +491,7 @@ const availableFeatures = [
   "Move with arrow keys and let the viewport follow when the active cell goes off-screen.",
   "Drag the fill handle or double-click it to continue a numeric series down the grid.",
   "Type spreadsheet formulas like =F1*1.1, =SUM(F1:F3), and =IF(H2,F2,0).",
+  "Start a formula with =, then click other cells to insert references while you keep editing.",
 ];
 
 const demoTypes = ["text", "number", "select", "checkbox", "link", "date", "custom"];
@@ -611,6 +612,7 @@ export default function App() {
               <li>Click Account in the first row, press <strong>Ctrl/Cmd + Shift + Right</strong>, then press <strong>Ctrl/Cmd + Shift + Down</strong>.</li>
               <li>Keep pressing the right arrow until the active cell reaches Website or Health and watch the grid scroll with it.</li>
               <li>Select the first two cells in the <strong>Series</strong> column, then drag the fill handle or double-click it to continue <strong>1, 2, 3, 4...</strong>.</li>
+              <li>Start editing an empty Forecast cell with <strong>=</strong>, click Budget, type <strong>+</strong>, then click Series to build the formula from cell picks.</li>
               <li>Select a cell in <strong>Forecast (K)</strong> and confirm the formula bar shows raw entries like <strong>=SUM(F1:F3)</strong> while the cell shows the computed total.</li>
               <li>Open the top-left <strong>+1</strong> badge and restore the hidden Notes column, then continue navigating into it with the keyboard.</li>
             </ol>

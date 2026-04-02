@@ -161,6 +161,7 @@ export type GridCellEditorProps<T extends GridRow = GridRow> = GridCellContext<T
   updateValue: (nextValue: any) => void;
   commit: () => void;
   cancel: () => void;
+  requestViewportFocusAfterEdit?: () => void;
 };
 
 /* =========================================================

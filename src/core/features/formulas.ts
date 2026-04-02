@@ -1,5 +1,6 @@
 import type { GridColumnDef, GridResolvedColumnDef, GridRow } from "../types";
 import {
+  cellAddress,
   formatCellValue,
   getRowValue,
   isFormulaValue,
@@ -83,6 +84,49 @@ export const GRID_FORMULA_REF = "#REF!";
 export const GRID_FORMULA_DIV_ZERO = "#DIV/0!";
 export const GRID_FORMULA_NAME = "#NAME?";
 export const GRID_FORMULA_VALUE = "#VALUE!";
+
+export function insertCellReferenceIntoFormula(
+  formula: string,
+  reference: string
+): string {
+  const current = String(formula ?? "");
+  const trimmedStart = current.trimStart();
+
+  if (!trimmedStart) {
+    return `=${reference}`;
+  }
+
+  if (!trimmedStart.startsWith("=")) {
+    return current;
+  }
+
+  const trimmedEnd = current.replace(/\s+$/, "");
+  const trailingReferenceMatch =
+    /([A-Z]+[1-9][0-9]*(?::[A-Z]+[1-9][0-9]*)?)$/i.exec(trimmedEnd);
+
+  if (trailingReferenceMatch) {
+    const matchIndex = trailingReferenceMatch.index;
+    const prefix = trimmedEnd.slice(0, matchIndex);
+    const previousChar = prefix.trimEnd().slice(-1);
+
+    if (
+      !previousChar ||
+      previousChar === "=" ||
+      "+-*/(,<>:".includes(previousChar)
+    ) {
+      return `${prefix}${reference}`;
+    }
+  }
+
+  return `${trimmedEnd}${reference}`;
+}
+
+export function createFormulaCellReference(
+  rowIndex: number,
+  columnIndex: number
+): string {
+  return cellAddress(rowIndex, columnIndex);
+}
 
 function tokenizeFormula(input: string): GridFormulaToken[] {
   const tokens: GridFormulaToken[] = [];

@@ -63,6 +63,9 @@ import { clamp, cloneRows, resolveColumns, shallowEqualRows } from "../../core/u
 export type UseGridMasterResult<T extends GridRow = GridRow> = {
   props: GridMasterProps<T>;
 
+  viewportRef: React.RefObject<HTMLDivElement | null>;
+  focusViewport: () => void;
+
   rows: T[];
   setRows: (rows: T[]) => void;
 
@@ -138,6 +141,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
   incomingProps: GridMasterProps<T>
 ): UseGridMasterResult<T> {
   const props = incomingProps;
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const mode = props.mode ?? DEFAULT_GRID_MODE;
   const height = props.height ?? DEFAULT_GRID_HEIGHT;
@@ -423,6 +427,10 @@ export function useGridMaster<T extends GridRow = GridRow>(
     [props]
   );
 
+  const focusViewport = useCallback(() => {
+    viewportRef.current?.focus({ preventScroll: true });
+  }, []);
+
   useEffect(() => {
     props.onSelectionChange?.({ selection });
   }, [selection, props]);
@@ -437,6 +445,9 @@ export function useGridMaster<T extends GridRow = GridRow>(
 
   return {
     props,
+
+    viewportRef,
+    focusViewport,
 
     rows,
     setRows,

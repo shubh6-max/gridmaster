@@ -12,12 +12,14 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
   const editing = useEditing({
     mode: grid.mode,
     rows: grid.rows,
+    columns: grid.columns,
     displayRowIndexes: grid.displayRowIndexes,
     visibleColumns: grid.visibleColumns,
     selection: grid.selection,
     editingCell: grid.editingCell,
     setEditingCell: grid.setEditingCell,
     updateRows: grid.updateRows,
+    focusViewport: grid.focusViewport,
     emitCellChange: grid.emitCellChange,
   });
 
@@ -25,6 +27,9 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
     <GridProvider
       value={{
         props: grid.props,
+
+        viewportRef: grid.viewportRef,
+        focusViewport: grid.focusViewport,
 
         rows: grid.rows,
         displayRows: grid.displayRows,
@@ -39,7 +44,9 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         history: grid.history,
         selection: grid.selection,
         editingCell: grid.editingCell,
+        editingOrigin: editing.editingOrigin,
         editingValue: editing.editingValue,
+        isFormulaEditing: editing.isFormulaEditing,
         sort: grid.sort,
         filters: grid.filters,
         clipboard: grid.clipboard,
@@ -59,7 +66,9 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         updateRows: grid.updateRows,
         emitCellChange: grid.emitCellChange,
         setEditingValue: editing.setEditingValue,
+        requestViewportFocusAfterEdit: editing.requestViewportFocusAfterEdit,
         startEditing: editing.startEditing,
+        insertFormulaReference: editing.insertFormulaReference,
         commitEditing: editing.commitEditing,
         cancelEditing: editing.cancelEditing,
 

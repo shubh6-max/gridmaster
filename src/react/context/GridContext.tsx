@@ -19,6 +19,9 @@ import type { GridFormulaEvaluator } from "../../core/features/formulas";
 export type GridContextValue<T extends GridRow = GridRow> = {
   props: GridMasterProps<T>;
 
+  viewportRef: React.RefObject<HTMLDivElement | null>;
+  focusViewport: () => void;
+
   rows: T[];
   displayRows: T[];
   displayRowIndexes: number[];
@@ -32,7 +35,9 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   history: GridHistoryState;
   selection: GridSelectionState;
   editingCell: GridEditCell;
+  editingOrigin: "cell" | "formulaBar" | null;
   editingValue: unknown;
+  isFormulaEditing: boolean;
   sort: GridSort;
   filters: GridFilters;
   clipboard: GridClipboardData;
@@ -52,7 +57,13 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   updateRows: (rows: T[]) => void;
   emitCellChange?: (event: GridCellChangeEvent<T>) => void;
   setEditingValue: React.Dispatch<React.SetStateAction<unknown>>;
-  startEditing: (cell?: GridEditCell, initialValue?: unknown) => boolean;
+  requestViewportFocusAfterEdit: () => void;
+  startEditing: (
+    cell?: GridEditCell,
+    initialValue?: unknown,
+    origin?: "cell" | "formulaBar"
+  ) => boolean;
+  insertFormulaReference: (displayRowIndex: number, visibleColumnIndex: number) => boolean;
   commitEditing: (nextValue?: unknown) => boolean;
   cancelEditing: () => void;
 

@@ -7,6 +7,7 @@ import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation";
 
 export function GridViewport() {
   const {
+    viewportRef,
     rows,
     displayRows,
     displayRowIndexes,
@@ -23,9 +24,9 @@ export function GridViewport() {
     mode,
     startEditing,
     cancelEditing,
+    isFormulaEditing,
   } = useGridContext();
 
-  const containerRef = React.useRef<HTMLDivElement>(null);
   const { clearSelection, copy, cut, paste } = useClipboard({
     rows,
     displayRows,
@@ -38,7 +39,7 @@ export function GridViewport() {
   });
 
   useKeyboardNavigation({
-    containerRef,
+    containerRef: viewportRef,
     rows: displayRows,
     columns: visibleColumns,
     selection,
@@ -60,7 +61,7 @@ export function GridViewport() {
   });
 
   React.useEffect(() => {
-    const container = containerRef.current;
+    const container = viewportRef.current;
     if (!container) return;
 
     const frameId = window.requestAnimationFrame(() => {
@@ -123,7 +124,7 @@ export function GridViewport() {
 
   return (
     <div
-      ref={containerRef}
+      ref={viewportRef}
       className="gm-viewport"
       onMouseDownCapture={(event) => {
         const target = event.target as HTMLElement | null;
@@ -134,9 +135,11 @@ export function GridViewport() {
           tag === "SELECT" ||
           tag === "BUTTON" ||
           tag === "A";
+        const isGridCellTarget =
+          target?.closest?.(".gm-td") || target?.closest?.(".gm-rh");
 
-        if (!isInteractive) {
-          containerRef.current?.focus({ preventScroll: true });
+        if (!isInteractive && !(isFormulaEditing && isGridCellTarget)) {
+          viewportRef.current?.focus({ preventScroll: true });
         }
       }}
       style={{

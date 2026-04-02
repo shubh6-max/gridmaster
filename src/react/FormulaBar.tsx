@@ -11,22 +11,23 @@ export function FormulaBar() {
     editingCell,
     editingValue,
     setEditingValue,
+    requestViewportFocusAfterEdit,
     startEditing,
     commitEditing,
     cancelEditing,
   } = useGridContext();
 
-  const activeRowIndex = selection?.cursor?.row ?? 0;
-  const activeColIndex = selection?.cursor?.col ?? 0;
+  const targetRowIndex = editingCell?.row ?? selection?.cursor?.row ?? 0;
+  const targetColIndex = editingCell?.col ?? selection?.cursor?.col ?? 0;
 
-  const row = displayRows[activeRowIndex];
-  const column = visibleColumns[activeColIndex];
+  const row = displayRows[targetRowIndex];
+  const column = visibleColumns[targetColIndex];
 
   const rawValue = row && column ? getRowValue(row, column) : "";
   const stringValue = rawValue == null ? "" : String(rawValue);
   const isReadonly = mode === "readonly" || !column || column.readonly || !column.editable;
   const isEditingActiveCell =
-    editingCell?.row === activeRowIndex && editingCell?.col === activeColIndex;
+    editingCell?.row === targetRowIndex && editingCell?.col === targetColIndex;
   const draftValue = isEditingActiveCell ? String(editingValue ?? "") : stringValue;
 
   return (
@@ -57,7 +58,7 @@ export function FormulaBar() {
           textAlign: "center",
         }}
       >
-        {cellAddress(activeRowIndex, activeColIndex)}
+        {cellAddress(targetRowIndex, targetColIndex)}
       </div>
 
       <div
@@ -77,13 +78,25 @@ export function FormulaBar() {
         {column?.title ?? "No column"}
       </div>
 
-      <input
+      <textarea
+        rows={1}
         value={draftValue}
         readOnly={isReadonly}
-        onChange={(event) => setEditingValue(event.target.value)}
+        onChange={(event) => {
+          if (!isEditingActiveCell && !isReadonly) {
+            startEditing(
+              { row: targetRowIndex, col: targetColIndex },
+              event.target.value,
+              "formulaBar"
+            );
+            return;
+          }
+
+          setEditingValue(event.target.value);
+        }}
         onFocus={() => {
           if (!isReadonly) {
-            startEditing({ row: activeRowIndex, col: activeColIndex });
+            startEditing({ row: targetRowIndex, col: targetColIndex }, undefined, "formulaBar");
           }
         }}
         onBlur={() => {
@@ -92,14 +105,21 @@ export function FormulaBar() {
           }
         }}
         onKeyDown={(event) => {
+          if (event.key === "Enter" && event.altKey) {
+            event.stopPropagation();
+            return;
+          }
+
           if (event.key === "Enter") {
             event.preventDefault();
+            requestViewportFocusAfterEdit();
             commitEditing();
             return;
           }
 
           if (event.key === "Escape") {
             event.preventDefault();
+            requestViewportFocusAfterEdit();
             cancelEditing();
             return;
           }
@@ -116,6 +136,8 @@ export function FormulaBar() {
           fontSize: 12,
           color: "#0f172a",
           outline: "none",
+          resize: "none",
+          lineHeight: 1.4,
         }}
       />
     </div>

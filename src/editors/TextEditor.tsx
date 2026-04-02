@@ -6,9 +6,10 @@ export function TextEditor<T extends GridRow = GridRow>({
   commit,
   cancel,
   updateValue,
+  requestViewportFocusAfterEdit,
 }: GridCellEditorProps<T>) {
   const [localValue, setLocalValue] = useState<string>(value == null ? "" : String(value));
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setLocalValue(value == null ? "" : String(value));
@@ -20,8 +21,9 @@ export function TextEditor<T extends GridRow = GridRow>({
   }, []);
 
   return (
-    <input
+    <textarea
       ref={inputRef}
+      rows={1}
       value={localValue}
       onChange={(e) => {
         const next = e.target.value;
@@ -30,20 +32,28 @@ export function TextEditor<T extends GridRow = GridRow>({
       }}
       onBlur={commit}
       onKeyDown={(e) => {
+        if (e.key === "Enter" && e.altKey) {
+          e.stopPropagation();
+          return;
+        }
+
         if (e.key === "Enter") {
           e.preventDefault();
+          requestViewportFocusAfterEdit?.();
           commit();
           return;
         }
 
         if (e.key === "Escape") {
           e.preventDefault();
+          requestViewportFocusAfterEdit?.();
           cancel();
           return;
         }
 
         if (e.key === "Tab") {
           e.preventDefault();
+          requestViewportFocusAfterEdit?.();
           commit();
           return;
         }
@@ -61,6 +71,7 @@ export function TextEditor<T extends GridRow = GridRow>({
         fontSize: 12,
         fontFamily: "inherit",
         color: "inherit",
+        resize: "none",
       }}
     />
   );

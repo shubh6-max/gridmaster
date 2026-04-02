@@ -1,7 +1,7 @@
 import React from "react";
 import { DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
-import { isCellActive, isCellSelected } from "../core/state/selectionState";
+import { isCellActive, isCellSelected, setActiveCell } from "../core/state/selectionState";
 import { resolveGridRowId } from "../core/utils";
 import { useFillHandle } from "./hooks/useFillHandle";
 import { useSelection } from "./hooks/useSelection";
@@ -17,6 +17,8 @@ export function GridBody() {
     rows,
     selection,
     setSelection,
+    isFormulaEditing,
+    insertFormulaReference,
     fill,
     setFill,
     updateRows,
@@ -123,11 +125,20 @@ export function GridBody() {
                     .filter(Boolean)
                     .join(" ")}
                   onMouseDown={(e) =>
-                    onCellMouseDown(rowIndex, colIndex, {
-                      shiftKey: e.shiftKey,
-                      ctrlKey: e.ctrlKey,
-                      metaKey: e.metaKey,
-                    })
+                    {
+                      if (isFormulaEditing) {
+                        e.preventDefault();
+                        setSelection((prev) => setActiveCell(prev, { row: rowIndex, col: colIndex }));
+                        insertFormulaReference(rowIndex, colIndex);
+                        return;
+                      }
+
+                      onCellMouseDown(rowIndex, colIndex, {
+                        shiftKey: e.shiftKey,
+                        ctrlKey: e.ctrlKey,
+                        metaKey: e.metaKey,
+                      });
+                    }
                   }
                   onMouseEnter={() => {
                     onCellMouseEnter(rowIndex, colIndex);

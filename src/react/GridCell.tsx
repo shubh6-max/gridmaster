@@ -32,9 +32,11 @@ export function GridCell<T extends GridRow = GridRow>({
     updateRows,
     emitCellChange,
     editingCell,
+    editingOrigin,
     editingValue,
     setEditingValue,
     startEditing,
+    requestViewportFocusAfterEdit,
     commitEditing,
     cancelEditing,
   } = useGridContext<T>();
@@ -46,9 +48,10 @@ export function GridCell<T extends GridRow = GridRow>({
     ? formulaResult.error
     : formatCellValue(value, row, column);
   const isReadonly = mode === "readonly" || column.readonly || !column.editable;
-  const isEditing = editingCell?.row === rowIndex && editingCell?.col === columnIndex;
-  const draftValue = isEditing ? editingValue : rawValue;
-  const parsedDraftValue = isEditing ? parseCellValue(draftValue, row, column) : value;
+  const isEditingCell = editingCell?.row === rowIndex && editingCell?.col === columnIndex;
+  const isEditing = isEditingCell && editingOrigin !== "formulaBar";
+  const draftValue = isEditingCell ? editingValue : rawValue;
+  const parsedDraftValue = isEditingCell ? parseCellValue(draftValue, row, column) : value;
   const validationError =
     formulaResult.error || isFormulaValue(parsedDraftValue)
       ? null
@@ -112,6 +115,7 @@ export function GridCell<T extends GridRow = GridRow>({
       updateValue: updateDraftValue,
       commit: () => commitEditing(),
       cancel: cancelEditing,
+      requestViewportFocusAfterEdit,
     };
 
     return (
