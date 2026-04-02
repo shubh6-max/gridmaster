@@ -24,8 +24,6 @@ import {
   hasColumnSelection,
   hasRowSelection,
   selectAllCells,
-  selectSingleColumn,
-  selectSingleRow,
 } from "../../core/state/selectionState";
 
 type UseKeyboardNavigationParams<T extends GridRow = GridRow> = {
@@ -71,28 +69,92 @@ function selectAxisByArrowShortcut(
   const current = getCurrentCell(state);
   const rowIndex = Math.min(Math.max(current.row, 0), bounds.totalRows - 1);
   const colIndex = Math.min(Math.max(current.col, 0), bounds.totalCols - 1);
+  const lastRow = bounds.totalRows - 1;
+  const lastCol = bounds.totalCols - 1;
+  const range = state.range
+    ? {
+        startRow: Math.min(state.range.start.row, state.range.end.row),
+        endRow: Math.max(state.range.start.row, state.range.end.row),
+        startCol: Math.min(state.range.start.col, state.range.end.col),
+        endCol: Math.max(state.range.start.col, state.range.end.col),
+      }
+    : {
+        startRow: rowIndex,
+        endRow: rowIndex,
+        startCol: colIndex,
+        endCol: colIndex,
+      };
+  const isSingleCell =
+    range.startRow === range.endRow && range.startCol === range.endCol;
 
-  const activeCell = { row: rowIndex, col: colIndex };
+  let startRow = range.startRow;
+  let endRow = range.endRow;
+  let startCol = range.startCol;
+  let endCol = range.endCol;
 
   if (key === KEYBOARD_KEYS.ARROW_LEFT || key === KEYBOARD_KEYS.ARROW_RIGHT) {
-    const nextSelection = selectSingleRow(state, rowIndex, bounds.totalCols);
-    return {
-      ...nextSelection,
-      anchor: activeCell,
-      cursor: activeCell,
-    };
+    if (isSingleCell) {
+      startRow = rowIndex;
+      endRow = rowIndex;
+      startCol = 0;
+      endCol = lastCol;
+    } else if (key === KEYBOARD_KEYS.ARROW_LEFT) {
+      startCol = 0;
+    } else {
+      endCol = lastCol;
+    }
+  } else if (key === KEYBOARD_KEYS.ARROW_UP || key === KEYBOARD_KEYS.ARROW_DOWN) {
+    if (isSingleCell) {
+      startRow = 0;
+      endRow = lastRow;
+      startCol = colIndex;
+      endCol = colIndex;
+    } else if (key === KEYBOARD_KEYS.ARROW_UP) {
+      startRow = 0;
+    } else {
+      endRow = lastRow;
+    }
+  } else {
+    return state;
   }
 
-  if (key === KEYBOARD_KEYS.ARROW_UP || key === KEYBOARD_KEYS.ARROW_DOWN) {
-    const nextSelection = selectSingleColumn(state, colIndex, bounds.totalRows);
-    return {
-      ...nextSelection,
-      anchor: activeCell,
-      cursor: activeCell,
-    };
+  const fullWidth = startCol === 0 && endCol === lastCol;
+  const fullHeight = startRow === 0 && endRow === lastRow;
+  const selectedRows = new Set<number>();
+  const selectedCols = new Set<number>();
+
+  if (fullWidth) {
+    for (let row = startRow; row <= endRow; row++) {
+      selectedRows.add(row);
+    }
   }
 
-  return state;
+  if (fullHeight) {
+    for (let col = startCol; col <= endCol; col++) {
+      selectedCols.add(col);
+    }
+  }
+
+  return {
+    mode:
+      fullWidth && fullHeight
+        ? "all"
+        : fullWidth
+        ? "row"
+        : fullHeight
+        ? "column"
+        : isSingleCell
+        ? "cell"
+        : "range",
+    anchor: { row: startRow, col: startCol },
+    cursor: { row: endRow, col: endCol },
+    range: {
+      start: { row: startRow, col: startCol },
+      end: { row: endRow, col: endCol },
+    },
+    selectedRows,
+    selectedCols,
+  };
 }
 
 export function useKeyboardNavigation<T extends GridRow = GridRow>({

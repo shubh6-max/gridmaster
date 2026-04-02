@@ -65,6 +65,7 @@ That is the intended happy path:
 
 - `Ctrl + Shift + Left/Right` selects the full active row. On macOS, use `Cmd + Shift + Left/Right`.
 - `Ctrl + Shift + Up/Down` selects the full active column. On macOS, use `Cmd + Shift + Up/Down`.
+- Repeating the shortcut on the other axis expands the current selection, so `Ctrl/Cmd + Shift + Right` followed by `Ctrl/Cmd + Shift + Down` grows the selection downward instead of replacing it.
 - Holding `Alt` on Windows/Linux or `Option` on macOS as an extra modifier also works for these row and column selection shortcuts.
 
 ## Presets
