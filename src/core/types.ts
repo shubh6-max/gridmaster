@@ -114,6 +114,14 @@ export type GridFillState = {
   current: GridCellCoord;
 } | null;
 
+export type GridFormatPainterMode = "idle" | "single" | "locked";
+
+export type GridFormatPainterClipboard = {
+  rows: number;
+  cols: number;
+  meta: Record<string, GridCellMeta>;
+} | null;
+
 /* =========================================================
    Cell meta / row meta
    ========================================================= */
@@ -353,6 +361,7 @@ export type GridState<T extends GridRow = GridRow> = {
   filters: GridFilters;
   clipboard: GridClipboardData;
   fill: GridFillState;
+  formatPainter: GridFormatPainterClipboard;
   ui: GridUiState;
 };
 

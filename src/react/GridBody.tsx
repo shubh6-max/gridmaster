@@ -2,7 +2,7 @@ import React from "react";
 import { DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
 import { isCellActive, isCellSelected, setActiveCell } from "../core/state/selectionState";
-import { resolveGridRowId } from "../core/utils";
+import { createCellMetaKey, resolveGridRowId } from "../core/utils";
 import { useFillHandle } from "./hooks/useFillHandle";
 import { useSelection } from "./hooks/useSelection";
 import { useGridContext } from "./context/GridContext";
@@ -17,8 +17,11 @@ export function GridBody() {
     rows,
     selection,
     setSelection,
+    cellMetaMap,
     isFormulaEditing,
     insertFormulaReference,
+    formatPainterMode,
+    paintFormatAtCell,
     fill,
     setFill,
     updateRows,
@@ -110,6 +113,16 @@ export function GridBody() {
               const active = isCellActive(selection, rowIndex, colIndex);
               const preview = isPreviewCell(rowIndex, colIndex);
               const showFillHandle = isFillHandleCell(rowIndex, colIndex);
+              const metaKey = createCellMetaKey(sourceRowIndex, column.key);
+              const cellMeta = cellMetaMap[metaKey];
+              const isMetaReadonly = Boolean(cellMeta?.readonly);
+              const shouldWrap = column.wrap || cellMeta?.wrap;
+              const backgroundColor =
+                active
+                  ? "#ffffff"
+                  : selected
+                  ? "#dbeafe"
+                  : cellMeta?.backgroundColor || "#ffffff";
 
               return (
                 <td
@@ -119,8 +132,10 @@ export function GridBody() {
                     selected && !active ? "gm-selected" : "",
                     active ? "gm-active" : "",
                     preview ? "gm-fill-preview" : "",
-                    column.readonly ? "gm-readonly" : "",
-                    column.wrap ? "gm-wrap" : "",
+                    column.readonly || isMetaReadonly ? "gm-readonly" : "",
+                    shouldWrap ? "gm-wrap" : "",
+                    formatPainterMode !== "idle" ? "gm-format-painter-target" : "",
+                    cellMeta?.className ?? "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -130,6 +145,12 @@ export function GridBody() {
                         e.preventDefault();
                         setSelection((prev) => setActiveCell(prev, { row: rowIndex, col: colIndex }));
                         insertFormulaReference(rowIndex, colIndex);
+                        return;
+                      }
+
+                      if (formatPainterMode !== "idle") {
+                        e.preventDefault();
+                        paintFormatAtCell(rowIndex, colIndex);
                         return;
                       }
 
@@ -152,13 +173,13 @@ export function GridBody() {
                     position: isFrozen ? "sticky" : undefined,
                     left: isFrozen ? DEFAULT_ROW_NUMBER_WIDTH + (colOffsets[column.key] ?? 0) : undefined,
                     zIndex: isFrozen ? Z_INDEX.FROZEN_CELL : undefined,
-                    background: active ? "#ffffff" : selected ? "#dbeafe" : "#ffffff",
+                    background: backgroundColor,
                     borderRight: "1px solid #e2e8f0",
                     borderBottom: "1px solid #e2e8f0",
                     padding: "0 8px",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    whiteSpace: column.wrap ? "pre-wrap" : "nowrap",
+                    whiteSpace: shouldWrap ? "pre-wrap" : "nowrap",
                     verticalAlign: "middle",
                     boxShadow:
                       active
@@ -166,9 +187,15 @@ export function GridBody() {
                         : isFrozen && colIndex === frozenColumns - 1
                         ? "3px 0 8px rgba(15, 23, 42, 0.08)"
                         : undefined,
-                    color: column.readonly ? "#64748b" : "#0f172a",
+                    color: column.readonly || isMetaReadonly ? "#64748b" : "#0f172a",
                     fontSize: 12,
-                    cursor: column.readonly ? "default" : "cell",
+                    cursor:
+                      formatPainterMode !== "idle"
+                        ? "copy"
+                        : column.readonly || isMetaReadonly
+                        ? "default"
+                        : "cell",
+                    ...(cellMeta?.style ?? {}),
                   }}
                 >
                   <GridCell
@@ -179,6 +206,7 @@ export function GridBody() {
                     columnIndex={colIndex}
                     isSelected={selected}
                     isActive={active}
+                    baseMeta={cellMeta}
                   />
                   {showFillHandle ? (
                     <button

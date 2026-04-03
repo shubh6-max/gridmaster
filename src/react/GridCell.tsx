@@ -1,6 +1,6 @@
 import React from "react";
 import { updateCellValue, validateCell } from "../core/features/editing";
-import type { GridResolvedColumnDef, GridRow } from "../core/types";
+import type { GridCellMeta, GridResolvedColumnDef, GridRow } from "../core/types";
 import { formatCellValue, getRowValue, isFormulaValue, parseCellValue } from "../core/utils";
 import { getDefaultCellEditor } from "../editors";
 import { getDefaultCellRenderer } from "../renderers";
@@ -14,6 +14,7 @@ type GridCellProps<T extends GridRow = GridRow> = {
   columnIndex: number;
   isSelected: boolean;
   isActive: boolean;
+  baseMeta?: GridCellMeta;
 };
 
 export function GridCell<T extends GridRow = GridRow>({
@@ -24,6 +25,7 @@ export function GridCell<T extends GridRow = GridRow>({
   columnIndex,
   isSelected,
   isActive,
+  baseMeta,
 }: GridCellProps<T>) {
   const {
     mode,
@@ -57,7 +59,16 @@ export function GridCell<T extends GridRow = GridRow>({
       ? null
       : validateCell(row, column, parsedDraftValue);
   const cellError = formulaResult.error ?? validationError;
-  const meta = cellError ? { error: cellError } : undefined;
+  const meta = React.useMemo(
+    () =>
+      baseMeta || cellError
+        ? {
+            ...(baseMeta ?? {}),
+            error: cellError ?? baseMeta?.error ?? null,
+          }
+        : undefined,
+    [baseMeta, cellError]
+  );
 
   const startEdit = React.useCallback(() => {
     if (isReadonly) return;

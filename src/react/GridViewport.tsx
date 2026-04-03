@@ -25,6 +25,10 @@ export function GridViewport() {
     startEditing,
     cancelEditing,
     isFormulaEditing,
+    formatPainterMode,
+    copyFormat,
+    pasteFormatToSelection,
+    stopFormatPainter,
   } = useGridContext();
 
   const { clearSelection, copy, cut, paste } = useClipboard({
@@ -58,6 +62,10 @@ export function GridViewport() {
     },
     onCancelEdit: cancelEditing,
     isEditing: Boolean(editingCell),
+    onCopyFormat: copyFormat,
+    onPasteFormat: pasteFormatToSelection,
+    onCancelFormatPainter: stopFormatPainter,
+    isFormatPainterActive: formatPainterMode !== "idle",
   });
 
   React.useEffect(() => {

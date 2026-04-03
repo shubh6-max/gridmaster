@@ -4,6 +4,7 @@ import { DEFAULT_HEADER_HEIGHT, DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../cor
 import { clearFilter, createValueSetFilter, getFilteredUniqueValuesForColumn } from "../core/features/filtering";
 import { isFrozenColumnIndex, toggleFrozenThroughColumn } from "../core/features/freezing";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
+import { columnLetter } from "../core/utils";
 import { useGridContext } from "./context/GridContext";
 import { useColumnSizing } from "./hooks/useColumnSizing";
 import { useSelection } from "./hooks/useSelection";
@@ -22,6 +23,8 @@ type FilterMenuState = {
   anchorEl: HTMLElement | null;
   anchorRect: DOMRect;
 } | null;
+
+const SPREADSHEET_HEADER_HEIGHT = 24;
 
 export function GridHeader() {
   const {
@@ -177,10 +180,80 @@ export function GridHeader() {
 
   const allSelected = selection.mode === "all";
   const hiddenColumnCount = hiddenColumnKeys.size;
+  const spreadsheetColumnIndexes = React.useMemo(
+    () =>
+      Object.fromEntries(columns.map((column, index) => [column.key, index])),
+    [columns]
+  );
 
   return (
     <>
       <thead>
+        <tr style={{ height: SPREADSHEET_HEADER_HEIGHT }}>
+          <th
+            className="gm-rh gm-rh-spreadsheet"
+            style={{
+              width: DEFAULT_ROW_NUMBER_WIDTH,
+              minWidth: DEFAULT_ROW_NUMBER_WIDTH,
+              maxWidth: DEFAULT_ROW_NUMBER_WIDTH,
+              position: "sticky",
+              left: 0,
+              top: 0,
+              zIndex: Z_INDEX.FROZEN_HEADER + 6,
+            }}
+          >
+            <div className="gm-corner-header gm-corner-header-spreadsheet" aria-hidden="true" />
+          </th>
+
+          {visibleColumns.map((column, index) => {
+            const isFrozen = isFrozenColumnIndex(index, frozenColumns);
+            const width = getColumnWidth(column, columnWidths);
+            const isSelected = selection.selectedCols.has(index);
+            const spreadsheetIndex = spreadsheetColumnIndexes[column.key] ?? index;
+
+            return (
+              <th
+                key={`${column.key}-spreadsheet`}
+                className={[
+                  "gm-th",
+                  "gm-th-spreadsheet",
+                  isSelected ? "gm-th-selected" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={(event) => {
+                  onColumnHeaderClick(index, {
+                    shiftKey: event.shiftKey,
+                    ctrlKey: event.ctrlKey,
+                    metaKey: event.metaKey,
+                  });
+                }}
+                style={{
+                  width,
+                  minWidth: width,
+                  maxWidth: width,
+                  height: SPREADSHEET_HEADER_HEIGHT,
+                  position: "sticky",
+                  top: 0,
+                  left: isFrozen
+                    ? DEFAULT_ROW_NUMBER_WIDTH + (colOffsets[column.key] ?? 0)
+                    : undefined,
+                  zIndex: isFrozen ? Z_INDEX.FROZEN_HEADER + 2 : Z_INDEX.HEADER + 2,
+                  boxShadow:
+                    isFrozen && index === frozenColumns - 1
+                      ? "3px 0 8px rgba(15, 23, 42, 0.08)"
+                      : undefined,
+                }}
+                title={`Spreadsheet column ${columnLetter(spreadsheetIndex)}`}
+              >
+                <div className="gm-spreadsheet-header-label">
+                  {columnLetter(spreadsheetIndex)}
+                </div>
+              </th>
+            );
+          })}
+        </tr>
+
         <tr style={{ height: headerHeight ?? DEFAULT_HEADER_HEIGHT }}>
           <th
             className="gm-rh"
@@ -191,7 +264,7 @@ export function GridHeader() {
               maxWidth: DEFAULT_ROW_NUMBER_WIDTH,
               position: "sticky",
               left: 0,
-              top: 0,
+              top: SPREADSHEET_HEADER_HEIGHT,
               zIndex: Z_INDEX.FROZEN_HEADER + 5,
               background: allSelected ? "#dbeafe" : "#f8fafc",
               borderRight: "2px solid #cbd5e1",
@@ -252,7 +325,7 @@ export function GridHeader() {
                   maxWidth: width,
                   height: headerHeight ?? DEFAULT_HEADER_HEIGHT,
                   position: "sticky",
-                  top: 0,
+                  top: SPREADSHEET_HEADER_HEIGHT,
                   left: isFrozen ? DEFAULT_ROW_NUMBER_WIDTH + (colOffsets[column.key] ?? 0) : undefined,
                   zIndex: isFrozen ? Z_INDEX.FROZEN_HEADER : Z_INDEX.HEADER,
                   boxShadow:

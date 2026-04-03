@@ -43,7 +43,11 @@ type UseKeyboardNavigationParams<T extends GridRow = GridRow> = {
   onDelete?: () => void;
   onStartEdit?: (initialValue?: string) => void;
   onCancelEdit?: () => void;
+  onCopyFormat?: () => boolean | void;
+  onPasteFormat?: () => boolean | void;
+  onCancelFormatPainter?: () => void;
   isEditing?: boolean;
+  isFormatPainterActive?: boolean;
 };
 
 function isTypingElement(target: EventTarget | null): boolean {
@@ -174,7 +178,11 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
   onDelete,
   onStartEdit,
   onCancelEdit,
+  onCopyFormat,
+  onPasteFormat,
+  onCancelFormatPainter,
   isEditing = false,
+  isFormatPainterActive = false,
 }: UseKeyboardNavigationParams<T>) {
   useEffect(() => {
     const container = containerRef.current;
@@ -195,6 +203,19 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
 
       const ctrlOrMeta = event.ctrlKey || event.metaKey;
       const key = event.key;
+      const altAndCtrlOrMeta = event.altKey && ctrlOrMeta;
+
+      if (altAndCtrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.C) {
+        event.preventDefault();
+        onCopyFormat?.();
+        return;
+      }
+
+      if (altAndCtrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.V) {
+        event.preventDefault();
+        onPasteFormat?.();
+        return;
+      }
 
       if (enableUndoRedo && ctrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.Z && !event.shiftKey) {
         event.preventDefault();
@@ -259,6 +280,12 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
           event.preventDefault();
           onCancelEdit?.();
         }
+        return;
+      }
+
+      if (isFormatPainterActive && key === KEYBOARD_KEYS.ESCAPE) {
+        event.preventDefault();
+        onCancelFormatPainter?.();
         return;
       }
 
@@ -334,6 +361,10 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
     onDelete,
     onStartEdit,
     onCancelEdit,
+    onCopyFormat,
+    onPasteFormat,
+    onCancelFormatPainter,
     isEditing,
+    isFormatPainterActive,
   ]);
 }

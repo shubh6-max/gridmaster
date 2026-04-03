@@ -2,9 +2,11 @@ import React from "react";
 import type { GridMasterProps, GridRow } from "../core/types";
 import { GridProvider } from "./context/GridContext";
 import { useEditing } from "./hooks/useEditing";
+import { useFormatPainter } from "./hooks/useFormatPainter";
 import { useGridMaster } from "./hooks/useGridMaster";
 import { FormulaBar } from "./FormulaBar";
 import { StatusBar } from "./StatusBar";
+import { GridToolbar } from "./GridToolbar";
 import { GridViewport } from "./GridViewport";
 
 export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T>) {
@@ -21,6 +23,16 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
     updateRows: grid.updateRows,
     focusViewport: grid.focusViewport,
     emitCellChange: grid.emitCellChange,
+  });
+  const formatPainter = useFormatPainter({
+    history: grid.history,
+    setHistory: grid.setHistory,
+    selection: grid.selection,
+    setSelection: grid.setSelection,
+    displayRows: grid.displayRows,
+    displayRowIndexes: grid.displayRowIndexes,
+    visibleColumns: grid.visibleColumns,
+    focusViewport: grid.focusViewport,
   });
 
   return (
@@ -40,6 +52,7 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         rawColumns: grid.props.columns,
         visibleColumns: grid.visibleColumns,
         formulaEvaluator: grid.formulaEvaluator,
+        cellMetaMap: grid.history.present.cellMeta,
 
         history: grid.history,
         selection: grid.selection,
@@ -50,6 +63,8 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         sort: grid.sort,
         filters: grid.filters,
         clipboard: grid.clipboard,
+        formatPainterClipboard: formatPainter.formatPainterClipboard,
+        formatPainterMode: formatPainter.formatPainterMode,
         fill: grid.fill,
         columnWidths: grid.columnWidths,
         frozenColumns: grid.frozenColumns,
@@ -71,6 +86,11 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         insertFormulaReference: editing.insertFormulaReference,
         commitEditing: editing.commitEditing,
         cancelEditing: editing.cancelEditing,
+        copyFormat: formatPainter.copyFormat,
+        startFormatPainter: formatPainter.startFormatPainter,
+        stopFormatPainter: formatPainter.stopFormatPainter,
+        pasteFormatToSelection: formatPainter.pasteFormatToSelection,
+        paintFormatAtCell: formatPainter.paintFormatAtCell,
 
         setHistory: grid.setHistory,
         setSelection: grid.setSelection,
@@ -99,6 +119,7 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
           ...props.style,
         }}
       >
+        <GridToolbar />
         {grid.showFormulaBar && <FormulaBar />}
         <GridViewport />
         {grid.showStatusBar && <StatusBar />}

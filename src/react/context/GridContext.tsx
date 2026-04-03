@@ -1,8 +1,11 @@
 import React, { createContext, useContext } from "react";
 import type {
   GridCellChangeEvent,
+  GridCellMeta,
   GridColumnDef,
   GridEditCell,
+  GridFormatPainterClipboard,
+  GridFormatPainterMode,
   GridHistoryState,
   GridMasterProps,
   GridResolvedColumnDef,
@@ -31,6 +34,7 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   rawColumns: GridColumnDef<T>[];
   visibleColumns: GridResolvedColumnDef<T>[];
   formulaEvaluator: GridFormulaEvaluator<T>;
+  cellMetaMap: Record<string, GridCellMeta>;
 
   history: GridHistoryState;
   selection: GridSelectionState;
@@ -41,6 +45,8 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   sort: GridSort;
   filters: GridFilters;
   clipboard: GridClipboardData;
+  formatPainterClipboard: GridFormatPainterClipboard;
+  formatPainterMode: GridFormatPainterMode;
   fill: GridFillState;
   columnWidths: GridColumnWidths;
   frozenColumns: number;
@@ -66,6 +72,11 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   insertFormulaReference: (displayRowIndex: number, visibleColumnIndex: number) => boolean;
   commitEditing: (nextValue?: unknown) => boolean;
   cancelEditing: () => void;
+  copyFormat: () => boolean;
+  startFormatPainter: (locked?: boolean) => boolean;
+  stopFormatPainter: () => void;
+  pasteFormatToSelection: () => boolean;
+  paintFormatAtCell: (displayRowIndex: number, visibleColumnIndex: number) => boolean;
 
   setHistory: React.Dispatch<React.SetStateAction<GridHistoryState>>;
   setSelection: React.Dispatch<React.SetStateAction<GridSelectionState>>;

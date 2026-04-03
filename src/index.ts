@@ -37,6 +37,7 @@ export {
 } from "./core/features/fill";
 export * from "./core/features/filtering";
 export * from "./core/features/formulas";
+export * from "./core/features/formatPainter";
 export * from "./core/features/freezing";
 export * from "./core/features/navigation";
 export * from "./core/features/sizing";
@@ -59,7 +60,9 @@ export * from "./renderers";
 export * from "./react/hooks/useClipboard";
 export * from "./react/hooks/useColumnSizing";
 export * from "./react/hooks/useEditing";
+export * from "./react/hooks/useFormatPainter";
 export * from "./react/hooks/useFloatingPortal";
 export * from "./react/hooks/useGridMaster";
 
 export { GridMaster } from "./react/GridMaster";
+export { GridToolbar } from "./react/GridToolbar";
