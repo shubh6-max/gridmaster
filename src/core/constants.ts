@@ -57,6 +57,7 @@ export const DEFAULT_ENABLE_COLUMN_VISIBILITY = true;
 export const DEFAULT_ENABLE_CELL_COLORING = true;
 export const DEFAULT_ENABLE_WRAP_TEXT = true;
 export const DEFAULT_ENABLE_INSERT_ROW = true;
+export const DEFAULT_ENABLE_INSERT_COLUMN = true;
 export const DEFAULT_ENABLE_DELETE_ROW = true;
 
 export const DEFAULT_SHOW_FORMULA_BAR = true;

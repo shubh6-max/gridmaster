@@ -14,6 +14,7 @@ export function createEditableGridPreset<T extends GridRow = GridRow>(): Partial
     enableCellColoring: true,
     enableWrapText: true,
     enableInsertRow: true,
+    enableInsertColumn: true,
     enableDeleteRow: true,
     showFormulaBar: true,
     showStatusBar: true,

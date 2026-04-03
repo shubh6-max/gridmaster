@@ -42,6 +42,7 @@ export * from "./core/features/freezing";
 export * from "./core/features/navigation";
 export * from "./core/features/sizing";
 export * from "./core/features/sorting";
+export * from "./core/features/structure";
 
 export * from "./core/transforms/columns";
 export * from "./core/transforms/rows";
@@ -65,4 +66,5 @@ export * from "./react/hooks/useFloatingPortal";
 export * from "./react/hooks/useGridMaster";
 
 export { GridMaster } from "./react/GridMaster";
+export { GridContextMenu } from "./react/GridContextMenu";
 export { GridToolbar } from "./react/GridToolbar";

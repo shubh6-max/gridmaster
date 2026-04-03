@@ -1,6 +1,6 @@
 import React from "react";
 import type { GridMasterProps, GridRow } from "../core/types";
-import { GridProvider } from "./context/GridContext";
+import { GridProvider, type GridContextMenuState } from "./context/GridContext";
 import { useEditing } from "./hooks/useEditing";
 import { useFormatPainter } from "./hooks/useFormatPainter";
 import { useGridMaster } from "./hooks/useGridMaster";
@@ -11,6 +11,7 @@ import { GridViewport } from "./GridViewport";
 
 export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T>) {
   const grid = useGridMaster(props);
+  const [contextMenu, setContextMenu] = React.useState<GridContextMenuState>(null);
   const editing = useEditing({
     mode: grid.mode,
     rows: grid.rows,
@@ -49,7 +50,7 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         hiddenColumnKeys: grid.hiddenColumnKeys,
 
         columns: grid.columns,
-        rawColumns: grid.props.columns,
+        rawColumns: grid.rawColumns,
         visibleColumns: grid.visibleColumns,
         formulaEvaluator: grid.formulaEvaluator,
         cellMetaMap: grid.history.present.cellMeta,
@@ -76,9 +77,14 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         mode: grid.mode,
 
         visibleRowCount: grid.visibleRowCount,
+        contextMenu,
 
         setRows: grid.setRows,
+        setColumns: grid.setColumns,
         updateRows: grid.updateRows,
+        updateColumns: grid.updateColumns,
+        insertRow: grid.insertRow,
+        insertColumn: grid.insertColumn,
         emitCellChange: grid.emitCellChange,
         setEditingValue: editing.setEditingValue,
         requestViewportFocusAfterEdit: editing.requestViewportFocusAfterEdit,
@@ -103,6 +109,8 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         setColumnHidden: grid.setColumnHidden,
         toggleColumnHidden: grid.toggleColumnHidden,
         setFrozenColumns: grid.setFrozenColumns,
+        openContextMenu: (next) => setContextMenu(next),
+        closeContextMenu: () => setContextMenu(null),
 
         enableSorting: grid.enableSorting,
         enableFiltering: grid.enableFiltering,
@@ -110,6 +118,8 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         enableColumnResize: grid.enableColumnResize,
         enableColumnAutoFit: grid.enableColumnAutoFit,
         enableColumnVisibility: grid.enableColumnVisibility,
+        enableInsertRow: grid.enableInsertRow,
+        enableInsertColumn: grid.enableInsertColumn,
       }}
     >
       <div

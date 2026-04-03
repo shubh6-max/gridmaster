@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  ChevronDown,
   ClipboardPaste,
   Copy,
   Paintbrush,
@@ -8,20 +9,37 @@ import {
 import { useGridContext } from "./context/GridContext";
 import { useClipboard } from "./hooks/useClipboard";
 
-function ToolbarButton({
+function RibbonGroup({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={["gm-ribbon-group", className].filter(Boolean).join(" ")}>
+      <div className="gm-ribbon-group-content">{children}</div>
+      <div className="gm-ribbon-group-footer">{label}</div>
+    </section>
+  );
+}
+
+function RibbonActionButton({
   icon,
   label,
   title,
+  size = "small",
   active = false,
-  disabled = false,
   onClick,
   onDoubleClick,
 }: {
   icon: React.ReactNode;
   label: string;
   title: string;
+  size?: "large" | "small";
   active?: boolean;
-  disabled?: boolean;
   onClick?: () => void;
   onDoubleClick?: () => void;
 }) {
@@ -29,24 +47,74 @@ function ToolbarButton({
     <button
       type="button"
       className={[
-        "gm-toolbar-button",
+        "gm-ribbon-action",
+        size === "large" ? "is-large" : "is-small",
         active ? "is-active" : "",
       ]
         .filter(Boolean)
         .join(" ")}
       title={title}
       aria-pressed={active || undefined}
-      disabled={disabled}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
     >
-      <span className="gm-toolbar-button-icon">{icon}</span>
-      <span>{label}</span>
+      <span className="gm-ribbon-action-icon">{icon}</span>
+      <span className="gm-ribbon-action-label">{label}</span>
+      {size === "large" ? (
+        <span className="gm-ribbon-action-caret" aria-hidden="true">
+          <ChevronDown style={{ width: 12, height: 12 }} />
+        </span>
+      ) : null}
     </button>
   );
 }
 
-export function GridToolbar() {
+function RibbonPlaceholderField({
+  label,
+  compact = false,
+}: {
+  label: string;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className={[
+        "gm-ribbon-placeholder-field",
+        compact ? "is-compact" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-hidden="true"
+    >
+      <span>{label}</span>
+      <ChevronDown style={{ width: 12, height: 12 }} />
+    </div>
+  );
+}
+
+function RibbonPlaceholderButton({
+  label,
+  accent = false,
+}: {
+  label: string;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={[
+        "gm-ribbon-placeholder-button",
+        accent ? "is-accent" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-hidden="true"
+    >
+      {label}
+    </div>
+  );
+}
+
+function ClipboardGroup() {
   const {
     rows,
     displayRows,
@@ -74,19 +142,11 @@ export function GridToolbar() {
   });
 
   return (
-    <div className="gm-toolbar">
-      <div className="gm-toolbar-group">
-        <ToolbarButton
-          icon={<Copy style={{ width: 14, height: 14 }} />}
-          label="Copy"
-          title="Copy selected cells"
-          onClick={() => {
-            void copy(false);
-            focusViewport();
-          }}
-        />
-        <ToolbarButton
-          icon={<ClipboardPaste style={{ width: 14, height: 14 }} />}
+    <RibbonGroup label="Clipboard" className="gm-ribbon-group-clipboard">
+      <div className="gm-ribbon-clipboard-layout">
+        <RibbonActionButton
+          size="large"
+          icon={<ClipboardPaste style={{ width: 28, height: 28 }} />}
           label="Paste"
           title="Paste into the current selection"
           onClick={() => {
@@ -94,36 +154,78 @@ export function GridToolbar() {
             focusViewport();
           }}
         />
-        <ToolbarButton
-          icon={<Scissors style={{ width: 14, height: 14 }} />}
-          label="Cut"
-          title="Cut selected cells"
-          onClick={() => {
-            void cut();
-            focusViewport();
-          }}
-        />
+
+        <div className="gm-ribbon-clipboard-stack">
+          <RibbonActionButton
+            icon={<Copy style={{ width: 15, height: 15 }} />}
+            label="Copy"
+            title="Copy selected cells"
+            onClick={() => {
+              void copy(false);
+              focusViewport();
+            }}
+          />
+
+          <RibbonActionButton
+            icon={<Scissors style={{ width: 15, height: 15 }} />}
+            label="Cut"
+            title="Cut selected cells"
+            onClick={() => {
+              void cut();
+              focusViewport();
+            }}
+          />
+
+          <RibbonActionButton
+            icon={<Paintbrush style={{ width: 15, height: 15 }} />}
+            label="Format Painter"
+            title="Click to paint formatting once. Double-click to keep painting until Esc."
+            active={formatPainterMode !== "idle"}
+            onClick={() => {
+              if (formatPainterMode !== "idle") {
+                stopFormatPainter();
+              } else {
+                startFormatPainter(false);
+              }
+            }}
+            onDoubleClick={() => {
+              startFormatPainter(true);
+            }}
+          />
+        </div>
       </div>
+    </RibbonGroup>
+  );
+}
 
-      <div className="gm-toolbar-divider" />
+function FontScaffoldGroup() {
+  return (
+    <RibbonGroup label="Font" className="gm-ribbon-group-font">
+      <div className="gm-ribbon-font-layout" aria-hidden="true">
+        <div className="gm-ribbon-font-row">
+          <RibbonPlaceholderField label="Aptos Narrow" />
+          <RibbonPlaceholderField label="11" compact />
+        </div>
 
-      <div className="gm-toolbar-group">
-        <ToolbarButton
-          icon={<Paintbrush style={{ width: 14, height: 14 }} />}
-          label="Format Painter"
-          title="Click to paint formatting once. Double-click to keep painting until Esc."
-          active={formatPainterMode !== "idle"}
-          onClick={() => {
-            if (formatPainterMode !== "idle") {
-              stopFormatPainter();
-            } else {
-              startFormatPainter(false);
-            }
-          }}
-          onDoubleClick={() => {
-            startFormatPainter(true);
-          }}
-        />
+        <div className="gm-ribbon-font-row gm-ribbon-font-row-buttons">
+          <RibbonPlaceholderButton label="B" accent />
+          <RibbonPlaceholderButton label="I" accent />
+          <RibbonPlaceholderButton label="U" accent />
+          <RibbonPlaceholderButton label="▦" />
+          <RibbonPlaceholderButton label="Fill" />
+          <RibbonPlaceholderButton label="A" />
+        </div>
+      </div>
+    </RibbonGroup>
+  );
+}
+
+export function GridToolbar() {
+  return (
+    <div className="gm-toolbar" role="toolbar" aria-label="Spreadsheet toolbar">
+      <div className="gm-ribbon">
+        <ClipboardGroup />
+        <FontScaffoldGroup />
       </div>
     </div>
   );

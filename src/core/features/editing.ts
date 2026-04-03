@@ -187,12 +187,12 @@ export function validateRow<T extends GridRow>(
    ========================================================= */
 
 export function updateSnapshotCell<T extends GridRow>(
-  snapshot: GridSnapshot,
+  snapshot: GridSnapshot<T>,
   rowIndex: number,
   column: GridResolvedColumnDef<T>,
   rawValue: any
 ): {
-  snapshot: GridSnapshot;
+  snapshot: GridSnapshot<T>;
   event: GridCellChangeEvent<T> | null;
 } {
   const currentRows = snapshot.rows as T[];
@@ -210,8 +210,9 @@ export function updateSnapshotCell<T extends GridRow>(
   const nextRows = result.rows;
   const nextRow = nextRows[rowIndex];
 
-  const nextSnapshot: GridSnapshot = {
+  const nextSnapshot: GridSnapshot<T> = {
     rows: nextRows,
+    columns: snapshot.columns,
     cellMeta: cloneCellMetaMap(snapshot.cellMeta),
     rowMeta: cloneRowMetaMap(snapshot.rowMeta),
   };
@@ -239,7 +240,7 @@ export function updateSnapshotCell<T extends GridRow>(
 }
 
 export function clearSnapshotRange<T extends GridRow>(
-  snapshot: GridSnapshot,
+  snapshot: GridSnapshot<T>,
   columns: GridResolvedColumnDef<T>[],
   bounds: {
     startRow: number;
@@ -247,11 +248,12 @@ export function clearSnapshotRange<T extends GridRow>(
     startCol: number;
     endCol: number;
   }
-): GridSnapshot {
+): GridSnapshot<T> {
   const nextRows = clearCellRange(snapshot.rows as T[], columns, bounds);
 
   return {
     rows: nextRows,
+    columns: snapshot.columns,
     cellMeta: cloneCellMetaMap(snapshot.cellMeta),
     rowMeta: cloneRowMetaMap(snapshot.rowMeta),
   };

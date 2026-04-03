@@ -376,6 +376,15 @@ export function cloneRows<T extends GridRow>(rows: T[]): T[] {
   return rows.map((row) => ({ ...row }));
 }
 
+export function cloneColumns<T extends GridRow>(
+  columns: Array<GridColumnDef<T> | GridResolvedColumnDef<T>>
+): GridColumnDef<T>[] {
+  return columns.map((column) => ({
+    ...column,
+    options: column.options ? [...column.options] : column.options,
+  }));
+}
+
 export function resolveGridRowId<T extends GridRow>(
   row: T,
   index: number,
@@ -428,6 +437,42 @@ export function shallowEqualRows<T extends GridRow>(left: T[], right: T[]): bool
     if (leftRow === rightRow) continue;
     if (!leftRow || !rightRow) return false;
     if (!shallowEqualObjects(leftRow, rightRow)) return false;
+  }
+
+  return true;
+}
+
+function shallowEqualStringArrays(left?: string[], right?: string[]): boolean {
+  if (left === right) return true;
+  if (!left || !right) return !left && !right;
+  if (left.length !== right.length) return false;
+
+  for (let index = 0; index < left.length; index++) {
+    if (!Object.is(left[index], right[index])) return false;
+  }
+
+  return true;
+}
+
+export function shallowEqualColumns<T extends GridRow>(
+  left: GridColumnDef<T>[],
+  right: GridColumnDef<T>[]
+): boolean {
+  if (left === right) return true;
+  if (left.length !== right.length) return false;
+
+  for (let index = 0; index < left.length; index++) {
+    const leftColumn = left[index];
+    const rightColumn = right[index];
+
+    if (leftColumn === rightColumn) continue;
+    if (!leftColumn || !rightColumn) return false;
+
+    const { options: leftOptions, ...leftRest } = leftColumn;
+    const { options: rightOptions, ...rightRest } = rightColumn;
+
+    if (!shallowEqualObjects(leftRest, rightRest)) return false;
+    if (!shallowEqualStringArrays(leftOptions, rightOptions)) return false;
   }
 
   return true;

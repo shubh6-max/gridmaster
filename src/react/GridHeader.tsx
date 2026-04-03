@@ -4,6 +4,7 @@ import { DEFAULT_HEADER_HEIGHT, DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../cor
 import { clearFilter, createValueSetFilter, getFilteredUniqueValuesForColumn } from "../core/features/filtering";
 import { isFrozenColumnIndex, toggleFrozenThroughColumn } from "../core/features/freezing";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
+import { selectSingleColumn } from "../core/state/selectionState";
 import { columnLetter } from "../core/utils";
 import { useGridContext } from "./context/GridContext";
 import { useColumnSizing } from "./hooks/useColumnSizing";
@@ -51,6 +52,8 @@ export function GridHeader() {
     enableColumnResize,
     enableColumnAutoFit,
     enableColumnVisibility,
+    enableInsertColumn,
+    openContextMenu,
   } = useGridContext();
   const [columnMenu, setColumnMenu] = React.useState<ColumnMenuState>(null);
   const [filterMenu, setFilterMenu] = React.useState<FilterMenuState>(null);
@@ -185,6 +188,22 @@ export function GridHeader() {
       Object.fromEntries(columns.map((column, index) => [column.key, index])),
     [columns]
   );
+  const openColumnContextMenu = React.useCallback(
+    (event: React.MouseEvent<HTMLElement>, columnKey: string, visibleColumnIndex: number) => {
+      if (!enableInsertColumn) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      setSelection((prev) => selectSingleColumn(prev, visibleColumnIndex, displayRows.length));
+      openContextMenu({
+        kind: "column",
+        anchorRect: new DOMRect(event.clientX, event.clientY, 0, 0),
+        visibleColumnIndex,
+        columnKey,
+      });
+    },
+    [displayRows.length, enableInsertColumn, openContextMenu, setSelection]
+  );
 
   return (
     <>
@@ -228,6 +247,7 @@ export function GridHeader() {
                     metaKey: event.metaKey,
                   });
                 }}
+                onContextMenu={(event) => openColumnContextMenu(event, column.key, index)}
                 style={{
                   width,
                   minWidth: width,
@@ -319,6 +339,7 @@ export function GridHeader() {
                     metaKey: event.metaKey,
                   });
                 }}
+                onContextMenu={(event) => openColumnContextMenu(event, column.key, index)}
                 style={{
                   width,
                   minWidth: width,

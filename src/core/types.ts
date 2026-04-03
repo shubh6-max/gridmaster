@@ -26,6 +26,8 @@ export type GridColumnType =
 export type GridMode = "editable" | "readonly";
 
 export type GridSortDirection = "asc" | "desc";
+export type GridRowInsertPosition = "above" | "below";
+export type GridColumnInsertPosition = "left" | "right";
 
 /* =========================================================
    Selection types
@@ -207,6 +209,12 @@ export type GridRowInsertEvent<T extends GridRow = GridRow> = {
   row: T;
 };
 
+export type GridColumnInsertEvent<T extends GridRow = GridRow> = {
+  columnIndex: number;
+  column: GridColumnDef<T>;
+  position: GridColumnInsertPosition;
+};
+
 export type GridRowDeleteEvent<T extends GridRow = GridRow> = {
   rowIndex: number;
   row: T;
@@ -276,6 +284,29 @@ export type GridColumnDef<T extends GridRow = GridRow> = {
   renderEditor?: (props: GridCellEditorProps<T>) => React.ReactNode;
 };
 
+export type GridInsertedRowFactoryContext<T extends GridRow = GridRow> = {
+  rows: T[];
+  columns: GridResolvedColumnDef<T>[];
+  insertAt: number;
+  position: GridRowInsertPosition;
+  referenceRow: T | null;
+};
+
+export type GridInsertedColumnFactoryContext<T extends GridRow = GridRow> = {
+  columns: GridColumnDef<T>[];
+  insertAt: number;
+  position: GridColumnInsertPosition;
+  referenceColumn: GridColumnDef<T> | null;
+};
+
+export type GridInsertedRowFactory<T extends GridRow = GridRow> = (
+  context: GridInsertedRowFactoryContext<T>
+) => T;
+
+export type GridInsertedColumnFactory<T extends GridRow = GridRow> = (
+  context: GridInsertedColumnFactoryContext<T>
+) => GridColumnDef<T>;
+
 /* =========================================================
    Internal normalized column
    ========================================================= */
@@ -306,21 +337,22 @@ export type GridResolvedColumnDef<T extends GridRow = GridRow> = Required<
    Grid history
    ========================================================= */
 
-export type GridSnapshot = {
-  rows: GridRow[];
+export type GridSnapshot<T extends GridRow = GridRow> = {
+  rows: T[];
+  columns: GridColumnDef<T>[];
   cellMeta: Record<string, GridCellMeta>;
   rowMeta: Record<number, GridRowMeta>;
 };
 
-export type GridHistoryState = {
-  past: GridSnapshot[];
-  present: GridSnapshot;
-  future: GridSnapshot[];
+export type GridHistoryState<T extends GridRow = GridRow> = {
+  past: GridSnapshot<T>[];
+  present: GridSnapshot<T>;
+  future: GridSnapshot<T>[];
 };
 
-export type GridHistoryAction =
-  | { type: "RESET"; payload: GridSnapshot }
-  | { type: "PUSH"; payload: GridSnapshot }
+export type GridHistoryAction<T extends GridRow = GridRow> =
+  | { type: "RESET"; payload: GridSnapshot<T> }
+  | { type: "PUSH"; payload: GridSnapshot<T> }
   | { type: "UNDO" }
   | { type: "REDO" };
 
@@ -375,15 +407,19 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   getRowId?: GridRowIdGetter<T>;
 
   onRowsChange?: (rows: T[]) => void;
+  onColumnsChange?: (columns: GridColumnDef<T>[]) => void;
   onCellChange?: (event: GridCellChangeEvent<T>) => void;
   onSelectionChange?: (event: GridSelectionChangeEvent) => void;
   onSortChange?: (event: GridSortChangeEvent) => void;
   onFilterChange?: (event: GridFilterChangeEvent) => void;
   onColumnResize?: (event: GridColumnResizeEvent<T>) => void;
   onRowInsert?: (event: GridRowInsertEvent<T>) => void;
+  onColumnInsert?: (event: GridColumnInsertEvent<T>) => void;
   onRowDelete?: (event: GridRowDeleteEvent<T>) => void;
   onCopy?: (event: GridClipboardEvent<T>) => void;
   onPaste?: (event: GridClipboardEvent<T>) => void;
+  createRowOnInsert?: GridInsertedRowFactory<T>;
+  createColumnOnInsert?: GridInsertedColumnFactory<T>;
 
   mode?: GridMode;
 
@@ -415,6 +451,7 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   enableCellColoring?: boolean;
   enableWrapText?: boolean;
   enableInsertRow?: boolean;
+  enableInsertColumn?: boolean;
   enableDeleteRow?: boolean;
 
   className?: string;

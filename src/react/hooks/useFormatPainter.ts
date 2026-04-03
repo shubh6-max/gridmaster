@@ -17,8 +17,8 @@ import type {
 import { getSelectionBounds } from "../../core/features/clipboard";
 
 type UseFormatPainterParams<T extends GridRow = GridRow> = {
-  history: GridHistoryState;
-  setHistory: React.Dispatch<React.SetStateAction<GridHistoryState>>;
+  history: GridHistoryState<T>;
+  setHistory: React.Dispatch<React.SetStateAction<GridHistoryState<T>>>;
   selection: GridSelectionState;
   setSelection: React.Dispatch<React.SetStateAction<GridSelectionState>>;
   displayRows: T[];
@@ -27,9 +27,9 @@ type UseFormatPainterParams<T extends GridRow = GridRow> = {
   focusViewport: () => void;
 };
 
-function pushCellMetaHistory(
-  setHistory: React.Dispatch<React.SetStateAction<GridHistoryState>>,
-  apply: (state: GridHistoryState) => GridHistoryState
+function pushCellMetaHistory<T extends GridRow = GridRow>(
+  setHistory: React.Dispatch<React.SetStateAction<GridHistoryState<T>>>,
+  apply: (state: GridHistoryState<T>) => GridHistoryState<T>
 ) {
   setHistory((prev) => apply(prev));
 }
@@ -98,6 +98,7 @@ export function useFormatPainter<T extends GridRow = GridRow>({
           type: "PUSH",
           payload: {
             rows: prev.present.rows,
+            columns: prev.present.columns,
             cellMeta: applyFormatPainterToBounds(
               prev.present.cellMeta,
               formatPainterClipboard,

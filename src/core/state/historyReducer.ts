@@ -1,23 +1,25 @@
 import type {
   GridHistoryAction,
   GridHistoryState,
+  GridColumnDef,
   GridRow,
   GridSnapshot,
   GridCellMeta,
   GridRowMeta,
 } from "../types";
 import { MAX_HISTORY_SIZE } from "../constants";
-import { cloneRows, cloneCellMetaMap, cloneRowMetaMap } from "../utils";
+import { cloneCellMetaMap, cloneColumns, cloneRowMetaMap, cloneRows } from "../utils";
 
 /* =========================================================
    Snapshot cloning
    ========================================================= */
 
 export function cloneSnapshot<T extends GridRow = GridRow>(
-  snapshot: GridSnapshot
-): GridSnapshot {
+  snapshot: GridSnapshot<T>
+): GridSnapshot<T> {
   return {
-    rows: cloneRows(snapshot.rows as T[]) as GridRow[],
+    rows: cloneRows(snapshot.rows as T[]),
+    columns: cloneColumns(snapshot.columns as GridColumnDef<T>[]),
     cellMeta: cloneCellMetaMap(snapshot.cellMeta),
     rowMeta: cloneRowMetaMap(snapshot.rowMeta),
   };
@@ -27,9 +29,10 @@ export function cloneSnapshot<T extends GridRow = GridRow>(
    Empty snapshot
    ========================================================= */
 
-export function createEmptySnapshot<T extends GridRow = GridRow>(): GridSnapshot {
+export function createEmptySnapshot<T extends GridRow = GridRow>(): GridSnapshot<T> {
   return {
-    rows: [] as T[],
+    rows: [],
+    columns: [],
     cellMeta: {} as Record<string, GridCellMeta>,
     rowMeta: {} as Record<number, GridRowMeta>,
   };
@@ -40,8 +43,8 @@ export function createEmptySnapshot<T extends GridRow = GridRow>(): GridSnapshot
    ========================================================= */
 
 export function createInitialHistoryState<T extends GridRow = GridRow>(
-  initialSnapshot?: GridSnapshot
-): GridHistoryState {
+  initialSnapshot?: GridSnapshot<T>
+): GridHistoryState<T> {
   const present = initialSnapshot ? cloneSnapshot(initialSnapshot) : createEmptySnapshot<T>();
 
   return {
@@ -55,10 +58,10 @@ export function createInitialHistoryState<T extends GridRow = GridRow>(
    History reducer
    ========================================================= */
 
-export function historyReducer(
-  state: GridHistoryState,
-  action: GridHistoryAction
-): GridHistoryState {
+export function historyReducer<T extends GridRow = GridRow>(
+  state: GridHistoryState<T>,
+  action: GridHistoryAction<T>
+): GridHistoryState<T> {
   switch (action.type) {
     case "RESET": {
       return {
@@ -112,35 +115,39 @@ export function historyReducer(
    History helpers
    ========================================================= */
 
-export function canUndo(state: GridHistoryState): boolean {
+export function canUndo<T extends GridRow = GridRow>(state: GridHistoryState<T>): boolean {
   return state.past.length > 0;
 }
 
-export function canRedo(state: GridHistoryState): boolean {
+export function canRedo<T extends GridRow = GridRow>(state: GridHistoryState<T>): boolean {
   return state.future.length > 0;
 }
 
-export function resetHistory(snapshot: GridSnapshot): GridHistoryAction {
+export function resetHistory<T extends GridRow = GridRow>(
+  snapshot: GridSnapshot<T>
+): GridHistoryAction<T> {
   return {
     type: "RESET",
     payload: cloneSnapshot(snapshot),
   };
 }
 
-export function pushHistory(snapshot: GridSnapshot): GridHistoryAction {
+export function pushHistory<T extends GridRow = GridRow>(
+  snapshot: GridSnapshot<T>
+): GridHistoryAction<T> {
   return {
     type: "PUSH",
     payload: cloneSnapshot(snapshot),
   };
 }
 
-export function undoHistory(): GridHistoryAction {
+export function undoHistory<T extends GridRow = GridRow>(): GridHistoryAction<T> {
   return {
     type: "UNDO",
   };
 }
 
-export function redoHistory(): GridHistoryAction {
+export function redoHistory<T extends GridRow = GridRow>(): GridHistoryAction<T> {
   return {
     type: "REDO",
   };

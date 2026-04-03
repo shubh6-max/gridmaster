@@ -3,6 +3,7 @@ import type {
   GridCellChangeEvent,
   GridCellMeta,
   GridColumnDef,
+  GridColumnInsertPosition,
   GridEditCell,
   GridFormatPainterClipboard,
   GridFormatPainterMode,
@@ -10,6 +11,7 @@ import type {
   GridMasterProps,
   GridResolvedColumnDef,
   GridRow,
+  GridRowInsertPosition,
   GridSelectionState,
   GridSort,
   GridFilters,
@@ -18,6 +20,16 @@ import type {
 import type { GridColumnWidths } from "../../core/features/sizing";
 import type { GridFillState } from "../../core/features/fill";
 import type { GridFormulaEvaluator } from "../../core/features/formulas";
+
+export type GridContextMenuState =
+  | {
+      kind: "cell" | "row" | "column";
+      anchorRect: DOMRect;
+      displayRowIndex?: number;
+      visibleColumnIndex?: number;
+      columnKey?: string;
+    }
+  | null;
 
 export type GridContextValue<T extends GridRow = GridRow> = {
   props: GridMasterProps<T>;
@@ -36,7 +48,7 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   formulaEvaluator: GridFormulaEvaluator<T>;
   cellMetaMap: Record<string, GridCellMeta>;
 
-  history: GridHistoryState;
+  history: GridHistoryState<T>;
   selection: GridSelectionState;
   editingCell: GridEditCell;
   editingOrigin: "cell" | "formulaBar" | null;
@@ -58,9 +70,17 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   mode: "editable" | "readonly";
 
   visibleRowCount: number;
+  contextMenu: GridContextMenuState;
 
   setRows: (rows: T[]) => void;
+  setColumns: (columns: GridColumnDef<T>[]) => void;
   updateRows: (rows: T[]) => void;
+  updateColumns: (columns: GridColumnDef<T>[]) => void;
+  insertRow: (sourceRowIndex: number, position: GridRowInsertPosition) => T | null;
+  insertColumn: (
+    columnKey: string,
+    position: GridColumnInsertPosition
+  ) => GridColumnDef<T> | null;
   emitCellChange?: (event: GridCellChangeEvent<T>) => void;
   setEditingValue: React.Dispatch<React.SetStateAction<unknown>>;
   requestViewportFocusAfterEdit: () => void;
@@ -78,7 +98,7 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   pasteFormatToSelection: () => boolean;
   paintFormatAtCell: (displayRowIndex: number, visibleColumnIndex: number) => boolean;
 
-  setHistory: React.Dispatch<React.SetStateAction<GridHistoryState>>;
+  setHistory: React.Dispatch<React.SetStateAction<GridHistoryState<T>>>;
   setSelection: React.Dispatch<React.SetStateAction<GridSelectionState>>;
   setEditingCell: React.Dispatch<React.SetStateAction<GridEditCell>>;
   setSort: React.Dispatch<React.SetStateAction<GridSort>>;
@@ -89,6 +109,8 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   setColumnHidden: (columnKey: string, hidden: boolean) => void;
   toggleColumnHidden: (columnKey: string) => void;
   setFrozenColumns: React.Dispatch<React.SetStateAction<number>>;
+  openContextMenu: (next: Exclude<GridContextMenuState, null>) => void;
+  closeContextMenu: () => void;
 
   enableSorting: boolean;
   enableFiltering: boolean;
@@ -96,6 +118,8 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   enableColumnResize: boolean;
   enableColumnAutoFit: boolean;
   enableColumnVisibility: boolean;
+  enableInsertRow: boolean;
+  enableInsertColumn: boolean;
 };
 
 const GridContext = createContext<GridContextValue<GridRow> | null>(null);

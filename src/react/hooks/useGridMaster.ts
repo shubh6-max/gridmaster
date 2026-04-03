@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
-  GridClipboardData,
   GridCellChangeEvent,
-  GridEditCell,
+  GridClipboardData,
+  GridColumnDef,
+  GridColumnInsertPosition,
   GridFilters,
   GridHistoryState,
   GridMasterProps,
   GridResolvedColumnDef,
   GridRow,
+  GridRowInsertPosition,
   GridSelectionState,
   GridSort,
 } from "../../core/types";
@@ -22,6 +24,7 @@ import {
   DEFAULT_ENABLE_EDITING,
   DEFAULT_ENABLE_FILL_HANDLE,
   DEFAULT_ENABLE_FILTERING,
+  DEFAULT_ENABLE_INSERT_COLUMN,
   DEFAULT_ENABLE_INSERT_ROW,
   DEFAULT_ENABLE_RANGE_SELECTION,
   DEFAULT_ENABLE_ROW_SELECTION,
@@ -42,23 +45,35 @@ import {
   EMPTY_SORT,
 } from "../../core/constants";
 import { clearFillState, type GridFillState } from "../../core/features/fill";
+import { createFormulaEvaluator, type GridFormulaEvaluator } from "../../core/features/formulas";
 import {
-  createFormulaEvaluator,
-  type GridFormulaEvaluator,
-} from "../../core/features/formulas";
+  createDefaultInsertedColumn,
+  createDefaultInsertedRow,
+  getInsertColumnIndex,
+  getInsertRowIndex,
+  insertColumnAtIndex,
+  insertColumnValueIntoRows,
+  shiftCellMetaForInsertedRow,
+  shiftRowMetaForInsertedRow,
+} from "../../core/features/structure";
 import {
   createInitialColumnWidths,
   getVisibleColumns,
   syncWidthMapWithColumns,
   type GridColumnWidths,
 } from "../../core/features/sizing";
-import {
-  createInitialHistoryState,
-  historyReducer,
-} from "../../core/state/historyReducer";
+import { insertRowAt } from "../../core/features/editing";
+import { createInitialHistoryState, historyReducer } from "../../core/state/historyReducer";
 import { getDisplayRowIndexes, getDisplayRows } from "../../core/state/gridState";
 import { createInitialSelectionState, setActiveCell } from "../../core/state/selectionState";
-import { clamp, cloneRows, resolveColumns, shallowEqualRows } from "../../core/utils";
+import {
+  clamp,
+  cloneColumns,
+  cloneRows,
+  resolveColumns,
+  shallowEqualColumns,
+  shallowEqualRows,
+} from "../../core/utils";
 
 export type UseGridMasterResult<T extends GridRow = GridRow> = {
   props: GridMasterProps<T>;
@@ -69,19 +84,22 @@ export type UseGridMasterResult<T extends GridRow = GridRow> = {
   rows: T[];
   setRows: (rows: T[]) => void;
 
+  rawColumns: GridColumnDef<T>[];
+  setColumns: (columns: GridColumnDef<T>[]) => void;
+
   columns: GridResolvedColumnDef<T>[];
   visibleColumns: GridResolvedColumnDef<T>[];
   displayRowIndexes: number[];
   hiddenColumnKeys: Set<string>;
   formulaEvaluator: GridFormulaEvaluator<T>;
 
-  history: GridHistoryState;
-  setHistory: React.Dispatch<React.SetStateAction<GridHistoryState>>;
+  history: GridHistoryState<T>;
+  setHistory: React.Dispatch<React.SetStateAction<GridHistoryState<T>>>;
 
   selection: GridSelectionState;
   setSelection: React.Dispatch<React.SetStateAction<GridSelectionState>>;
-  editingCell: GridEditCell;
-  setEditingCell: React.Dispatch<React.SetStateAction<GridEditCell>>;
+  editingCell: { row: number; col: number } | null;
+  setEditingCell: React.Dispatch<React.SetStateAction<{ row: number; col: number } | null>>;
 
   sort: GridSort;
   setSort: React.Dispatch<React.SetStateAction<GridSort>>;
@@ -131,9 +149,13 @@ export type UseGridMasterResult<T extends GridRow = GridRow> = {
   enableCellColoring: boolean;
   enableWrapText: boolean;
   enableInsertRow: boolean;
+  enableInsertColumn: boolean;
   enableDeleteRow: boolean;
 
   updateRows: (nextRows: T[]) => void;
+  updateColumns: (nextColumns: GridColumnDef<T>[]) => void;
+  insertRow: (sourceRowIndex: number, position: GridRowInsertPosition) => T | null;
+  insertColumn: (columnKey: string, position: GridColumnInsertPosition) => GridColumnDef<T> | null;
   emitCellChange: (event: GridCellChangeEvent<T>) => void;
 };
 
@@ -170,9 +192,29 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const enableCellColoring = props.enableCellColoring ?? DEFAULT_ENABLE_CELL_COLORING;
   const enableWrapText = props.enableWrapText ?? DEFAULT_ENABLE_WRAP_TEXT;
   const enableInsertRow = props.enableInsertRow ?? DEFAULT_ENABLE_INSERT_ROW;
+  const enableInsertColumn = props.enableInsertColumn ?? DEFAULT_ENABLE_INSERT_COLUMN;
   const enableDeleteRow = props.enableDeleteRow ?? DEFAULT_ENABLE_DELETE_ROW;
 
-  const resolvedColumns = useMemo(() => resolveColumns(props.columns ?? []), [props.columns]);
+  const lastPropRowsRef = useRef(props.rows);
+  const lastPropRowsValueRef = useRef(cloneRows(props.rows ?? []));
+  const lastPropColumnsRef = useRef(props.columns);
+  const lastPropColumnsValueRef = useRef(cloneColumns(props.columns ?? []));
+  const lastEmittedRowsRef = useRef<T[] | null>(null);
+  const lastEmittedColumnsRef = useRef<GridColumnDef<T>[] | null>(null);
+
+  const [history, setHistory] = useState<GridHistoryState<T>>(() =>
+    createInitialHistoryState({
+      rows: cloneRows(props.rows ?? []),
+      columns: cloneColumns(props.columns ?? []),
+      cellMeta: {},
+      rowMeta: {},
+    })
+  );
+
+  const rows = history.present.rows as T[];
+  const rawColumns = history.present.columns as GridColumnDef<T>[];
+  const resolvedColumns = useMemo(() => resolveColumns(rawColumns), [rawColumns]);
+
   const [hiddenColumnKeys, setHiddenColumnKeys] = useState<Set<string>>(
     () =>
       new Set(
@@ -207,24 +249,18 @@ export function useGridMaster<T extends GridRow = GridRow>(
     [hiddenColumnKeys, resolvedColumns]
   );
   const visibleColumns = useMemo(() => getVisibleColumns(columns), [columns]);
-  const lastPropRowsRef = useRef(props.rows);
-  const lastEmittedRowsRef = useRef<T[] | null>(null);
-
-  const [history, setHistory] = useState<GridHistoryState>(() =>
-    createInitialHistoryState({
-      rows: cloneRows(props.rows ?? []),
-      cellMeta: {},
-      rowMeta: {},
-    })
-  );
-  const rows = history.present.rows as T[];
 
   useEffect(() => {
     if (props.rows === lastPropRowsRef.current) return;
 
     lastPropRowsRef.current = props.rows;
-
     const nextRows = cloneRows(props.rows ?? []);
+
+    if (shallowEqualRows(nextRows, lastPropRowsValueRef.current)) {
+      return;
+    }
+
+    lastPropRowsValueRef.current = nextRows;
 
     if (
       (lastEmittedRowsRef.current && shallowEqualRows(nextRows, lastEmittedRowsRef.current)) ||
@@ -237,16 +273,48 @@ export function useGridMaster<T extends GridRow = GridRow>(
     setHistory((prev) =>
       createInitialHistoryState({
         rows: nextRows,
+        columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
         cellMeta: prev.present.cellMeta ?? {},
         rowMeta: prev.present.rowMeta ?? {},
       })
     );
   }, [history.present.rows, props.rows]);
 
+  useEffect(() => {
+    if (props.columns === lastPropColumnsRef.current) return;
+
+    lastPropColumnsRef.current = props.columns;
+    const nextColumns = cloneColumns(props.columns ?? []);
+
+    if (shallowEqualColumns(nextColumns, lastPropColumnsValueRef.current)) {
+      return;
+    }
+
+    lastPropColumnsValueRef.current = nextColumns;
+
+    if (
+      (lastEmittedColumnsRef.current &&
+        shallowEqualColumns(nextColumns, lastEmittedColumnsRef.current)) ||
+      shallowEqualColumns(nextColumns, history.present.columns as GridColumnDef<T>[])
+    ) {
+      lastEmittedColumnsRef.current = null;
+      return;
+    }
+
+    setHistory((prev) =>
+      createInitialHistoryState({
+        rows: cloneRows(prev.present.rows as T[]),
+        columns: nextColumns,
+        cellMeta: prev.present.cellMeta ?? {},
+        rowMeta: prev.present.rowMeta ?? {},
+      })
+    );
+  }, [history.present.columns, props.columns]);
+
   const [selection, setSelection] = useState<GridSelectionState>(() =>
     setActiveCell(createInitialSelectionState(), { row: 0, col: 0 })
   );
-  const [editingCell, setEditingCell] = useState<GridEditCell>(null);
+  const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
 
   const [sort, setSort] = useState<GridSort>(EMPTY_SORT);
   const [filters, setFilters] = useState<GridFilters>(EMPTY_FILTERS);
@@ -309,7 +377,10 @@ export function useGridMaster<T extends GridRow = GridRow>(
     () => getDisplayRows(rows, displayRowIndexes),
     [rows, displayRowIndexes]
   );
-  const formulaEvaluator = useMemo(() => createFormulaEvaluator(rows, columns), [columns, rows]);
+  const formulaEvaluator = useMemo(
+    () => createFormulaEvaluator(rows, columns),
+    [columns, rows]
+  );
 
   const visibleRowCount = displayRows.length;
 
@@ -381,22 +452,44 @@ export function useGridMaster<T extends GridRow = GridRow>(
       if (prev.row > maxRow || prev.col > maxCol) return null;
       return prev;
     });
-  }, [displayRows.length, visibleColumns.length, setSelection]);
+  }, [displayRows.length, visibleColumns.length]);
 
   const setRows = useCallback(
     (nextRows: T[]) => {
       const cloned = cloneRows(nextRows);
+
       setHistory(
         createInitialHistoryState({
           rows: cloned,
+          columns: cloneColumns(rawColumns),
           cellMeta: {},
           rowMeta: {},
         })
       );
+
       lastEmittedRowsRef.current = cloned;
       props.onRowsChange?.(cloned);
     },
-    [props]
+    [props, rawColumns]
+  );
+
+  const setColumns = useCallback(
+    (nextColumns: GridColumnDef<T>[]) => {
+      const cloned = cloneColumns(nextColumns);
+
+      setHistory(
+        createInitialHistoryState({
+          rows: cloneRows(rows),
+          columns: cloned,
+          cellMeta: history.present.cellMeta,
+          rowMeta: history.present.rowMeta,
+        })
+      );
+
+      lastEmittedColumnsRef.current = cloned;
+      props.onColumnsChange?.(cloned);
+    },
+    [history.present.cellMeta, history.present.rowMeta, props, rows]
   );
 
   const updateRows = useCallback(
@@ -409,15 +502,189 @@ export function useGridMaster<T extends GridRow = GridRow>(
           type: "PUSH",
           payload: {
             rows: cloned,
+            columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
             cellMeta: prev.present.cellMeta,
             rowMeta: prev.present.rowMeta,
           },
         })
       );
+
       lastEmittedRowsRef.current = cloned;
       props.onRowsChange?.(cloned);
     },
     [props, rows]
+  );
+
+  const updateColumns = useCallback(
+    (nextColumns: GridColumnDef<T>[]) => {
+      const cloned = cloneColumns(nextColumns);
+      if (shallowEqualColumns(cloned, rawColumns)) return;
+
+      setHistory((prev) =>
+        historyReducer(prev, {
+          type: "PUSH",
+          payload: {
+            rows: cloneRows(prev.present.rows as T[]),
+            columns: cloned,
+            cellMeta: prev.present.cellMeta,
+            rowMeta: prev.present.rowMeta,
+          },
+        })
+      );
+
+      lastEmittedColumnsRef.current = cloned;
+      props.onColumnsChange?.(cloned);
+    },
+    [props, rawColumns]
+  );
+
+  const insertRow = useCallback(
+    (sourceRowIndex: number, position: GridRowInsertPosition) => {
+      if (mode === "readonly" || !enableInsertRow) return null;
+
+      const insertAt = getInsertRowIndex(sourceRowIndex, rows.length, position);
+      const referenceRow = rows[Math.max(0, Math.min(sourceRowIndex, rows.length - 1))] ?? null;
+      const nextRow =
+        props.createRowOnInsert?.({
+          rows,
+          columns,
+          insertAt,
+          position,
+          referenceRow,
+        }) ?? createDefaultInsertedRow(rows, columns);
+
+      const nextRows = insertRowAt(rows, insertAt, nextRow);
+
+      setHistory((prev) =>
+        historyReducer(prev, {
+          type: "PUSH",
+          payload: {
+            rows: nextRows,
+            columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+            cellMeta: shiftCellMetaForInsertedRow(prev.present.cellMeta, insertAt),
+            rowMeta: shiftRowMetaForInsertedRow(prev.present.rowMeta, insertAt),
+          },
+        })
+      );
+
+      lastEmittedRowsRef.current = nextRows;
+      props.onRowsChange?.(nextRows);
+      props.onRowInsert?.({
+        rowIndex: insertAt,
+        row: nextRow,
+      });
+
+      const nextDisplayRowIndexes = getDisplayRowIndexes(nextRows, columns, filters, sort, {
+        enableFiltering,
+        enableSorting,
+      });
+      const insertedDisplayRowIndex = nextDisplayRowIndexes.findIndex(
+        (rowIndex) => rowIndex === insertAt
+      );
+
+      if (insertedDisplayRowIndex >= 0) {
+        setSelection((prev) =>
+          setActiveCell(prev, {
+            row: insertedDisplayRowIndex,
+            col: Math.min(prev.cursor?.col ?? 0, Math.max(visibleColumns.length - 1, 0)),
+          })
+        );
+      }
+
+      return nextRow;
+    },
+    [
+      columns,
+      enableFiltering,
+      enableInsertRow,
+      enableSorting,
+      filters,
+      mode,
+      props,
+      rows,
+      sort,
+      visibleColumns.length,
+    ]
+  );
+
+  const insertColumn = useCallback(
+    (columnKey: string, position: GridColumnInsertPosition) => {
+      if (mode === "readonly" || !enableInsertColumn) return null;
+
+      const sourceColumnIndex = rawColumns.findIndex((column) => column.key === columnKey);
+      if (sourceColumnIndex < 0) return null;
+
+      const insertAt = getInsertColumnIndex(sourceColumnIndex, rawColumns.length, position);
+      const referenceColumn = rawColumns[sourceColumnIndex] ?? null;
+      const nextColumn =
+        props.createColumnOnInsert?.({
+          columns: cloneColumns(rawColumns),
+          insertAt,
+          position,
+          referenceColumn,
+        }) ?? createDefaultInsertedColumn(rawColumns, insertAt, referenceColumn, position);
+
+      const nextColumns = insertColumnAtIndex(rawColumns, insertAt, nextColumn);
+      const nextRows = insertColumnValueIntoRows(rows, nextColumn);
+
+      setHistory((prev) =>
+        historyReducer(prev, {
+          type: "PUSH",
+          payload: {
+            rows: nextRows,
+            columns: nextColumns,
+            cellMeta: prev.present.cellMeta,
+            rowMeta: prev.present.rowMeta,
+          },
+        })
+      );
+
+      lastEmittedRowsRef.current = nextRows;
+      lastEmittedColumnsRef.current = nextColumns;
+      props.onRowsChange?.(nextRows);
+      props.onColumnsChange?.(nextColumns);
+      props.onColumnInsert?.({
+        columnIndex: insertAt,
+        column: nextColumn,
+        position,
+      });
+
+      const nextResolvedColumns = resolveColumns(nextColumns).map((column) => ({
+        ...column,
+        hidden: hiddenColumnKeys.has(column.key),
+      }));
+      const nextVisibleColumns = getVisibleColumns(nextResolvedColumns);
+      const insertedVisibleColumnIndex = nextVisibleColumns.findIndex(
+        (column) => column.key === nextColumn.key
+      );
+      const nextDisplayRowCount = getDisplayRowIndexes(nextRows, nextResolvedColumns, filters, sort, {
+        enableFiltering,
+        enableSorting,
+      }).length;
+
+      if (insertedVisibleColumnIndex >= 0) {
+        setSelection((prev) =>
+          setActiveCell(prev, {
+            row: Math.min(prev.cursor?.row ?? 0, Math.max(nextDisplayRowCount - 1, 0)),
+            col: insertedVisibleColumnIndex,
+          })
+        );
+      }
+
+      return nextColumn;
+    },
+    [
+      enableFiltering,
+      enableInsertColumn,
+      enableSorting,
+      filters,
+      hiddenColumnKeys,
+      mode,
+      props,
+      rawColumns,
+      rows,
+      sort,
+    ]
   );
 
   const emitCellChange = useCallback(
@@ -451,6 +718,9 @@ export function useGridMaster<T extends GridRow = GridRow>(
 
     rows,
     setRows,
+
+    rawColumns,
+    setColumns,
 
     columns,
     visibleColumns,
@@ -514,9 +784,13 @@ export function useGridMaster<T extends GridRow = GridRow>(
     enableCellColoring,
     enableWrapText,
     enableInsertRow,
+    enableInsertColumn,
     enableDeleteRow,
 
     updateRows,
+    updateColumns,
+    insertRow,
+    insertColumn,
     emitCellChange,
   };
 }

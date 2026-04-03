@@ -7,6 +7,8 @@ export function createReadonlyGridPreset<T extends GridRow = GridRow>(): Partial
     enableClipboard: true,
     enableFillHandle: false,
     enableUndoRedo: false,
+    enableInsertRow: false,
+    enableInsertColumn: false,
     showFormulaBar: true,
     showStatusBar: true,
   };

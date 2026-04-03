@@ -38,9 +38,10 @@ export function FormulaBar() {
         alignItems: "center",
         gap: 12,
         border: "1px solid #e2e8f0",
+        borderTop: "1px solid #dbe3ee",
         borderBottom: "none",
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
         background: "#ffffff",
         padding: "10px 12px",
       }}

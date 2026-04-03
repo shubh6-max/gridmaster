@@ -1,7 +1,12 @@
 import React from "react";
 import { DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
-import { isCellActive, isCellSelected, setActiveCell } from "../core/state/selectionState";
+import {
+  isCellActive,
+  isCellSelected,
+  selectSingleRow,
+  setActiveCell,
+} from "../core/state/selectionState";
 import { createCellMetaKey, resolveGridRowId } from "../core/utils";
 import { useFillHandle } from "./hooks/useFillHandle";
 import { useSelection } from "./hooks/useSelection";
@@ -30,6 +35,9 @@ export function GridBody() {
     rowHeight,
     editingCell,
     enableFillHandle,
+    enableInsertRow,
+    enableInsertColumn,
+    openContextMenu,
   } = useGridContext();
 
   const { onCellMouseDown, onCellMouseEnter, onRowHeaderClick } = useSelection({
@@ -66,6 +74,40 @@ export function GridBody() {
     [visibleColumns, columnWidths]
   );
 
+  const openCellContextMenu = React.useCallback(
+    (event: React.MouseEvent<HTMLElement>, rowIndex: number, colIndex: number, columnKey: string) => {
+      if (!enableInsertRow && !enableInsertColumn) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      setSelection((prev) => setActiveCell(prev, { row: rowIndex, col: colIndex }));
+      openContextMenu({
+        kind: "cell",
+        anchorRect: new DOMRect(event.clientX, event.clientY, 0, 0),
+        displayRowIndex: rowIndex,
+        visibleColumnIndex: colIndex,
+        columnKey,
+      });
+    },
+    [enableInsertColumn, enableInsertRow, openContextMenu, setSelection]
+  );
+
+  const openRowContextMenu = React.useCallback(
+    (event: React.MouseEvent<HTMLElement>, rowIndex: number) => {
+      if (!enableInsertRow) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      setSelection((prev) => selectSingleRow(prev, rowIndex, visibleColumns.length));
+      openContextMenu({
+        kind: "row",
+        anchorRect: new DOMRect(event.clientX, event.clientY, 0, 0),
+        displayRowIndex: rowIndex,
+      });
+    },
+    [enableInsertRow, openContextMenu, setSelection, visibleColumns.length]
+  );
+
   return (
     <tbody>
       {displayRows.map((row, rowIndex: number) => {
@@ -84,6 +126,7 @@ export function GridBody() {
                   metaKey: e.metaKey,
                 })
               }
+              onContextMenu={(event) => openRowContextMenu(event, rowIndex)}
               style={{
                 width: DEFAULT_ROW_NUMBER_WIDTH,
                 minWidth: DEFAULT_ROW_NUMBER_WIDTH,
@@ -165,6 +208,9 @@ export function GridBody() {
                     onCellMouseEnter(rowIndex, colIndex);
                     onFillMouseEnter(rowIndex, colIndex);
                   }}
+                  onContextMenu={(event) =>
+                    openCellContextMenu(event, rowIndex, colIndex, column.key)
+                  }
                   style={{
                     width,
                     minWidth: width,

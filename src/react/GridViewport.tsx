@@ -1,5 +1,6 @@
 import React from "react";
 import { GridBody } from "./GridBody";
+import { GridContextMenu } from "./GridContextMenu";
 import { GridHeader } from "./GridHeader";
 import { useGridContext } from "./context/GridContext";
 import { useClipboard } from "./hooks/useClipboard";
@@ -173,6 +174,7 @@ export function GridViewport() {
         <GridHeader />
         <GridBody />
       </table>
+      <GridContextMenu />
     </div>
   );
 }
