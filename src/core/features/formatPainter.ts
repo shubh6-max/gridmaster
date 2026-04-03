@@ -13,6 +13,11 @@ function normalizeFormatMeta(meta?: GridCellMeta): GridCellMeta {
   return {
     backgroundColor: meta?.backgroundColor ?? "",
     wrap: meta?.wrap ?? false,
+    wrapText: meta?.wrapText,
+    horizontalAlign: meta?.horizontalAlign,
+    verticalAlign: meta?.verticalAlign,
+    textOrientation: meta?.textOrientation,
+    indentLevel: meta?.indentLevel,
     className: meta?.className ?? "",
     style: meta?.style ? { ...meta.style } : undefined,
   };
@@ -25,7 +30,12 @@ function isEmptyStyle(style?: React.CSSProperties): boolean {
 export function isEmptyFormatMeta(meta?: GridCellMeta): boolean {
   return (
     !meta?.backgroundColor &&
-    !meta?.wrap &&
+    meta?.wrap === undefined &&
+    meta?.wrapText === undefined &&
+    !meta?.horizontalAlign &&
+    !meta?.verticalAlign &&
+    !meta?.textOrientation &&
+    !meta?.indentLevel &&
     !meta?.className &&
     isEmptyStyle(meta?.style)
   );
@@ -123,6 +133,11 @@ export function applyFormatPainterToBounds<T extends GridRow>(
         error: currentMeta.error,
         backgroundColor: formatMeta.backgroundColor,
         wrap: formatMeta.wrap,
+        wrapText: formatMeta.wrapText,
+        horizontalAlign: formatMeta.horizontalAlign,
+        verticalAlign: formatMeta.verticalAlign,
+        textOrientation: formatMeta.textOrientation,
+        indentLevel: formatMeta.indentLevel,
         className: formatMeta.className,
         style: formatMeta.style ? { ...formatMeta.style } : undefined,
       };

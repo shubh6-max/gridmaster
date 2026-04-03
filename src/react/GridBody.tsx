@@ -1,5 +1,9 @@
 import React from "react";
 import { DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
+import {
+  getEffectiveVerticalAlign,
+  getEffectiveWrapText,
+} from "../core/features/formatting";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
 import {
   isCellActive,
@@ -159,13 +163,14 @@ export function GridBody() {
               const metaKey = createCellMetaKey(sourceRowIndex, column.key);
               const cellMeta = cellMetaMap[metaKey];
               const isMetaReadonly = Boolean(cellMeta?.readonly);
-              const shouldWrap = column.wrap || cellMeta?.wrap;
+              const shouldWrap = getEffectiveWrapText(cellMeta, column);
               const backgroundColor =
                 active
                   ? "#ffffff"
                   : selected
                   ? "#dbeafe"
                   : cellMeta?.backgroundColor || "#ffffff";
+              const verticalAlign = getEffectiveVerticalAlign(cellMeta);
 
               return (
                 <td
@@ -224,9 +229,9 @@ export function GridBody() {
                     borderBottom: "1px solid #e2e8f0",
                     padding: "0 8px",
                     overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: shouldWrap ? "pre-wrap" : "nowrap",
-                    verticalAlign: "middle",
+                    textOverflow: shouldWrap ? "clip" : "ellipsis",
+                    whiteSpace: shouldWrap ? "normal" : "nowrap",
+                    verticalAlign,
                     boxShadow:
                       active
                         ? "inset 0 0 0 2px #2563eb"

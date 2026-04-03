@@ -2,12 +2,22 @@ node_modules/
 dist/
 .vite/
 coverage/
+.cache/
 
 *.log
+npm-debug.log*
+yarn-*.log*
+pnpm-debug.log*
 *.tsbuildinfo
+*.tmp
+*.temp
+*.bak
+*.orig
 
 .DS_Store
 Thumbs.db
 
 .idea/
 .vscode/
+.env
+.env.*

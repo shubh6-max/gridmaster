@@ -1,4 +1,11 @@
 import React from "react";
+import {
+  getEffectiveHorizontalAlign,
+  getEffectiveIndentLevel,
+  getEffectiveTextOrientation,
+  getEffectiveVerticalAlign,
+  getEffectiveWrapText,
+} from "../core/features/formatting";
 import { updateCellValue, validateCell } from "../core/features/editing";
 import type { GridCellMeta, GridResolvedColumnDef, GridRow } from "../core/types";
 import { formatCellValue, getRowValue, isFormulaValue, parseCellValue } from "../core/utils";
@@ -16,6 +23,43 @@ type GridCellProps<T extends GridRow = GridRow> = {
   isActive: boolean;
   baseMeta?: GridCellMeta;
 };
+
+function getVerticalJustify(verticalAlign: "top" | "middle" | "bottom"): React.CSSProperties["justifyContent"] {
+  switch (verticalAlign) {
+    case "top":
+      return "flex-start";
+    case "bottom":
+      return "flex-end";
+    default:
+      return "center";
+  }
+}
+
+function getOrientationStyles(
+  orientation: "horizontal" | "rotateUp" | "rotateDown" | "vertical"
+): React.CSSProperties {
+  switch (orientation) {
+    case "rotateUp":
+      return {
+        writingMode: "vertical-rl",
+        textOrientation: "mixed",
+        transform: "rotate(180deg)",
+        transformOrigin: "center",
+      };
+    case "rotateDown":
+      return {
+        writingMode: "vertical-rl",
+        textOrientation: "mixed",
+      };
+    case "vertical":
+      return {
+        writingMode: "vertical-rl",
+        textOrientation: "upright",
+      };
+    default:
+      return {};
+  }
+}
 
 export function GridCell<T extends GridRow = GridRow>({
   row,
@@ -108,6 +152,23 @@ export function GridCell<T extends GridRow = GridRow>({
   const wrapperTitle = cellError
     ? [formattedValue, cellError].filter(Boolean).join("\n")
     : formattedValue || undefined;
+  const effectiveWrapText = getEffectiveWrapText(meta, column);
+  const effectiveHorizontalAlign = getEffectiveHorizontalAlign(meta, column);
+  const effectiveVerticalAlign = getEffectiveVerticalAlign(meta);
+  const effectiveTextOrientation = getEffectiveTextOrientation(meta);
+  const effectiveIndentLevel = getEffectiveIndentLevel(meta);
+  const wrapperStyle: React.CSSProperties = {
+    overflow: effectiveWrapText ? "visible" : "hidden",
+    justifyContent: getVerticalJustify(effectiveVerticalAlign),
+  };
+  const contentStyle: React.CSSProperties = {
+    textAlign: effectiveHorizontalAlign,
+    whiteSpace: effectiveWrapText ? "pre-wrap" : "nowrap",
+    overflow: effectiveWrapText ? "visible" : "hidden",
+    textOverflow: effectiveWrapText ? "clip" : "ellipsis",
+    paddingInlineStart: effectiveIndentLevel ? `${effectiveIndentLevel * 12}px` : undefined,
+    ...getOrientationStyles(effectiveTextOrientation),
+  };
 
   if (isEditing) {
     const DefaultEditor = getDefaultCellEditor<T>(column.type);
@@ -132,7 +193,7 @@ export function GridCell<T extends GridRow = GridRow>({
     return (
       <div
         className={wrapperClassName}
-        style={{ overflow: column.wrap ? "visible" : "hidden" }}
+        style={wrapperStyle}
         title={cellError ?? undefined}
       >
         {column.renderEditor ? <>{column.renderEditor(editorProps)}</> : <DefaultEditor {...editorProps} />}
@@ -161,10 +222,21 @@ export function GridCell<T extends GridRow = GridRow>({
     <div
       className={wrapperClassName}
       onDoubleClick={startEdit}
-      style={{ overflow: column.wrap ? "visible" : "hidden" }}
+      style={wrapperStyle}
       title={wrapperTitle}
     >
-      {column.renderCell ? <>{column.renderCell(rendererProps)}</> : <DefaultRenderer {...rendererProps} />}
+      <div
+        className={[
+          "gm-cell-content",
+          effectiveWrapText ? "is-wrap" : "",
+          effectiveTextOrientation !== "horizontal" ? "is-oriented" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        style={contentStyle}
+      >
+        {column.renderCell ? <>{column.renderCell(rendererProps)}</> : <DefaultRenderer {...rendererProps} />}
+      </div>
       {cellError ? <span className="gm-cell-error-indicator" aria-label={cellError} /> : null}
     </div>
   );

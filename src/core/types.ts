@@ -28,6 +28,9 @@ export type GridMode = "editable" | "readonly";
 export type GridSortDirection = "asc" | "desc";
 export type GridRowInsertPosition = "above" | "below";
 export type GridColumnInsertPosition = "left" | "right";
+export type GridHorizontalAlign = "left" | "center" | "right";
+export type GridVerticalAlign = "top" | "middle" | "bottom";
+export type GridTextOrientation = "horizontal" | "rotateUp" | "rotateDown" | "vertical";
 
 /* =========================================================
    Selection types
@@ -131,6 +134,11 @@ export type GridFormatPainterClipboard = {
 export type GridCellMeta = {
   backgroundColor?: string;
   wrap?: boolean;
+  wrapText?: boolean;
+  horizontalAlign?: GridHorizontalAlign;
+  verticalAlign?: GridVerticalAlign;
+  textOrientation?: GridTextOrientation;
+  indentLevel?: number;
   readonly?: boolean;
   className?: string;
   style?: React.CSSProperties;

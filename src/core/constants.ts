@@ -70,6 +70,11 @@ export const DEFAULT_SHOW_STATUS_BAR = true;
 export const DEFAULT_CELL_META: GridCellMeta = {
   backgroundColor: "",
   wrap: false,
+  wrapText: undefined,
+  horizontalAlign: undefined,
+  verticalAlign: undefined,
+  textOrientation: undefined,
+  indentLevel: undefined,
   readonly: false,
   className: "",
   style: undefined,

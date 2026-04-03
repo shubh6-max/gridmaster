@@ -3,6 +3,7 @@ import { GridBody } from "./GridBody";
 import { GridContextMenu } from "./GridContextMenu";
 import { GridHeader } from "./GridHeader";
 import { useGridContext } from "./context/GridContext";
+import { useCellFormatting } from "./hooks/useCellFormatting";
 import { useClipboard } from "./hooks/useClipboard";
 import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation";
 
@@ -31,6 +32,21 @@ export function GridViewport() {
     pasteFormatToSelection,
     stopFormatPainter,
   } = useGridContext();
+  const {
+    toggleBold,
+    toggleItalic,
+    toggleUnderline,
+  } = useCellFormatting({
+    history,
+    setHistory,
+    selection,
+    displayRows,
+    displayRowIndexes,
+    visibleColumns,
+    focusViewport: () => {
+      viewportRef.current?.focus({ preventScroll: true });
+    },
+  });
 
   const { clearSelection, copy, cut, paste } = useClipboard({
     rows,
@@ -66,6 +82,9 @@ export function GridViewport() {
     onCopyFormat: copyFormat,
     onPasteFormat: pasteFormatToSelection,
     onCancelFormatPainter: stopFormatPainter,
+    onToggleBold: toggleBold,
+    onToggleItalic: toggleItalic,
+    onToggleUnderline: toggleUnderline,
     isFormatPainterActive: formatPainterMode !== "idle",
   });
 

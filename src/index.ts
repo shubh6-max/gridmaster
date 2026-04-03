@@ -36,6 +36,7 @@ export {
   updateFillState,
 } from "./core/features/fill";
 export * from "./core/features/filtering";
+export * from "./core/features/formatting";
 export * from "./core/features/formulas";
 export * from "./core/features/formatPainter";
 export * from "./core/features/freezing";
@@ -59,6 +60,7 @@ export * from "./presets/readonly";
 export * from "./renderers";
 
 export * from "./react/hooks/useClipboard";
+export * from "./react/hooks/useCellFormatting";
 export * from "./react/hooks/useColumnSizing";
 export * from "./react/hooks/useEditing";
 export * from "./react/hooks/useFormatPainter";

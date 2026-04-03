@@ -278,10 +278,20 @@
   min-width: 260px;
 }
 
+.gm-ribbon-group-alignment {
+  min-width: 336px;
+}
+
 .gm-ribbon-font-layout {
   display: grid;
   gap: 10px;
   min-width: 228px;
+}
+
+.gm-ribbon-alignment-layout {
+  display: grid;
+  gap: 8px;
+  min-width: 304px;
 }
 
 .gm-ribbon-font-row {
@@ -289,44 +299,171 @@
   gap: 8px;
 }
 
+.gm-ribbon-alignment-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.gm-ribbon-alignment-row:nth-child(1),
+.gm-ribbon-alignment-row:nth-child(2) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gm-ribbon-alignment-row:nth-child(3) {
+  grid-template-columns: 86px minmax(0, 1fr);
+}
+
+.gm-ribbon-alignment-row:nth-child(5) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .gm-ribbon-font-row-buttons {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
-.gm-ribbon-placeholder-field,
-.gm-ribbon-placeholder-button {
+.gm-ribbon-select-field,
+.gm-ribbon-tool-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   border: 1px solid #dbe3ee;
   border-radius: 8px;
   background: linear-gradient(180deg, #ffffff, #f8fafc);
   color: #94a3b8;
-  user-select: none;
 }
 
-.gm-ribbon-placeholder-field {
+.gm-ribbon-select-field {
   flex: 1;
   justify-content: space-between;
   min-height: 34px;
-  padding: 0 10px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 0 4px 0 10px;
 }
 
-.gm-ribbon-placeholder-field.is-compact {
+.gm-ribbon-select-field.is-mixed {
+  border-color: #93c5fd;
+  background: linear-gradient(180deg, #f8fbff, #eef5ff);
+}
+
+.gm-ribbon-select-field.is-compact {
   flex: 0 0 62px;
 }
 
-.gm-ribbon-placeholder-button {
-  min-height: 30px;
+.gm-ribbon-select {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #0f172a;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
+  font-family: inherit;
+  appearance: none;
+  cursor: pointer;
 }
 
-.gm-ribbon-placeholder-button.is-accent {
+.gm-ribbon-select:focus-visible {
+  outline: none;
+}
+
+.gm-ribbon-select-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #64748b;
+  pointer-events: none;
+}
+
+.gm-ribbon-tool-button {
+  min-height: 30px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #475569;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+  box-shadow 120ms ease;
+  user-select: none;
+  gap: 6px;
+}
+
+.gm-ribbon-tool-button:focus-visible,
+.gm-ribbon-select-field:focus-within,
+.gm-ribbon-action:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 1px;
+}
+
+.gm-ribbon-tool-button:hover {
+  background: linear-gradient(180deg, #ffffff, #eef5ff);
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+}
+
+.gm-ribbon-tool-button.is-active {
+  background: linear-gradient(180deg, #eff6ff, #dbeafe);
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.08);
+}
+
+.gm-ribbon-tool-button.is-mixed {
+  background: linear-gradient(180deg, #f8fbff, #eef5ff);
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.gm-ribbon-tool-button:disabled {
+  cursor: not-allowed;
+  color: #94a3b8;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border-color: #e2e8f0;
+  box-shadow: none;
+}
+
+.gm-ribbon-tool-button:disabled:hover {
+  color: #94a3b8;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border-color: #e2e8f0;
+  box-shadow: none;
+}
+
+.gm-ribbon-tool-button.is-accent {
+  color: #64748b;
+}
+
+.gm-ribbon-tool-icon,
+.gm-ribbon-tool-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.gm-ribbon-tool-icon {
+  flex-shrink: 0;
+}
+
+.gm-ribbon-tool-label {
+  width: 100%;
+}
+
+.gm-ribbon-tool-indicator {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 4px;
+  height: 3px;
+  border: 1px solid transparent;
+  border-radius: 999px;
 }
 
 .gm-toolbar::-webkit-scrollbar {
@@ -360,11 +497,28 @@
 .gm-cell-shell {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
   height: 100%;
   min-width: 0;
   overflow: hidden;
+}
+
+.gm-cell-content {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.gm-cell-content.is-wrap {
+  word-break: break-word;
+}
+
+.gm-cell-content.is-oriented {
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
 }
 
 .gm-fill-handle {

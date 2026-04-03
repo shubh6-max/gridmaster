@@ -46,6 +46,9 @@ type UseKeyboardNavigationParams<T extends GridRow = GridRow> = {
   onCopyFormat?: () => boolean | void;
   onPasteFormat?: () => boolean | void;
   onCancelFormatPainter?: () => void;
+  onToggleBold?: () => boolean | void;
+  onToggleItalic?: () => boolean | void;
+  onToggleUnderline?: () => boolean | void;
   isEditing?: boolean;
   isFormatPainterActive?: boolean;
 };
@@ -181,6 +184,9 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
   onCopyFormat,
   onPasteFormat,
   onCancelFormatPainter,
+  onToggleBold,
+  onToggleItalic,
+  onToggleUnderline,
   isEditing = false,
   isFormatPainterActive = false,
 }: UseKeyboardNavigationParams<T>) {
@@ -241,6 +247,24 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
       if (enableClipboard && ctrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.C) {
         event.preventDefault();
         onCopy?.();
+        return;
+      }
+
+      if (!isEditing && ctrlOrMeta && key.toLowerCase() === "b") {
+        event.preventDefault();
+        onToggleBold?.();
+        return;
+      }
+
+      if (!isEditing && ctrlOrMeta && key.toLowerCase() === "i") {
+        event.preventDefault();
+        onToggleItalic?.();
+        return;
+      }
+
+      if (!isEditing && ctrlOrMeta && key.toLowerCase() === "u") {
+        event.preventDefault();
+        onToggleUnderline?.();
         return;
       }
 
@@ -364,6 +388,9 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
     onCopyFormat,
     onPasteFormat,
     onCancelFormatPainter,
+    onToggleBold,
+    onToggleItalic,
+    onToggleUnderline,
     isEditing,
     isFormatPainterActive,
   ]);
