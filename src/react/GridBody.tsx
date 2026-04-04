@@ -41,6 +41,8 @@ export function GridBody() {
     enableFillHandle,
     enableInsertRow,
     enableInsertColumn,
+    enableDeleteRow,
+    enableDeleteColumn,
     openContextMenu,
   } = useGridContext();
 
@@ -80,7 +82,9 @@ export function GridBody() {
 
   const openCellContextMenu = React.useCallback(
     (event: React.MouseEvent<HTMLElement>, rowIndex: number, colIndex: number, columnKey: string) => {
-      if (!enableInsertRow && !enableInsertColumn) return;
+      if (!enableInsertRow && !enableInsertColumn && !enableDeleteRow && !enableDeleteColumn) {
+        return;
+      }
 
       event.preventDefault();
       event.stopPropagation();
@@ -93,12 +97,19 @@ export function GridBody() {
         columnKey,
       });
     },
-    [enableInsertColumn, enableInsertRow, openContextMenu, setSelection]
+    [
+      enableDeleteColumn,
+      enableDeleteRow,
+      enableInsertColumn,
+      enableInsertRow,
+      openContextMenu,
+      setSelection,
+    ]
   );
 
   const openRowContextMenu = React.useCallback(
     (event: React.MouseEvent<HTMLElement>, rowIndex: number) => {
-      if (!enableInsertRow) return;
+      if (!enableInsertRow && !enableDeleteRow) return;
 
       event.preventDefault();
       event.stopPropagation();
@@ -109,7 +120,7 @@ export function GridBody() {
         displayRowIndex: rowIndex,
       });
     },
-    [enableInsertRow, openContextMenu, setSelection, visibleColumns.length]
+    [enableDeleteRow, enableInsertRow, openContextMenu, setSelection, visibleColumns.length]
   );
 
   return (
@@ -220,7 +231,7 @@ export function GridBody() {
                     width,
                     minWidth: width,
                     maxWidth: width,
-                    height: rowHeight,
+                    height: shouldWrap ? undefined : rowHeight,
                     position: isFrozen ? "sticky" : undefined,
                     left: isFrozen ? DEFAULT_ROW_NUMBER_WIDTH + (colOffsets[column.key] ?? 0) : undefined,
                     zIndex: isFrozen ? Z_INDEX.FROZEN_CELL : undefined,
@@ -228,7 +239,7 @@ export function GridBody() {
                     borderRight: "1px solid #e2e8f0",
                     borderBottom: "1px solid #e2e8f0",
                     padding: "0 8px",
-                    overflow: "hidden",
+                    overflow: shouldWrap ? "visible" : "hidden",
                     textOverflow: shouldWrap ? "clip" : "ellipsis",
                     whiteSpace: shouldWrap ? "normal" : "nowrap",
                     verticalAlign,

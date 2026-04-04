@@ -84,7 +84,9 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         updateRows: grid.updateRows,
         updateColumns: grid.updateColumns,
         insertRow: grid.insertRow,
+        deleteRow: grid.deleteRow,
         insertColumn: grid.insertColumn,
+        deleteColumn: grid.deleteColumn,
         emitCellChange: grid.emitCellChange,
         setEditingValue: editing.setEditingValue,
         requestViewportFocusAfterEdit: editing.requestViewportFocusAfterEdit,
@@ -120,6 +122,8 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         enableColumnVisibility: grid.enableColumnVisibility,
         enableInsertRow: grid.enableInsertRow,
         enableInsertColumn: grid.enableInsertColumn,
+        enableDeleteRow: grid.enableDeleteRow,
+        enableDeleteColumn: grid.enableDeleteColumn,
       }}
     >
       <div

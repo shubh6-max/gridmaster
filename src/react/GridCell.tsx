@@ -7,6 +7,7 @@ import {
   getEffectiveWrapText,
 } from "../core/features/formatting";
 import { updateCellValue, validateCell } from "../core/features/editing";
+import { setActiveCell } from "../core/state/selectionState";
 import type { GridCellMeta, GridResolvedColumnDef, GridRow } from "../core/types";
 import { formatCellValue, getRowValue, isFormulaValue, parseCellValue } from "../core/utils";
 import { getDefaultCellEditor } from "../editors";
@@ -80,6 +81,7 @@ export function GridCell<T extends GridRow = GridRow>({
     editingCell,
     editingOrigin,
     editingValue,
+    setSelection,
     setEditingValue,
     startEditing,
     requestViewportFocusAfterEdit,
@@ -118,6 +120,13 @@ export function GridCell<T extends GridRow = GridRow>({
     if (isReadonly) return;
     startEditing({ row: rowIndex, col: columnIndex });
   }, [columnIndex, isReadonly, rowIndex, startEditing]);
+
+  const startSelectEdit = React.useCallback(() => {
+    if (isReadonly) return;
+
+    setSelection((prev) => setActiveCell(prev, { row: rowIndex, col: columnIndex }));
+    startEditing({ row: rowIndex, col: columnIndex });
+  }, [columnIndex, isReadonly, rowIndex, setSelection, startEditing]);
 
   const updateDraftValue = React.useCallback(
     (nextValue: unknown) => {
@@ -216,6 +225,7 @@ export function GridCell<T extends GridRow = GridRow>({
     isEditing,
     mode,
     updateValue: updateRenderedValue,
+    startEditing: column.type === "select" ? startSelectEdit : startEdit,
   };
 
   return (

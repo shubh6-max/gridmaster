@@ -6,10 +6,15 @@ const {
   createColumn,
   createDefaultInsertedColumn,
   createDefaultInsertedRow,
+  deleteCellMetaForColumn,
+  deleteColumnAtIndex,
+  deleteColumnValueFromRows,
   insertColumnAtIndex,
   insertColumnValueIntoRows,
   resolveColumns,
+  shiftCellMetaForDeletedRow,
   shiftCellMetaForInsertedRow,
+  shiftRowMetaForDeletedRow,
   shiftRowMetaForInsertedRow,
 } = require("../dist/index.cjs");
 
@@ -62,6 +67,18 @@ export function runStructureTests() {
   assert.deepEqual(nextColumns.map((column) => column.key), ["account", "live", "value"]);
 
   assert.deepEqual(
+    deleteColumnAtIndex(
+      [
+        createColumn.text("account", { title: "Account" }),
+        createColumn.number("value", { title: "Value" }),
+        createColumn.checkbox("live", { title: "Live" }),
+      ],
+      1
+    ).map((column) => column.key),
+    ["account", "live"]
+  );
+
+  assert.deepEqual(
     insertColumnValueIntoRows(
       [
         { account: "Northwind", value: 120 },
@@ -75,13 +92,77 @@ export function runStructureTests() {
     ]
   );
 
-  assert.deepEqual(shiftCellMetaForInsertedRow({ "0::account": { error: null }, "2::value": { error: "bad" } }, 1), {
-    "0::account": { error: null },
-    "3::value": { error: "bad" },
-  });
+  assert.deepEqual(
+    deleteColumnValueFromRows(
+      [
+        { account: "Northwind", value: 120, live: true },
+        { account: "BluePeak", value: 80, live: false },
+      ],
+      "value"
+    ),
+    [
+      { account: "Northwind", live: true },
+      { account: "BluePeak", live: false },
+    ]
+  );
 
-  assert.deepEqual(shiftRowMetaForInsertedRow({ 0: { className: "a" }, 2: { className: "b" } }, 1), {
-    0: { className: "a" },
-    3: { className: "b" },
-  });
+  assert.deepEqual(
+    shiftCellMetaForInsertedRow(
+      { "0::account": { error: null }, "2::value": { error: "bad" } },
+      1
+    ),
+    {
+      "0::account": { error: null },
+      "3::value": { error: "bad" },
+    }
+  );
+
+  assert.deepEqual(
+    shiftCellMetaForDeletedRow(
+      {
+        "0::account": { error: null },
+        "1::value": { error: "remove" },
+        "2::value": { error: "bad" },
+      },
+      1
+    ),
+    {
+      "0::account": { error: null },
+      "1::value": { error: "bad" },
+    }
+  );
+
+  assert.deepEqual(
+    deleteCellMetaForColumn(
+      {
+        "0::account": { error: null },
+        "1::value": { error: "bad" },
+        "2::live": { error: "warn" },
+      },
+      "value"
+    ),
+    {
+      "0::account": { error: null },
+      "2::live": { error: "warn" },
+    }
+  );
+
+  assert.deepEqual(
+    shiftRowMetaForInsertedRow({ 0: { className: "a" }, 2: { className: "b" } }, 1),
+    {
+      0: { className: "a" },
+      3: { className: "b" },
+    }
+  );
+
+  assert.deepEqual(
+    shiftRowMetaForDeletedRow(
+      { 0: { className: "a" }, 1: { className: "remove" }, 3: { className: "b" } },
+      1
+    ),
+    {
+      0: { className: "a" },
+      2: { className: "b" },
+    }
+  );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { GridCellEditorProps, GridRow } from "../core/types";
 
 export function SelectEditor<T extends GridRow = GridRow>({
@@ -16,8 +16,23 @@ export function SelectEditor<T extends GridRow = GridRow>({
     setLocalValue(value == null ? "" : String(value));
   }, [value]);
 
-  useEffect(() => {
-    selectRef.current?.focus();
+  useLayoutEffect(() => {
+    const selectElement = selectRef.current as
+      | (HTMLSelectElement & { showPicker?: () => void })
+      | null;
+
+    if (!selectElement) return;
+
+    selectElement.focus();
+    selectElement.showPicker?.();
+
+    const frameId = window.requestAnimationFrame(() => {
+      selectElement.showPicker?.();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
   }, []);
 
   return (

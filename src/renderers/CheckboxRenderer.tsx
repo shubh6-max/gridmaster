@@ -10,12 +10,11 @@ export function CheckboxRenderer<T extends GridRow = GridRow>({
   const isReadonly = mode === "readonly" || column.readonly || !column.editable;
 
   return (
-    <div
+    <span
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: column.align === "center" ? "center" : "flex-start",
-        height: "100%",
+        display: "block",
+        width: "100%",
+        textAlign: "inherit",
       }}
     >
       <input
@@ -29,7 +28,7 @@ export function CheckboxRenderer<T extends GridRow = GridRow>({
           updateValue(!Boolean(value));
         }}
       />
-    </div>
+    </span>
   );
 }
 

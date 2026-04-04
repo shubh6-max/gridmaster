@@ -151,8 +151,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 116px;
-  padding: 12px 16px 28px;
+  min-height: 104px;
+  padding: 10px 14px;
   border-right: 1px solid #dbe3ee;
 }
 
@@ -160,17 +160,50 @@
   border-right: none;
 }
 
+.gm-ribbon-group.has-footer {
+  padding-bottom: 26px;
+}
+
 .gm-ribbon-group-content {
   display: flex;
-  align-items: stretch;
-  height: 100%;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.gm-ribbon-group-clipboard-font {
+  min-width: 262px;
+}
+
+.gm-ribbon-stacked-layout {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.gm-ribbon-section-block {
+  display: grid;
+  gap: 8px;
+}
+
+.gm-ribbon-section-heading {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.gm-ribbon-stacked-divider {
+  height: 1px;
+  margin: 0 10px;
+  background: linear-gradient(90deg, transparent, #dbe3ee 12%, #dbe3ee 88%, transparent);
 }
 
 .gm-ribbon-group-footer {
   position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 8px;
+  left: 14px;
+  right: 14px;
+  bottom: 7px;
   text-align: center;
   color: #64748b;
   font-size: 11px;
@@ -179,19 +212,12 @@
 
 .gm-ribbon-clipboard-layout {
   display: grid;
-  grid-template-columns: 92px 138px;
-  gap: 10px;
-  align-items: stretch;
-}
-
-.gm-ribbon-clipboard-stack {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, max-content);
   gap: 8px;
-  align-content: start;
+  align-items: start;
 }
 
-.gm-ribbon-clipboard-stack .gm-ribbon-action:last-child {
+.gm-ribbon-clipboard-layout .gm-ribbon-action:last-child {
   grid-column: 1 / -1;
 }
 
@@ -230,7 +256,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 72px;
+  min-height: 58px;
   padding: 12px 10px 10px;
   font-size: 12px;
   font-weight: 600;
@@ -239,12 +265,13 @@
 
 .gm-ribbon-action.is-small {
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  min-height: 30px;
-  padding: 0 10px;
+  min-height: 32px;
+  padding: 0 12px;
   font-size: 12px;
   font-weight: 600;
-  text-align: left;
+  text-align: center;
 }
 
 .gm-ribbon-action-icon {
@@ -286,12 +313,14 @@
   display: grid;
   gap: 10px;
   min-width: 228px;
+  align-content: start;
 }
 
 .gm-ribbon-alignment-layout {
   display: grid;
   gap: 8px;
   min-width: 304px;
+  align-content: start;
 }
 
 .gm-ribbon-font-row {
@@ -338,7 +367,7 @@
 .gm-ribbon-select-field {
   flex: 1;
   justify-content: space-between;
-  min-height: 34px;
+  min-height: 32px;
   padding: 0 4px 0 10px;
 }
 
@@ -378,7 +407,7 @@
 }
 
 .gm-ribbon-tool-button {
-  min-height: 30px;
+  min-height: 32px;
   padding: 0 6px;
   font-size: 11px;
   font-weight: 700;
@@ -519,6 +548,51 @@
   display: inline-block;
   width: auto;
   max-width: 100%;
+}
+
+.gm-select-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.gm-select-cell-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: inherit;
+  text-align: inherit;
+}
+
+.gm-select-cell-caret,
+.gm-select-cell-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  color: #64748b;
+}
+
+.gm-select-cell-trigger {
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.gm-select-cell-trigger:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
 }
 
 .gm-fill-handle {
@@ -797,6 +871,25 @@
 .gm-menu-action:hover {
   background: #f8fafc;
   color: #0f172a;
+}
+
+.gm-menu-action.is-danger {
+  color: #b91c1c;
+}
+
+.gm-menu-action.is-danger:hover:not(:disabled) {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.gm-menu-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.gm-menu-action:disabled:hover {
+  background: transparent;
+  color: inherit;
 }
 
 .gm-menu-action.is-subtle {

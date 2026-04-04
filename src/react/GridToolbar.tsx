@@ -72,14 +72,22 @@ function RibbonGroup({
   children,
   className,
 }: {
-  label: string;
+  label?: string;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
-    <section className={["gm-ribbon-group", className].filter(Boolean).join(" ")}>
+    <section
+      className={[
+        "gm-ribbon-group",
+        label ? "has-footer" : "is-footerless",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className="gm-ribbon-group-content">{children}</div>
-      <div className="gm-ribbon-group-footer">{label}</div>
+      {label ? <div className="gm-ribbon-group-footer">{label}</div> : null}
     </section>
   );
 }
@@ -258,7 +266,7 @@ function resolveMixedNumber(
     : { value: String(value ?? fallback), mixed: false };
 }
 
-function ClipboardGroup() {
+function ClipboardSection() {
   const {
     rows,
     displayRows,
@@ -286,11 +294,11 @@ function ClipboardGroup() {
   });
 
   return (
-    <RibbonGroup label="Clipboard" className="gm-ribbon-group-clipboard">
+    <div className="gm-ribbon-section-block">
+      <div className="gm-ribbon-section-heading">Clipboard</div>
       <div className="gm-ribbon-clipboard-layout">
         <RibbonActionButton
-          size="large"
-          icon={<ClipboardPaste style={{ width: 28, height: 28 }} />}
+          icon={<ClipboardPaste style={{ width: 15, height: 15 }} />}
           label="Paste"
           title="Paste into the current selection"
           onClick={() => {
@@ -298,51 +306,46 @@ function ClipboardGroup() {
             focusViewport();
           }}
         />
-
-        <div className="gm-ribbon-clipboard-stack">
-          <RibbonActionButton
-            icon={<Copy style={{ width: 15, height: 15 }} />}
-            label="Copy"
-            title="Copy selected cells"
-            onClick={() => {
-              void copy(false);
-              focusViewport();
-            }}
-          />
-
-          <RibbonActionButton
-            icon={<Scissors style={{ width: 15, height: 15 }} />}
-            label="Cut"
-            title="Cut selected cells"
-            onClick={() => {
-              void cut();
-              focusViewport();
-            }}
-          />
-
-          <RibbonActionButton
-            icon={<Paintbrush style={{ width: 15, height: 15 }} />}
-            label="Format Painter"
-            title="Click to paint formatting once. Double-click to keep painting until Esc."
-            active={formatPainterMode !== "idle"}
-            onClick={() => {
-              if (formatPainterMode !== "idle") {
-                stopFormatPainter();
-              } else {
-                startFormatPainter(false);
-              }
-            }}
-            onDoubleClick={() => {
-              startFormatPainter(true);
-            }}
-          />
-        </div>
+        <RibbonActionButton
+          icon={<Copy style={{ width: 15, height: 15 }} />}
+          label="Copy"
+          title="Copy selected cells"
+          onClick={() => {
+            void copy(false);
+            focusViewport();
+          }}
+        />
+        <RibbonActionButton
+          icon={<Scissors style={{ width: 15, height: 15 }} />}
+          label="Cut"
+          title="Cut selected cells"
+          onClick={() => {
+            void cut();
+            focusViewport();
+          }}
+        />
+        <RibbonActionButton
+          icon={<Paintbrush style={{ width: 15, height: 15 }} />}
+          label="Format Painter"
+          title="Click to paint formatting once. Double-click to keep painting until Esc."
+          active={formatPainterMode !== "idle"}
+          onClick={() => {
+            if (formatPainterMode !== "idle") {
+              stopFormatPainter();
+            } else {
+              startFormatPainter(false);
+            }
+          }}
+          onDoubleClick={() => {
+            startFormatPainter(true);
+          }}
+        />
       </div>
-    </RibbonGroup>
+    </div>
   );
 }
 
-function FontGroup({ formatting }: { formatting: CellFormattingApi }) {
+function FontSection({ formatting }: { formatting: CellFormattingApi }) {
   const {
     summary,
     setFontFamily,
@@ -371,7 +374,8 @@ function FontGroup({ formatting }: { formatting: CellFormattingApi }) {
       : "";
 
   return (
-    <RibbonGroup label="Font" className="gm-ribbon-group-font">
+    <div className="gm-ribbon-section-block">
+      <div className="gm-ribbon-section-heading">Font</div>
       <div className="gm-ribbon-font-layout">
         <div className="gm-ribbon-font-row">
           <RibbonSelectField
@@ -484,12 +488,24 @@ function FontGroup({ formatting }: { formatting: CellFormattingApi }) {
           onClose={() => setColorMenu(null)}
         />
       ) : null}
-    </RibbonGroup>
+    </div>
   );
 }
 
 function AlignmentToolRow({ children }: { children: React.ReactNode }) {
   return <div className="gm-ribbon-alignment-row">{children}</div>;
+}
+
+function ClipboardFontGroup({ formatting }: { formatting: CellFormattingApi }) {
+  return (
+    <RibbonGroup className="gm-ribbon-group-clipboard-font">
+      <div className="gm-ribbon-stacked-layout">
+        <ClipboardSection />
+        <div className="gm-ribbon-stacked-divider" aria-hidden="true" />
+        <FontSection formatting={formatting} />
+      </div>
+    </RibbonGroup>
+  );
 }
 
 function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
@@ -679,8 +695,7 @@ export function GridToolbar() {
   return (
     <div className="gm-toolbar" role="toolbar" aria-label="Spreadsheet toolbar">
       <div className="gm-ribbon">
-        <ClipboardGroup />
-        <FontGroup formatting={formatting} />
+        <ClipboardFontGroup formatting={formatting} />
         <AlignmentGroup formatting={formatting} />
       </div>
     </div>

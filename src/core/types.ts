@@ -173,6 +173,7 @@ export type GridCellContext<T extends GridRow = GridRow> = {
 
 export type GridCellRendererProps<T extends GridRow = GridRow> = GridCellContext<T> & {
   updateValue: (nextValue: any) => void;
+  startEditing?: () => void;
 };
 
 export type GridCellEditorProps<T extends GridRow = GridRow> = GridCellContext<T> & {
@@ -226,6 +227,11 @@ export type GridColumnInsertEvent<T extends GridRow = GridRow> = {
 export type GridRowDeleteEvent<T extends GridRow = GridRow> = {
   rowIndex: number;
   row: T;
+};
+
+export type GridColumnDeleteEvent<T extends GridRow = GridRow> = {
+  columnIndex: number;
+  column: GridColumnDef<T>;
 };
 
 export type GridClipboardEvent<T extends GridRow = GridRow> = {
@@ -424,6 +430,7 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   onRowInsert?: (event: GridRowInsertEvent<T>) => void;
   onColumnInsert?: (event: GridColumnInsertEvent<T>) => void;
   onRowDelete?: (event: GridRowDeleteEvent<T>) => void;
+  onColumnDelete?: (event: GridColumnDeleteEvent<T>) => void;
   onCopy?: (event: GridClipboardEvent<T>) => void;
   onPaste?: (event: GridClipboardEvent<T>) => void;
   createRowOnInsert?: GridInsertedRowFactory<T>;
@@ -461,6 +468,7 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   enableInsertRow?: boolean;
   enableInsertColumn?: boolean;
   enableDeleteRow?: boolean;
+  enableDeleteColumn?: boolean;
 
   className?: string;
   style?: React.CSSProperties;

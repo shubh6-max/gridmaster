@@ -77,10 +77,12 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   updateRows: (rows: T[]) => void;
   updateColumns: (columns: GridColumnDef<T>[]) => void;
   insertRow: (sourceRowIndex: number, position: GridRowInsertPosition) => T | null;
+  deleteRow: (sourceRowIndex: number) => T | null;
   insertColumn: (
     columnKey: string,
     position: GridColumnInsertPosition
   ) => GridColumnDef<T> | null;
+  deleteColumn: (columnKey: string) => GridColumnDef<T> | null;
   emitCellChange?: (event: GridCellChangeEvent<T>) => void;
   setEditingValue: React.Dispatch<React.SetStateAction<unknown>>;
   requestViewportFocusAfterEdit: () => void;
@@ -120,6 +122,8 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   enableColumnVisibility: boolean;
   enableInsertRow: boolean;
   enableInsertColumn: boolean;
+  enableDeleteRow: boolean;
+  enableDeleteColumn: boolean;
 };
 
 const GridContext = createContext<GridContextValue<GridRow> | null>(null);

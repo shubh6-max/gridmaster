@@ -21,6 +21,7 @@ import {
   DEFAULT_ENABLE_COLUMN_SELECTION,
   DEFAULT_ENABLE_COLUMN_VISIBILITY,
   DEFAULT_ENABLE_DELETE_ROW,
+  DEFAULT_ENABLE_DELETE_COLUMN,
   DEFAULT_ENABLE_EDITING,
   DEFAULT_ENABLE_FILL_HANDLE,
   DEFAULT_ENABLE_FILTERING,
@@ -49,11 +50,16 @@ import { createFormulaEvaluator, type GridFormulaEvaluator } from "../../core/fe
 import {
   createDefaultInsertedColumn,
   createDefaultInsertedRow,
+  deleteCellMetaForColumn,
+  deleteColumnAtIndex,
+  deleteColumnValueFromRows,
   getInsertColumnIndex,
   getInsertRowIndex,
   insertColumnAtIndex,
   insertColumnValueIntoRows,
+  shiftCellMetaForDeletedRow,
   shiftCellMetaForInsertedRow,
+  shiftRowMetaForDeletedRow,
   shiftRowMetaForInsertedRow,
 } from "../../core/features/structure";
 import {
@@ -62,10 +68,14 @@ import {
   syncWidthMapWithColumns,
   type GridColumnWidths,
 } from "../../core/features/sizing";
-import { insertRowAt } from "../../core/features/editing";
+import { deleteRowAt, insertRowAt } from "../../core/features/editing";
 import { createInitialHistoryState, historyReducer } from "../../core/state/historyReducer";
 import { getDisplayRowIndexes, getDisplayRows } from "../../core/state/gridState";
-import { createInitialSelectionState, setActiveCell } from "../../core/state/selectionState";
+import {
+  clearSelection,
+  createInitialSelectionState,
+  setActiveCell,
+} from "../../core/state/selectionState";
 import {
   clamp,
   cloneColumns,
@@ -151,11 +161,14 @@ export type UseGridMasterResult<T extends GridRow = GridRow> = {
   enableInsertRow: boolean;
   enableInsertColumn: boolean;
   enableDeleteRow: boolean;
+  enableDeleteColumn: boolean;
 
   updateRows: (nextRows: T[]) => void;
   updateColumns: (nextColumns: GridColumnDef<T>[]) => void;
   insertRow: (sourceRowIndex: number, position: GridRowInsertPosition) => T | null;
   insertColumn: (columnKey: string, position: GridColumnInsertPosition) => GridColumnDef<T> | null;
+  deleteRow: (sourceRowIndex: number) => T | null;
+  deleteColumn: (columnKey: string) => GridColumnDef<T> | null;
   emitCellChange: (event: GridCellChangeEvent<T>) => void;
 };
 
@@ -194,6 +207,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const enableInsertRow = props.enableInsertRow ?? DEFAULT_ENABLE_INSERT_ROW;
   const enableInsertColumn = props.enableInsertColumn ?? DEFAULT_ENABLE_INSERT_COLUMN;
   const enableDeleteRow = props.enableDeleteRow ?? DEFAULT_ENABLE_DELETE_ROW;
+  const enableDeleteColumn = props.enableDeleteColumn ?? DEFAULT_ENABLE_DELETE_COLUMN;
 
   const lastPropRowsRef = useRef(props.rows);
   const lastPropRowsValueRef = useRef(cloneRows(props.rows ?? []));
@@ -687,6 +701,170 @@ export function useGridMaster<T extends GridRow = GridRow>(
     ]
   );
 
+  const deleteRow = useCallback(
+    (sourceRowIndex: number) => {
+      if (mode === "readonly" || !enableDeleteRow) return null;
+      if (sourceRowIndex < 0 || sourceRowIndex >= rows.length) return null;
+
+      const deletedRow = rows[sourceRowIndex];
+      const nextRows = deleteRowAt(rows, sourceRowIndex);
+
+      setHistory((prev) =>
+        historyReducer(prev, {
+          type: "PUSH",
+          payload: {
+            rows: nextRows,
+            columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+            cellMeta: shiftCellMetaForDeletedRow(prev.present.cellMeta, sourceRowIndex),
+            rowMeta: shiftRowMetaForDeletedRow(prev.present.rowMeta, sourceRowIndex),
+          },
+        })
+      );
+
+      setEditingCell(null);
+
+      lastEmittedRowsRef.current = nextRows;
+      props.onRowsChange?.(nextRows);
+      props.onRowDelete?.({
+        rowIndex: sourceRowIndex,
+        row: deletedRow,
+      });
+
+      const nextDisplayRowIndexes = getDisplayRowIndexes(nextRows, columns, filters, sort, {
+        enableFiltering,
+        enableSorting,
+      });
+
+      if (!nextDisplayRowIndexes.length || !visibleColumns.length) {
+        setSelection(clearSelection());
+        return deletedRow;
+      }
+
+      const nextSourceRowIndex = Math.min(sourceRowIndex, nextRows.length - 1);
+      const nextDisplayRowIndex = nextDisplayRowIndexes.findIndex(
+        (rowIndex) => rowIndex === nextSourceRowIndex
+      );
+
+      setSelection((prev) =>
+        setActiveCell(prev, {
+          row:
+            nextDisplayRowIndex >= 0
+              ? nextDisplayRowIndex
+              : Math.min(prev.cursor?.row ?? 0, nextDisplayRowIndexes.length - 1),
+          col: Math.min(prev.cursor?.col ?? 0, visibleColumns.length - 1),
+        })
+      );
+
+      return deletedRow;
+    },
+    [
+      columns,
+      enableDeleteRow,
+      enableFiltering,
+      enableSorting,
+      filters,
+      mode,
+      props,
+      rows,
+      sort,
+      visibleColumns.length,
+    ]
+  );
+
+  const deleteColumn = useCallback(
+    (columnKey: string) => {
+      if (mode === "readonly" || !enableDeleteColumn) return null;
+
+      const sourceColumnIndex = rawColumns.findIndex((column) => column.key === columnKey);
+      if (sourceColumnIndex < 0 || rawColumns.length <= 1) return null;
+
+      const deletedColumn = rawColumns[sourceColumnIndex];
+      const currentVisibleColumnIndex = visibleColumns.findIndex(
+        (column) => column.key === columnKey
+      );
+      const nextColumns = deleteColumnAtIndex(rawColumns, sourceColumnIndex);
+      const nextRows = deleteColumnValueFromRows(rows, columnKey);
+      const nextSort = sort?.columnKey === columnKey ? null : sort;
+      const nextFilters =
+        columnKey in filters
+          ? Object.fromEntries(
+              Object.entries(filters).filter(([key]) => key !== columnKey)
+            )
+          : filters;
+
+      setHistory((prev) =>
+        historyReducer(prev, {
+          type: "PUSH",
+          payload: {
+            rows: nextRows,
+            columns: nextColumns,
+            cellMeta: deleteCellMetaForColumn(prev.present.cellMeta, columnKey),
+            rowMeta: prev.present.rowMeta,
+          },
+        })
+      );
+
+      setEditingCell(null);
+      if (nextSort !== sort) {
+        setSort(nextSort);
+      }
+      if (nextFilters !== filters) {
+        setFilters(nextFilters);
+      }
+
+      lastEmittedRowsRef.current = nextRows;
+      lastEmittedColumnsRef.current = nextColumns;
+      props.onRowsChange?.(nextRows);
+      props.onColumnsChange?.(nextColumns);
+      props.onColumnDelete?.({
+        columnIndex: sourceColumnIndex,
+        column: deletedColumn,
+      });
+
+      const nextResolvedColumns = resolveColumns(nextColumns).map((column) => ({
+        ...column,
+        hidden: hiddenColumnKeys.has(column.key),
+      }));
+      const nextVisibleColumns = getVisibleColumns(nextResolvedColumns);
+      const nextDisplayRowCount = getDisplayRowIndexes(nextRows, nextResolvedColumns, nextFilters, nextSort, {
+        enableFiltering,
+        enableSorting,
+      }).length;
+
+      if (!nextVisibleColumns.length || nextDisplayRowCount <= 0) {
+        setSelection(clearSelection());
+        return deletedColumn;
+      }
+
+      const nextVisibleColumnIndex = Math.min(
+        currentVisibleColumnIndex < 0 ? 0 : currentVisibleColumnIndex,
+        nextVisibleColumns.length - 1
+      );
+
+      setSelection((prev) =>
+        setActiveCell(prev, {
+          row: Math.min(prev.cursor?.row ?? 0, nextDisplayRowCount - 1),
+          col: nextVisibleColumnIndex,
+        })
+      );
+
+      return deletedColumn;
+    },
+    [
+      enableDeleteColumn,
+      enableFiltering,
+      enableSorting,
+      filters,
+      hiddenColumnKeys,
+      mode,
+      props,
+      rawColumns,
+      rows,
+      sort,
+      visibleColumns,
+    ]
+  );
+
   const emitCellChange = useCallback(
     (event: GridCellChangeEvent<T>) => {
       props.onCellChange?.(event);
@@ -786,11 +964,14 @@ export function useGridMaster<T extends GridRow = GridRow>(
     enableInsertRow,
     enableInsertColumn,
     enableDeleteRow,
+    enableDeleteColumn,
 
     updateRows,
     updateColumns,
     insertRow,
     insertColumn,
+    deleteRow,
+    deleteColumn,
     emitCellChange,
   };
 }

@@ -8,7 +8,7 @@ import type {
   GridRowMeta,
 } from "../types";
 import { createEmptyRow } from "./editing";
-import { columnLetter, createCellMetaKey } from "../utils";
+import { cloneColumns, columnLetter, createCellMetaKey } from "../utils";
 
 function getDefaultCellValue<T extends GridRow>(column: GridColumnDef<T>): any {
   switch (column.type) {
@@ -126,6 +126,29 @@ export function insertColumnValueIntoRows<T extends GridRow>(
   });
 }
 
+export function deleteColumnAtIndex<T extends GridRow>(
+  columns: GridColumnDef<T>[],
+  deleteAt: number
+): GridColumnDef<T>[] {
+  if (deleteAt < 0 || deleteAt >= columns.length) {
+    return cloneColumns(columns);
+  }
+
+  const next = cloneColumns(columns);
+  next.splice(deleteAt, 1);
+  return next;
+}
+
+export function deleteColumnValueFromRows<T extends GridRow>(
+  rows: T[],
+  columnKey: string
+): T[] {
+  return rows.map((row) => {
+    const { [columnKey]: _deletedValue, ...rest } = row;
+    return rest as T;
+  });
+}
+
 export function shiftCellMetaForInsertedRow(
   cellMeta: Record<string, GridCellMeta>,
   insertAt: number
@@ -148,6 +171,52 @@ export function shiftCellMetaForInsertedRow(
   return next;
 }
 
+export function shiftCellMetaForDeletedRow(
+  cellMeta: Record<string, GridCellMeta>,
+  deleteAt: number
+): Record<string, GridCellMeta> {
+  const next: Record<string, GridCellMeta> = {};
+
+  for (const [key, meta] of Object.entries(cellMeta)) {
+    const separatorIndex = key.indexOf("::");
+    if (separatorIndex < 0) {
+      next[key] = { ...meta };
+      continue;
+    }
+
+    const rowIndex = Number(key.slice(0, separatorIndex));
+    const columnKey = key.slice(separatorIndex + 2);
+
+    if (rowIndex === deleteAt) continue;
+
+    const nextRowIndex = rowIndex > deleteAt ? rowIndex - 1 : rowIndex;
+    next[createCellMetaKey(nextRowIndex, columnKey)] = { ...meta };
+  }
+
+  return next;
+}
+
+export function deleteCellMetaForColumn(
+  cellMeta: Record<string, GridCellMeta>,
+  columnKey: string
+): Record<string, GridCellMeta> {
+  const next: Record<string, GridCellMeta> = {};
+
+  for (const [key, meta] of Object.entries(cellMeta)) {
+    const separatorIndex = key.indexOf("::");
+    if (separatorIndex < 0) {
+      next[key] = { ...meta };
+      continue;
+    }
+
+    const metaColumnKey = key.slice(separatorIndex + 2);
+    if (metaColumnKey === columnKey) continue;
+    next[key] = { ...meta };
+  }
+
+  return next;
+}
+
 export function shiftRowMetaForInsertedRow(
   rowMeta: Record<number, GridRowMeta>,
   insertAt: number
@@ -157,6 +226,23 @@ export function shiftRowMetaForInsertedRow(
   for (const [key, meta] of Object.entries(rowMeta)) {
     const rowIndex = Number(key);
     const nextRowIndex = rowIndex >= insertAt ? rowIndex + 1 : rowIndex;
+    next[nextRowIndex] = { ...meta };
+  }
+
+  return next;
+}
+
+export function shiftRowMetaForDeletedRow(
+  rowMeta: Record<number, GridRowMeta>,
+  deleteAt: number
+): Record<number, GridRowMeta> {
+  const next: Record<number, GridRowMeta> = {};
+
+  for (const [key, meta] of Object.entries(rowMeta)) {
+    const rowIndex = Number(key);
+    if (rowIndex === deleteAt) continue;
+
+    const nextRowIndex = rowIndex > deleteAt ? rowIndex - 1 : rowIndex;
     next[nextRowIndex] = { ...meta };
   }
 

@@ -53,6 +53,7 @@ export function GridHeader() {
     enableColumnAutoFit,
     enableColumnVisibility,
     enableInsertColumn,
+    enableDeleteColumn,
     openContextMenu,
   } = useGridContext();
   const [columnMenu, setColumnMenu] = React.useState<ColumnMenuState>(null);
@@ -190,7 +191,7 @@ export function GridHeader() {
   );
   const openColumnContextMenu = React.useCallback(
     (event: React.MouseEvent<HTMLElement>, columnKey: string, visibleColumnIndex: number) => {
-      if (!enableInsertColumn) return;
+      if (!enableInsertColumn && !enableDeleteColumn) return;
 
       event.preventDefault();
       event.stopPropagation();
@@ -202,7 +203,7 @@ export function GridHeader() {
         columnKey,
       });
     },
-    [displayRows.length, enableInsertColumn, openContextMenu, setSelection]
+    [displayRows.length, enableDeleteColumn, enableInsertColumn, openContextMenu, setSelection]
   );
 
   return (

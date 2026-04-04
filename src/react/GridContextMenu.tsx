@@ -1,6 +1,13 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Plus } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { Z_INDEX } from "../core/constants";
 import { useFloatingAnchorRect, useFloatingPortal } from "./hooks/useFloatingPortal";
 import { useGridContext } from "./context/GridContext";
@@ -9,11 +16,18 @@ type MenuActionProps = {
   label: string;
   icon: React.ReactNode;
   onClick: () => void;
+  danger?: boolean;
+  disabled?: boolean;
 };
 
-function MenuAction({ label, icon, onClick }: MenuActionProps) {
+function MenuAction({ label, icon, onClick, danger = false, disabled = false }: MenuActionProps) {
   return (
-    <button type="button" className="gm-menu-action" onClick={onClick}>
+    <button
+      type="button"
+      className={["gm-menu-action", danger ? "is-danger" : ""].filter(Boolean).join(" ")}
+      onClick={onClick}
+      disabled={disabled}
+    >
       <span className="gm-menu-action-icon">{icon}</span>
       <span className="gm-menu-action-label">{label}</span>
     </button>
@@ -24,12 +38,17 @@ export function GridContextMenu() {
   const {
     contextMenu,
     closeContextMenu,
+    rawColumns,
     displayRowIndexes,
     visibleColumns,
     enableInsertRow,
     enableInsertColumn,
+    enableDeleteRow,
+    enableDeleteColumn,
     insertRow,
     insertColumn,
+    deleteRow,
+    deleteColumn,
     focusViewport,
   } = useGridContext();
   const target = useFloatingPortal();
@@ -64,21 +83,40 @@ export function GridContextMenu() {
 
   if (!target || !contextMenu) return null;
 
-  const showRowActions =
-    enableInsertRow &&
+  const hasRowTarget =
     (contextMenu.kind === "cell" || contextMenu.kind === "row") &&
     typeof contextMenu.displayRowIndex === "number";
-  const showColumnActions =
-    enableInsertColumn &&
+  const hasColumnTarget =
     (contextMenu.kind === "cell" || contextMenu.kind === "column") &&
-    Boolean(contextMenu.columnKey);
+    (Boolean(contextMenu.columnKey) || typeof contextMenu.visibleColumnIndex === "number");
+
+  const sourceRowIndex =
+    typeof contextMenu.displayRowIndex === "number"
+      ? (displayRowIndexes[contextMenu.displayRowIndex] ?? contextMenu.displayRowIndex)
+      : -1;
+  const columnKey =
+    contextMenu.columnKey ??
+    (typeof contextMenu.visibleColumnIndex === "number"
+      ? visibleColumns[contextMenu.visibleColumnIndex]?.key
+      : undefined);
+
+  const rowActionCount = Number(enableInsertRow && hasRowTarget) * 2 + Number(enableDeleteRow && hasRowTarget);
+  const columnActionCount =
+    Number(enableInsertColumn && hasColumnTarget && Boolean(columnKey)) * 2 +
+    Number(enableDeleteColumn && hasColumnTarget && Boolean(columnKey));
+  const showRowActions = rowActionCount > 0;
+  const showColumnActions = columnActionCount > 0;
 
   if (!showRowActions && !showColumnActions) {
     return null;
   }
 
   const menuWidth = 248;
-  const menuHeight = showRowActions && showColumnActions ? 216 : 144;
+  const menuHeight =
+    54 +
+    (showRowActions ? 30 + rowActionCount * 38 + 16 : 0) +
+    (showRowActions && showColumnActions ? 1 : 0) +
+    (showColumnActions ? 30 + columnActionCount * 38 + 16 : 0);
   const viewportWidth = typeof window === "undefined" ? menuWidth + 16 : window.innerWidth;
   const viewportHeight = typeof window === "undefined" ? menuHeight + 16 : window.innerHeight;
   const top =
@@ -92,16 +130,7 @@ export function GridContextMenu() {
     closeContextMenu();
     focusViewport();
   };
-
-  const sourceRowIndex =
-    typeof contextMenu.displayRowIndex === "number"
-      ? (displayRowIndexes[contextMenu.displayRowIndex] ?? contextMenu.displayRowIndex)
-      : -1;
-  const columnKey =
-    contextMenu.columnKey ??
-    (typeof contextMenu.visibleColumnIndex === "number"
-      ? visibleColumns[contextMenu.visibleColumnIndex]?.key
-      : undefined);
+  const canDeleteLastColumn = rawColumns.length > 1;
 
   return createPortal(
     <div
@@ -117,7 +146,7 @@ export function GridContextMenu() {
     >
       <div className="gm-menu-header">
         <div className="gm-menu-kicker">Context Menu</div>
-        <div className="gm-menu-title">Insert spreadsheet structure</div>
+        <div className="gm-menu-title">Update spreadsheet structure</div>
       </div>
 
       {showRowActions ? (
@@ -126,26 +155,38 @@ export function GridContextMenu() {
             <div className="gm-menu-section-title">Rows</div>
           </div>
           <div className="gm-menu-section">
-            <MenuAction
-              label="Insert Row Above"
-              icon={
-                <>
-                  <Plus style={{ width: 12, height: 12 }} />
-                  <ArrowUp style={{ width: 12, height: 12 }} />
-                </>
-              }
-              onClick={() => runAction(() => void insertRow(sourceRowIndex, "above"))}
-            />
-            <MenuAction
-              label="Insert Row Below"
-              icon={
-                <>
-                  <Plus style={{ width: 12, height: 12 }} />
-                  <ArrowDown style={{ width: 12, height: 12 }} />
-                </>
-              }
-              onClick={() => runAction(() => void insertRow(sourceRowIndex, "below"))}
-            />
+            {enableInsertRow ? (
+              <MenuAction
+                label="Insert Row Above"
+                icon={
+                  <>
+                    <Plus style={{ width: 12, height: 12 }} />
+                    <ArrowUp style={{ width: 12, height: 12 }} />
+                  </>
+                }
+                onClick={() => runAction(() => void insertRow(sourceRowIndex, "above"))}
+              />
+            ) : null}
+            {enableInsertRow ? (
+              <MenuAction
+                label="Insert Row Below"
+                icon={
+                  <>
+                    <Plus style={{ width: 12, height: 12 }} />
+                    <ArrowDown style={{ width: 12, height: 12 }} />
+                  </>
+                }
+                onClick={() => runAction(() => void insertRow(sourceRowIndex, "below"))}
+              />
+            ) : null}
+            {enableDeleteRow ? (
+              <MenuAction
+                label="Delete Row"
+                icon={<Trash2 style={{ width: 12, height: 12 }} />}
+                danger
+                onClick={() => runAction(() => void deleteRow(sourceRowIndex))}
+              />
+            ) : null}
           </div>
         </>
       ) : null}
@@ -158,26 +199,39 @@ export function GridContextMenu() {
             <div className="gm-menu-section-title">Columns</div>
           </div>
           <div className="gm-menu-section">
-            <MenuAction
-              label="Insert Column Left"
-              icon={
-                <>
-                  <Plus style={{ width: 12, height: 12 }} />
-                  <ArrowLeft style={{ width: 12, height: 12 }} />
-                </>
-              }
-              onClick={() => runAction(() => void insertColumn(columnKey, "left"))}
-            />
-            <MenuAction
-              label="Insert Column Right"
-              icon={
-                <>
-                  <Plus style={{ width: 12, height: 12 }} />
-                  <ArrowRight style={{ width: 12, height: 12 }} />
-                </>
-              }
-              onClick={() => runAction(() => void insertColumn(columnKey, "right"))}
-            />
+            {enableInsertColumn ? (
+              <MenuAction
+                label="Insert Column Left"
+                icon={
+                  <>
+                    <Plus style={{ width: 12, height: 12 }} />
+                    <ArrowLeft style={{ width: 12, height: 12 }} />
+                  </>
+                }
+                onClick={() => runAction(() => void insertColumn(columnKey, "left"))}
+              />
+            ) : null}
+            {enableInsertColumn ? (
+              <MenuAction
+                label="Insert Column Right"
+                icon={
+                  <>
+                    <Plus style={{ width: 12, height: 12 }} />
+                    <ArrowRight style={{ width: 12, height: 12 }} />
+                  </>
+                }
+                onClick={() => runAction(() => void insertColumn(columnKey, "right"))}
+              />
+            ) : null}
+            {enableDeleteColumn ? (
+              <MenuAction
+                label="Delete Column"
+                icon={<Trash2 style={{ width: 12, height: 12 }} />}
+                danger
+                disabled={!canDeleteLastColumn}
+                onClick={() => runAction(() => void deleteColumn(columnKey))}
+              />
+            ) : null}
           </div>
         </>
       ) : null}

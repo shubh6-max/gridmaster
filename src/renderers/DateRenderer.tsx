@@ -3,7 +3,6 @@ import type { GridCellRendererProps, GridRow } from "../core/types";
 
 export function DateRenderer<T extends GridRow = GridRow>({
   formattedValue,
-  column,
 }: GridCellRendererProps<T>) {
   return (
     <span
@@ -12,8 +11,8 @@ export function DateRenderer<T extends GridRow = GridRow>({
         width: "100%",
         overflow: "hidden",
         textOverflow: "ellipsis",
-        whiteSpace: column.wrap ? "pre-wrap" : "nowrap",
-        textAlign: column.align ?? "left",
+        whiteSpace: "inherit",
+        textAlign: "inherit",
       }}
       title={formattedValue}
     >

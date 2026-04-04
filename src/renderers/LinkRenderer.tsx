@@ -4,7 +4,6 @@ import { ensureHttps } from "../core/utils";
 
 export function LinkRenderer<T extends GridRow = GridRow>({
   formattedValue,
-  column,
 }: GridCellRendererProps<T>) {
   if (!formattedValue) return null;
 
@@ -16,9 +15,11 @@ export function LinkRenderer<T extends GridRow = GridRow>({
       onClick={(event) => event.stopPropagation()}
       style={{
         display: "block",
+        width: "100%",
         overflow: "hidden",
         textOverflow: "ellipsis",
-        whiteSpace: column.wrap ? "pre-wrap" : "nowrap",
+        whiteSpace: "inherit",
+        textAlign: "inherit",
         color: "#2563eb",
         textDecoration: "none",
       }}
