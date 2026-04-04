@@ -5,14 +5,14 @@ GridMaster is a React spreadsheet-style grid with selection, editing, sorting, f
 ## Install
 
 ```bash
-npm install gridmaster
+npm install gridmaster-react
 ```
 
 ## Minimal Usage
 
 ```tsx
-import { GridMaster, createColumn } from "gridmaster";
-import "gridmaster/styles.css";
+import { GridMaster, createColumn } from "gridmaster-react";
+import "gridmaster-react/styles.css";
 
 type Row = {
   id: number;
@@ -84,7 +84,7 @@ import {
   createColumn,
   createCompactGridPreset,
   createEditableGridPreset,
-} from "gridmaster";
+} from "gridmaster-react";
 
 const compactEditableProps = {
   ...createEditableGridPreset(),
@@ -105,7 +105,7 @@ Available presets:
 Import the packaged stylesheet once:
 
 ```tsx
-import "gridmaster/styles.css";
+import "gridmaster-react/styles.css";
 ```
 
 ## Development

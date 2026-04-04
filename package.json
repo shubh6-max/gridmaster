@@ -1,5 +1,5 @@
 {
-  "name": "gridmaster",
+  "name": "gridmaster-react",
   "version": "0.1.0",
   "description": "Excel-like React grid library with selection, editing, sorting, filtering, clipboard, and spreadsheet-style UX.",
   "type": "module",
