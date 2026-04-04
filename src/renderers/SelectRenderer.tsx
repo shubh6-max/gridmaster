@@ -28,11 +28,11 @@ export function SelectRenderer<T extends GridRow = GridRow>({
           onMouseDown={(event) => {
             event.preventDefault();
             event.stopPropagation();
+            startEditing?.();
           }}
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            startEditing?.();
           }}
         >
           <ChevronDown style={{ width: 14, height: 14 }} />

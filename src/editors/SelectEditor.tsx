@@ -24,15 +24,12 @@ export function SelectEditor<T extends GridRow = GridRow>({
     if (!selectElement) return;
 
     selectElement.focus();
-    selectElement.showPicker?.();
-
-    const frameId = window.requestAnimationFrame(() => {
+    try {
       selectElement.showPicker?.();
-    });
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-    };
+    } catch {
+      // `showPicker()` can throw when the browser no longer considers the
+      // interaction user-initiated. Focusing the select still keeps the editor usable.
+    }
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 {
   "name": "gridmaster-react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Excel-like React grid library with selection, editing, sorting, filtering, clipboard, and spreadsheet-style UX.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -26,6 +26,8 @@
     "build:lib": "vite build --configLoader native",
     "build:types": "tsc -p tsconfig.build.json",
     "build:demo": "vite build --mode demo --configLoader native",
+    "dev:test-app": "npm --prefix test-app run dev",
+    "build:test-app": "npm --prefix test-app run build",
     "prepare": "npm run build",
     "test": "npm run build && node tests/run.mjs",
     "prepublishOnly": "npm run test"
