@@ -26,8 +26,17 @@
     "build:lib": "vite build --configLoader native",
     "build:types": "tsc -p tsconfig.build.json",
     "build:demo": "vite build --mode demo --configLoader native",
+    "prepare": "npm run build",
     "test": "npm run build && node tests/run.mjs",
     "prepublishOnly": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shubh6-max/gridmaster.git"
+  },
+  "homepage": "https://github.com/shubh6-max/gridmaster#readme",
+  "bugs": {
+    "url": "https://github.com/shubh6-max/gridmaster/issues"
   },
   "peerDependencies": {
     "react": ">=18",
