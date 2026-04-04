@@ -7,6 +7,7 @@
     "dev": "vite --host 0.0.0.0 --port 4174 --configLoader native",
     "build": "tsc && vite build --configLoader native",
     "build:pages": "tsc && vite build --configLoader native --base=/gridmaster/",
+    "build:site": "tsc && vite build --configLoader native --base=/gridmaster/test-app-pages/ --outDir=../test-app-pages --emptyOutDir",
     "preview": "vite preview --host 0.0.0.0 --port 4174 --configLoader native"
   },
   "dependencies": {

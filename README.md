@@ -2,7 +2,7 @@
 
 GridMaster is a React spreadsheet-style grid with selection, editing, sorting, filtering, frozen columns, column sizing, formula-bar editing, and extensible renderers/editors.
 
-Live test app: [https://shubh6-max.github.io/gridmaster/](https://shubh6-max.github.io/gridmaster/)
+Live test app: [https://shubh6-max.github.io/gridmaster/test-app-pages/](https://shubh6-max.github.io/gridmaster/test-app-pages/)
 
 ## Install
 
@@ -142,7 +142,9 @@ Library output:
 
 ## GitHub Pages
 
-The npm-powered test app in `test-app/` is deployed to GitHub Pages from `.github/workflows/deploy-test-app.yml`.
-After pushing to `main`, GitHub Actions publishes the site to:
+The published static test app lives at:
 
-- [https://shubh6-max.github.io/gridmaster/](https://shubh6-max.github.io/gridmaster/)
+- [https://shubh6-max.github.io/gridmaster/test-app-pages/](https://shubh6-max.github.io/gridmaster/test-app-pages/)
+
+The source app is in `test-app/`, and the committed static Pages build is in `test-app-pages/`.
+The repository also includes `.github/workflows/deploy-test-app.yml` for an Actions-based Pages deployment if the repo Pages source is switched to GitHub Actions later.
