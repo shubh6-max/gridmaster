@@ -3,11 +3,14 @@ dist/
 .vite/
 coverage/
 .cache/
+.npm-cache/
+.npm/
 
 *.log
 npm-debug.log*
 yarn-*.log*
 pnpm-debug.log*
+*.tgz
 *.tsbuildinfo
 *.tmp
 *.temp
@@ -19,5 +22,6 @@ Thumbs.db
 
 .idea/
 .vscode/
+.npmrc
 .env
 .env.*
