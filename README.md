@@ -2,6 +2,8 @@
 
 GridMaster is a React spreadsheet-style grid with selection, editing, sorting, filtering, frozen columns, column sizing, formula-bar editing, and extensible renderers/editors.
 
+Live test app: [https://shubh6-max.github.io/gridmaster/](https://shubh6-max.github.io/gridmaster/)
+
 ## Install
 
 ```bash
@@ -11,7 +13,7 @@ npm install gridmaster-react
 ## Minimal Usage
 
 ```tsx
-import { GridMaster, createColumn } from "gridmaster-react";
+import { GridMaster, createColumnFactory } from "gridmaster-react";
 import "gridmaster-react/styles.css";
 
 type Row = {
@@ -21,10 +23,12 @@ type Row = {
   active: boolean;
 };
 
+const createColumn = createColumnFactory<Row>();
+
 const columns = [
-  createColumn.text<Row>("name", { title: "Name" }),
-  createColumn.number<Row>("age", { title: "Age" }),
-  createColumn.checkbox<Row>("active", { title: "Active" }),
+  createColumn.text("name", { title: "Name" }),
+  createColumn.number("age", { title: "Age" }),
+  createColumn.checkbox("active", { title: "Active" }),
 ];
 
 export function App() {
@@ -134,3 +138,11 @@ Library output:
 
 - [basic-grid](./examples/basic-grid/App.tsx)
 - [editable-grid](./examples/editable-grid/App.tsx)
+- [test-app](./test-app/src/App.tsx)
+
+## GitHub Pages
+
+The npm-powered test app in `test-app/` is deployed to GitHub Pages from `.github/workflows/deploy-test-app.yml`.
+After pushing to `main`, GitHub Actions publishes the site to:
+
+- [https://shubh6-max.github.io/gridmaster/](https://shubh6-max.github.io/gridmaster/)
