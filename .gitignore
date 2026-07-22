@@ -5,6 +5,7 @@ coverage/
 .cache/
 .npm-cache/
 .npm/
+.temp-pg/
 
 *.log
 npm-debug.log*
