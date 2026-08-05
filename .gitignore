@@ -32,3 +32,6 @@ automation/
 
 # Superpowers plan artifacts
 docs/superpowers/plans/
+
+# Local project instructions (session-only; not versioned)
+CLAUDE.md
