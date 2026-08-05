@@ -50,6 +50,8 @@ export function runFormulaTests() {
       result: createConditionFilter("gt", 26),
     },
     null,
+    {},
+    null,
     {
       enableFiltering: true,
       enableSorting: false,
@@ -65,6 +67,8 @@ export function runFormulaTests() {
       columnKey: "result",
       direction: "desc",
     },
+    {},
+    null,
     {
       enableFiltering: false,
       enableSorting: true,
