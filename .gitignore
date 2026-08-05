@@ -26,3 +26,9 @@ Thumbs.db
 .npmrc
 .env
 .env.*
+
+# Local automation scratch (personal scripts/data — never commit)
+automation/
+
+# Superpowers plan artifacts
+docs/superpowers/plans/
