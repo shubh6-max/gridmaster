@@ -1,6 +1,6 @@
 {
   "name": "gridmaster-react",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Excel-like React grid library with selection, editing, sorting, filtering, clipboard, and spreadsheet-style UX.",
   "type": "module",
   "main": "./dist/index.cjs",
