@@ -4,11 +4,16 @@ import { Check, Filter } from "lucide-react";
 import { Z_INDEX } from "../core/constants";
 import { useFloatingAnchorRect, useFloatingPortal } from "../react/hooks/useFloatingPortal";
 
+const DEFAULT_FILTER_VISIBLE_VALUE_COUNT = 4;
+const FILTER_VALUE_ROW_HEIGHT = 38;
+const FILTER_VALUE_LIST_PADDING = 8;
+
 type FilterMenuProps = {
   anchorEl?: HTMLElement | null;
   anchorRect?: DOMRect | null;
   title: string;
   values: string[];
+  loading?: boolean;
   selectedValues: Set<string>;
   onApply: (values: Set<string>) => void;
   onClear: () => void;
@@ -20,6 +25,7 @@ export function FilterMenu({
   anchorRect,
   title,
   values,
+  loading = false,
   selectedValues,
   onApply,
   onClear,
@@ -36,7 +42,8 @@ export function FilterMenu({
 
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
-      if (!(event.target as HTMLElement).closest("[data-gm-filter-menu]")) {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target?.closest("[data-gm-filter-menu]")) {
         onClose();
       }
     };
@@ -48,13 +55,13 @@ export function FilterMenu({
     };
 
     const timeoutId = window.setTimeout(() => {
-      document.addEventListener("mousedown", handleMouseDown);
+      document.addEventListener("mousedown", handleMouseDown, true);
       document.addEventListener("keydown", handleKeyDown);
     }, 0);
 
     return () => {
       window.clearTimeout(timeoutId);
-      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mousedown", handleMouseDown, true);
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose]);
@@ -79,6 +86,8 @@ export function FilterMenu({
       ? Math.max(8, rect.top - menuHeight)
       : rect.bottom + 6;
   const left = Math.max(8, Math.min(rect.left, viewportWidth - menuWidth - 8));
+  const filterValueListMaxHeight =
+    DEFAULT_FILTER_VISIBLE_VALUE_COUNT * FILTER_VALUE_ROW_HEIGHT + FILTER_VALUE_LIST_PADDING;
 
   return createPortal(
     <div
@@ -111,6 +120,7 @@ export function FilterMenu({
           <button
             type="button"
             className="gm-filter-action"
+            disabled={loading}
             onClick={() => setDraft(new Set(values))}
           >
             {allValuesSelected ? "All selected" : "Select all"}
@@ -118,6 +128,7 @@ export function FilterMenu({
           <button
             type="button"
             className="gm-filter-action"
+            disabled={loading}
             onClick={() =>
               setDraft((prev) => {
                 const next = new Set(prev);
@@ -135,8 +146,10 @@ export function FilterMenu({
         </div>
       </div>
 
-      <div className="gm-menu-scroll">
-        {visibleValues.length ? (
+      <div className="gm-menu-scroll" style={{ maxHeight: filterValueListMaxHeight }}>
+        {loading ? (
+          <div className="gm-menu-empty">Loading values...</div>
+        ) : visibleValues.length ? (
           visibleValues.map((value) => {
             const checked = draft.has(value);
 
@@ -176,7 +189,7 @@ export function FilterMenu({
         <button
           type="button"
           className="gm-button gm-button-primary"
-          disabled={draft.size === 0}
+          disabled={loading || draft.size === 0}
           onClick={() => onApply(draft)}
         >
           Apply

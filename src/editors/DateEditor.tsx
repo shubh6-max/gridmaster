@@ -13,6 +13,7 @@ export function DateEditor<T extends GridRow = GridRow>({
   cancel,
   updateValue,
   requestViewportFocusAfterEdit,
+  autoSelectOnFocus = true,
 }: GridCellEditorProps<T>) {
   const [localValue, setLocalValue] = useState<string>(getEditorDateValue(value));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -22,9 +23,18 @@ export function DateEditor<T extends GridRow = GridRow>({
   }, [value]);
 
   useEffect(() => {
-    inputRef.current?.focus();
-    inputRef.current?.select();
-  }, []);
+    const input = inputRef.current;
+    if (!input) return;
+
+    input.focus();
+    if (autoSelectOnFocus) {
+      input.select();
+      return;
+    }
+
+    const caretIndex = input.value.length;
+    input.setSelectionRange(caretIndex, caretIndex);
+  }, [autoSelectOnFocus]);
 
   return (
     <input

@@ -2,6 +2,8 @@ import React, { createContext, useContext } from "react";
 import type {
   GridCellChangeEvent,
   GridCellMeta,
+  GridColorFilters,
+  GridColorSort,
   GridColumnDef,
   GridColumnInsertPosition,
   GridEditCell,
@@ -53,9 +55,12 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   editingCell: GridEditCell;
   editingOrigin: "cell" | "formulaBar" | null;
   editingValue: unknown;
+  editorAutoSelectOnFocus: boolean;
   isFormulaEditing: boolean;
   sort: GridSort;
   filters: GridFilters;
+  colorFilters: GridColorFilters;
+  colorSort: GridColorSort;
   clipboard: GridClipboardData;
   formatPainterClipboard: GridFormatPainterClipboard;
   formatPainterMode: GridFormatPainterMode;
@@ -105,6 +110,8 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   setEditingCell: React.Dispatch<React.SetStateAction<GridEditCell>>;
   setSort: React.Dispatch<React.SetStateAction<GridSort>>;
   setFilters: React.Dispatch<React.SetStateAction<GridFilters>>;
+  setColorFilters: React.Dispatch<React.SetStateAction<GridColorFilters>>;
+  setColorSort: React.Dispatch<React.SetStateAction<GridColorSort>>;
   setClipboard: React.Dispatch<React.SetStateAction<GridClipboardData>>;
   setFill: React.Dispatch<React.SetStateAction<GridFillState>>;
   setColumnWidths: React.Dispatch<React.SetStateAction<GridColumnWidths>>;

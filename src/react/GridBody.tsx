@@ -20,6 +20,7 @@ import { GridCell } from "./GridCell";
 export function GridBody() {
   const {
     props,
+    viewportRef,
     displayRows,
     displayRowIndexes,
     visibleColumns,
@@ -37,6 +38,7 @@ export function GridBody() {
     columnWidths,
     frozenColumns,
     rowHeight,
+    headerHeight,
     editingCell,
     enableFillHandle,
     enableInsertRow,
@@ -45,6 +47,12 @@ export function GridBody() {
     enableDeleteColumn,
     openContextMenu,
   } = useGridContext();
+  const virtualizationEnabled = Boolean(props.virtualizeRows && displayRows.length > 0);
+  const overscanRowCount = Math.max(2, props.overscanRowCount ?? 8);
+  const [viewportMetrics, setViewportMetrics] = React.useState({
+    scrollTop: 0,
+    viewportHeight: 0,
+  });
 
   const { onCellMouseDown, onCellMouseEnter, onRowHeaderClick } = useSelection({
     rows: displayRows,
@@ -79,6 +87,81 @@ export function GridBody() {
     () => buildColumnOffsets(visibleColumns, columnWidths),
     [visibleColumns, columnWidths]
   );
+
+  React.useEffect(() => {
+    if (!virtualizationEnabled) {
+      setViewportMetrics((current) =>
+        current.scrollTop === 0 && current.viewportHeight === 0
+          ? current
+          : {
+              scrollTop: 0,
+              viewportHeight: 0,
+            }
+      );
+      return;
+    }
+
+    const container = viewportRef.current;
+    if (!container) return;
+
+    const updateMetrics = () => {
+      setViewportMetrics((current) => {
+        const next = {
+          scrollTop: container.scrollTop,
+          viewportHeight: container.clientHeight,
+        };
+
+        if (
+          current.scrollTop === next.scrollTop &&
+          current.viewportHeight === next.viewportHeight
+        ) {
+          return current;
+        }
+
+        return next;
+      });
+    };
+
+    updateMetrics();
+    container.addEventListener("scroll", updateMetrics, { passive: true });
+
+    const resizeObserver = new ResizeObserver(updateMetrics);
+    resizeObserver.observe(container);
+
+    return () => {
+      container.removeEventListener("scroll", updateMetrics);
+      resizeObserver.disconnect();
+    };
+  }, [viewportRef, virtualizationEnabled]);
+
+  const stickyHeaderHeight = 24 + headerHeight;
+  const visibleBodyHeight = Math.max(
+    viewportMetrics.viewportHeight - stickyHeaderHeight,
+    rowHeight
+  );
+  const firstVisibleRowIndex = virtualizationEnabled
+    ? Math.min(
+        Math.max(
+          Math.floor(Math.max(viewportMetrics.scrollTop - stickyHeaderHeight, 0) / rowHeight) -
+            overscanRowCount,
+          0
+        ),
+        Math.max(displayRows.length - 1, 0)
+      )
+    : 0;
+  const visibleRowWindow = virtualizationEnabled
+    ? Math.ceil(visibleBodyHeight / rowHeight) + overscanRowCount * 2
+    : displayRows.length;
+  const lastVisibleRowIndex = virtualizationEnabled
+    ? Math.min(displayRows.length, firstVisibleRowIndex + visibleRowWindow)
+    : displayRows.length;
+  const topSpacerHeight = virtualizationEnabled ? firstVisibleRowIndex * rowHeight : 0;
+  const bottomSpacerHeight = virtualizationEnabled
+    ? Math.max(displayRows.length - lastVisibleRowIndex, 0) * rowHeight
+    : 0;
+  const renderedRows = virtualizationEnabled
+    ? displayRows.slice(firstVisibleRowIndex, lastVisibleRowIndex)
+    : displayRows;
 
   const openCellContextMenu = React.useCallback(
     (event: React.MouseEvent<HTMLElement>, rowIndex: number, colIndex: number, columnKey: string) => {
@@ -125,13 +208,42 @@ export function GridBody() {
 
   return (
     <tbody>
-      {displayRows.map((row, rowIndex: number) => {
+      {topSpacerHeight > 0 ? (
+        <tr aria-hidden="true">
+          <td
+            colSpan={visibleColumns.length + 1}
+            style={{
+              height: topSpacerHeight,
+              padding: 0,
+              border: 0,
+              background: "transparent",
+            }}
+          />
+        </tr>
+      ) : null}
+
+      {renderedRows.map((row, visibleRowOffset: number) => {
+        const rowIndex = firstVisibleRowIndex + visibleRowOffset;
         const isRowActive = selection.selectedRows?.has?.(rowIndex);
         const sourceRowIndex = displayRowIndexes[rowIndex] ?? rowIndex;
         const rowKey = resolveGridRowId(row, sourceRowIndex, props.getRowId);
+        const rowMeta = props.getRowMeta?.(row, sourceRowIndex);
+        const rowBackgroundColor =
+          typeof rowMeta?.style?.backgroundColor === "string" &&
+          rowMeta.style.backgroundColor.trim()
+            ? rowMeta.style.backgroundColor
+            : undefined;
+        const isRowReadonly = Boolean(rowMeta?.readonly);
 
         return (
-          <tr key={rowKey} style={{ height: rowHeight }}>
+          <tr
+            key={rowKey}
+            className={rowMeta?.className}
+            style={{
+              height: rowHeight,
+              ...(rowMeta?.style ?? {}),
+            }}
+          >
             <td
               className="gm-rh"
               onClick={(e) =>
@@ -149,7 +261,7 @@ export function GridBody() {
                 position: "sticky",
                 left: 0,
                 zIndex: Z_INDEX.ROW_HEADER,
-                background: isRowActive ? "#dbeafe" : "#f8fafc",
+                background: isRowActive ? "#dbeafe" : rowBackgroundColor || "#f8fafc",
                 borderRight: "2px solid #cbd5e1",
                 borderBottom: "1px solid #e2e8f0",
                 textAlign: "right",
@@ -164,23 +276,36 @@ export function GridBody() {
               {rowIndex + 1}
             </td>
 
-            {visibleColumns.map((column, colIndex: number) => {
-              const isFrozen = colIndex < frozenColumns;
-              const width = getColumnWidth(column, columnWidths);
-              const selected = isCellSelected(selection, rowIndex, colIndex);
-              const active = isCellActive(selection, rowIndex, colIndex);
-              const preview = isPreviewCell(rowIndex, colIndex);
-              const showFillHandle = isFillHandleCell(rowIndex, colIndex);
-              const metaKey = createCellMetaKey(sourceRowIndex, column.key);
-              const cellMeta = cellMetaMap[metaKey];
-              const isMetaReadonly = Boolean(cellMeta?.readonly);
-              const shouldWrap = getEffectiveWrapText(cellMeta, column);
-              const backgroundColor =
+              {visibleColumns.map((column, colIndex: number) => {
+                const isFrozen = colIndex < frozenColumns;
+                const width = getColumnWidth(column, columnWidths);
+                const selected = isCellSelected(selection, rowIndex, colIndex);
+                const active = isCellActive(selection, rowIndex, colIndex);
+                const preview = isPreviewCell(rowIndex, colIndex);
+                const showFillHandle = isFillHandleCell(rowIndex, colIndex);
+                const metaKey = createCellMetaKey(sourceRowIndex, column.key);
+                const historyCellMeta = cellMetaMap[metaKey];
+                const dynamicCellMeta = props.getCellMeta?.(row, sourceRowIndex, column.key);
+                const cellMeta =
+                  historyCellMeta || dynamicCellMeta
+                    ? {
+                        ...(historyCellMeta ?? {}),
+                        ...(dynamicCellMeta ?? {}),
+                        style: {
+                          ...(historyCellMeta?.style ?? {}),
+                          ...(dynamicCellMeta?.style ?? {}),
+                        },
+                      }
+                    : undefined;
+                const isMetaReadonly = Boolean(cellMeta?.readonly);
+                const isReadonly = Boolean(column.readonly || isMetaReadonly || isRowReadonly);
+                const shouldWrap = getEffectiveWrapText(cellMeta, column);
+                const backgroundColor =
                 active
                   ? "#ffffff"
                   : selected
                   ? "#dbeafe"
-                  : cellMeta?.backgroundColor || "#ffffff";
+                  : cellMeta?.backgroundColor || rowBackgroundColor || "#ffffff";
               const verticalAlign = getEffectiveVerticalAlign(cellMeta);
 
               return (
@@ -191,7 +316,7 @@ export function GridBody() {
                     selected && !active ? "gm-selected" : "",
                     active ? "gm-active" : "",
                     preview ? "gm-fill-preview" : "",
-                    column.readonly || isMetaReadonly ? "gm-readonly" : "",
+                    isReadonly ? "gm-readonly" : "",
                     shouldWrap ? "gm-wrap" : "",
                     formatPainterMode !== "idle" ? "gm-format-painter-target" : "",
                     cellMeta?.className ?? "",
@@ -249,12 +374,12 @@ export function GridBody() {
                         : isFrozen && colIndex === frozenColumns - 1
                         ? "3px 0 8px rgba(15, 23, 42, 0.08)"
                         : undefined,
-                    color: column.readonly || isMetaReadonly ? "#64748b" : "#0f172a",
+                    color: isReadonly ? "#64748b" : "#0f172a",
                     fontSize: 12,
                     cursor:
                       formatPainterMode !== "idle"
                         ? "copy"
-                        : column.readonly || isMetaReadonly
+                        : isReadonly
                         ? "default"
                         : "cell",
                     ...(cellMeta?.style ?? {}),
@@ -286,6 +411,20 @@ export function GridBody() {
           </tr>
         );
       })}
+
+      {bottomSpacerHeight > 0 ? (
+        <tr aria-hidden="true">
+          <td
+            colSpan={visibleColumns.length + 1}
+            style={{
+              height: bottomSpacerHeight,
+              padding: 0,
+              border: 0,
+              background: "transparent",
+            }}
+          />
+        </tr>
+      ) : null}
 
       {displayRows.length === 0 && (
         <tr>

@@ -10,15 +10,23 @@ import type {
 import { MAX_HISTORY_SIZE } from "../constants";
 import { cloneCellMetaMap, cloneColumns, cloneRowMetaMap, cloneRows } from "../utils";
 
+export type GridHistoryCloneOptions = {
+  historyLimit?: number;
+  preserveRowReferences?: boolean;
+};
+
 /* =========================================================
    Snapshot cloning
    ========================================================= */
 
 export function cloneSnapshot<T extends GridRow = GridRow>(
-  snapshot: GridSnapshot<T>
+  snapshot: GridSnapshot<T>,
+  options?: GridHistoryCloneOptions
 ): GridSnapshot<T> {
   return {
-    rows: cloneRows(snapshot.rows as T[]),
+    rows: options?.preserveRowReferences
+      ? [...(snapshot.rows as T[])]
+      : cloneRows(snapshot.rows as T[]),
     columns: cloneColumns(snapshot.columns as GridColumnDef<T>[]),
     cellMeta: cloneCellMetaMap(snapshot.cellMeta),
     rowMeta: cloneRowMetaMap(snapshot.rowMeta),
@@ -43,9 +51,12 @@ export function createEmptySnapshot<T extends GridRow = GridRow>(): GridSnapshot
    ========================================================= */
 
 export function createInitialHistoryState<T extends GridRow = GridRow>(
-  initialSnapshot?: GridSnapshot<T>
+  initialSnapshot?: GridSnapshot<T>,
+  options?: GridHistoryCloneOptions
 ): GridHistoryState<T> {
-  const present = initialSnapshot ? cloneSnapshot(initialSnapshot) : createEmptySnapshot<T>();
+  const present = initialSnapshot
+    ? cloneSnapshot(initialSnapshot, options)
+    : createEmptySnapshot<T>();
 
   return {
     past: [],
@@ -60,23 +71,26 @@ export function createInitialHistoryState<T extends GridRow = GridRow>(
 
 export function historyReducer<T extends GridRow = GridRow>(
   state: GridHistoryState<T>,
-  action: GridHistoryAction<T>
+  action: GridHistoryAction<T>,
+  options?: GridHistoryCloneOptions
 ): GridHistoryState<T> {
+  const historyLimit = options?.historyLimit ?? MAX_HISTORY_SIZE;
+
   switch (action.type) {
     case "RESET": {
       return {
         past: [],
-        present: cloneSnapshot(action.payload),
+        present: cloneSnapshot(action.payload, options),
         future: [],
       };
     }
 
     case "PUSH": {
-      const past = [...state.past, cloneSnapshot(state.present)].slice(-MAX_HISTORY_SIZE);
+      const past = [...state.past, cloneSnapshot(state.present, options)].slice(-historyLimit);
 
       return {
         past,
-        present: cloneSnapshot(action.payload),
+        present: cloneSnapshot(action.payload, options),
         future: [],
       };
     }
@@ -89,8 +103,8 @@ export function historyReducer<T extends GridRow = GridRow>(
 
       return {
         past: nextPast,
-        present: cloneSnapshot(previous),
-        future: [cloneSnapshot(state.present), ...state.future],
+        present: cloneSnapshot(previous, options),
+        future: [cloneSnapshot(state.present, options), ...state.future],
       };
     }
 
@@ -100,9 +114,9 @@ export function historyReducer<T extends GridRow = GridRow>(
       const [next, ...restFuture] = state.future;
 
       return {
-        past: [...state.past, cloneSnapshot(state.present)].slice(-MAX_HISTORY_SIZE),
-        present: cloneSnapshot(next),
-        future: restFuture.map(cloneSnapshot),
+        past: [...state.past, cloneSnapshot(state.present, options)].slice(-historyLimit),
+        present: cloneSnapshot(next, options),
+        future: restFuture.map((snapshot) => cloneSnapshot(snapshot, options)),
       };
     }
 

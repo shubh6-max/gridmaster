@@ -24,7 +24,7 @@ export function updateRowAt<T extends GridRow>(
   nextRow: T
 ): T[] {
   if (rowIndex < 0 || rowIndex >= rows.length) return rows;
-  const next = cloneRows(rows);
+  const next = [...rows];
   next[rowIndex] = nextRow;
   return next;
 }
@@ -34,25 +34,25 @@ export function insertRowAt<T extends GridRow>(
   rowIndex: number,
   newRow: T
 ): T[] {
-  const next = cloneRows(rows);
+  const next = [...rows];
   const safeIndex = Math.max(0, Math.min(rowIndex, next.length));
   next.splice(safeIndex, 0, newRow);
   return next;
 }
 
 export function appendRow<T extends GridRow>(rows: T[], newRow: T): T[] {
-  return [...cloneRows(rows), { ...newRow }];
+  return [...rows, newRow];
 }
 
 export function deleteRowAt<T extends GridRow>(rows: T[], rowIndex: number): T[] {
   if (rowIndex < 0 || rowIndex >= rows.length) return rows;
-  return rows.filter((_, index) => index !== rowIndex).map((row) => ({ ...row }));
+  return rows.filter((_, index) => index !== rowIndex);
 }
 
 export function deleteRowsAt<T extends GridRow>(rows: T[], rowIndexes: number[]): T[] {
-  if (!rowIndexes.length) return cloneRows(rows);
+  if (!rowIndexes.length) return [...rows];
   const toDelete = new Set(rowIndexes);
-  return rows.filter((_, index) => !toDelete.has(index)).map((row) => ({ ...row }));
+  return rows.filter((_, index) => !toDelete.has(index));
 }
 
 /* =========================================================

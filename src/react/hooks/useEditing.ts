@@ -12,6 +12,7 @@ import type {
   GridSelectionState,
 } from "../../core/types";
 import { getRowValue, isFormulaValue } from "../../core/utils";
+import { getGridEditorAutoSelectOnFocus } from "./gridEditorFocusPolicy";
 
 export type GridEditingTarget<T extends GridRow = GridRow> = {
   displayRowIndex: number;
@@ -78,6 +79,7 @@ export function useEditing<T extends GridRow = GridRow>({
 }: UseEditingParams<T>) {
   const [editingValue, setEditingValue] = useState<unknown>("");
   const [editingOrigin, setEditingOrigin] = useState<"cell" | "formulaBar" | null>(null);
+  const [editorAutoSelectOnFocus, setEditorAutoSelectOnFocus] = useState(true);
   const preserveNextSyncRef = useRef(false);
   const shouldFocusViewportAfterEditRef = useRef(false);
 
@@ -123,6 +125,10 @@ export function useEditing<T extends GridRow = GridRow>({
       const nextCell = cell ?? selection.cursor ?? selection.anchor;
       const target = resolveEditingTarget(mode, rows, displayRowIndexes, visibleColumns, nextCell);
       if (!nextCell || !target || target.readonly) return false;
+
+      setEditorAutoSelectOnFocus(
+        getGridEditorAutoSelectOnFocus({ initialValueProvided: initialValue !== undefined })
+      );
 
       if (initialValue !== undefined) {
         preserveNextSyncRef.current = true;
@@ -219,6 +225,7 @@ export function useEditing<T extends GridRow = GridRow>({
     activeTarget,
     editingOrigin,
     editingValue,
+    editorAutoSelectOnFocus,
     isFormulaEditing,
     setEditingValue,
     requestViewportFocusAfterEdit,

@@ -9,6 +9,7 @@ import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation";
 
 export function GridViewport() {
   const {
+    props,
     viewportRef,
     rows,
     displayRows,
@@ -16,6 +17,10 @@ export function GridViewport() {
     visibleColumns,
     selection,
     setSelection,
+    sort,
+    filters,
+    colorFilters,
+    colorSort,
     editingCell,
     history,
     setHistory,
@@ -23,8 +28,11 @@ export function GridViewport() {
     setClipboard,
     updateRows,
     height,
+    rowHeight,
+    headerHeight,
     mode,
     startEditing,
+    commitEditing,
     cancelEditing,
     isFormulaEditing,
     formatPainterMode,
@@ -46,6 +54,8 @@ export function GridViewport() {
     focusViewport: () => {
       viewportRef.current?.focus({ preventScroll: true });
     },
+    historyLimit: props.historyLimit,
+    preserveRowReferences: props.rowPatchMode,
   });
 
   const { clearSelection, copy, cut, paste } = useClipboard({
@@ -67,7 +77,9 @@ export function GridViewport() {
     setSelection,
     history,
     setHistory,
-    enableUndoRedo: true,
+    historyLimit: props.historyLimit,
+    preserveRowReferences: props.rowPatchMode,
+    enableUndoRedo: props.enableUndoRedo,
     enableClipboard: true,
     enableEditing: mode !== "readonly",
     onCopy: copy,
@@ -77,7 +89,9 @@ export function GridViewport() {
     onStartEdit: (initialValue) => {
       startEditing(undefined, initialValue);
     },
+    onCommitEdit: commitEditing,
     onCancelEdit: cancelEditing,
+    onSaveShortcut: props.onSaveShortcut,
     isEditing: Boolean(editingCell),
     onCopyFormat: copyFormat,
     onPasteFormat: pasteFormatToSelection,
@@ -92,9 +106,50 @@ export function GridViewport() {
     const container = viewportRef.current;
     if (!container) return;
 
+    container.scrollTo({
+      left: 0,
+      top: 0,
+    });
+    setSelection((prev) => {
+      if (!displayRows.length || !visibleColumns.length) {
+        return prev;
+      }
+      return {
+        ...prev,
+        cursor: { row: 0, col: 0 },
+        anchor: { row: 0, col: 0 },
+      };
+    });
+  }, [colorFilters, colorSort, displayRows.length, filters, setSelection, sort, viewportRef, visibleColumns.length]);
+
+  React.useEffect(() => {
+    const container = viewportRef.current;
+    if (!container) return;
+
     const frameId = window.requestAnimationFrame(() => {
       const activeCell = container.querySelector<HTMLElement>(".gm-td.gm-active");
-      if (!activeCell) return;
+      if (!activeCell) {
+        if (!props.virtualizeRows || selection.cursor == null) return;
+
+        const topInset = 24 + headerHeight;
+        const rowTop = topInset + selection.cursor.row * rowHeight;
+        const rowBottom = rowTop + rowHeight;
+        let nextScrollTop = container.scrollTop;
+
+        if (rowTop < container.scrollTop + topInset) {
+          nextScrollTop = Math.max(rowTop - topInset, 0);
+        } else if (rowBottom > container.scrollTop + container.clientHeight) {
+          nextScrollTop = Math.max(rowBottom - container.clientHeight, 0);
+        }
+
+        if (nextScrollTop !== container.scrollTop) {
+          container.scrollTo({
+            left: container.scrollLeft,
+            top: nextScrollTop,
+          });
+        }
+        return;
+      }
 
       const containerRect = container.getBoundingClientRect();
       const cellRect = activeCell.getBoundingClientRect();
@@ -148,7 +203,14 @@ export function GridViewport() {
     });
 
     return () => window.cancelAnimationFrame(frameId);
-  }, [selection.cursor?.row, selection.cursor?.col, selection.mode]);
+  }, [
+    headerHeight,
+    props.virtualizeRows,
+    rowHeight,
+    selection.cursor?.row,
+    selection.cursor?.col,
+    selection.mode,
+  ]);
 
   return (
     <div
@@ -173,6 +235,7 @@ export function GridViewport() {
       style={{
         position: "relative",
         overflow: "auto",
+        height: height ?? "72vh",
         maxHeight: height ?? "72vh",
         outline: "none",
         border: "1px solid #e2e8f0",

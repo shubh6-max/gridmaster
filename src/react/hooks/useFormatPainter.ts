@@ -25,6 +25,8 @@ type UseFormatPainterParams<T extends GridRow = GridRow> = {
   displayRowIndexes: number[];
   visibleColumns: GridResolvedColumnDef<T>[];
   focusViewport: () => void;
+  historyLimit?: number;
+  preserveRowReferences?: boolean;
 };
 
 function pushCellMetaHistory<T extends GridRow = GridRow>(
@@ -43,6 +45,8 @@ export function useFormatPainter<T extends GridRow = GridRow>({
   displayRowIndexes,
   visibleColumns,
   focusViewport,
+  historyLimit,
+  preserveRowReferences,
 }: UseFormatPainterParams<T>) {
   const [formatPainterClipboard, setFormatPainterClipboard] =
     useState<GridFormatPainterClipboard>(null);
@@ -108,6 +112,9 @@ export function useFormatPainter<T extends GridRow = GridRow>({
             ),
             rowMeta: prev.present.rowMeta,
           },
+        }, {
+          historyLimit,
+          preserveRowReferences,
         })
       );
 

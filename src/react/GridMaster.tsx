@@ -11,6 +11,7 @@ import { GridViewport } from "./GridViewport";
 
 export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T>) {
   const grid = useGridMaster(props);
+  const showToolbar = props.showToolbar ?? true;
   const [contextMenu, setContextMenu] = React.useState<GridContextMenuState>(null);
   const editing = useEditing({
     mode: grid.mode,
@@ -34,6 +35,8 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
     displayRowIndexes: grid.displayRowIndexes,
     visibleColumns: grid.visibleColumns,
     focusViewport: grid.focusViewport,
+    historyLimit: props.historyLimit,
+    preserveRowReferences: props.rowPatchMode,
   });
 
   return (
@@ -60,9 +63,12 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         editingCell: grid.editingCell,
         editingOrigin: editing.editingOrigin,
         editingValue: editing.editingValue,
+        editorAutoSelectOnFocus: editing.editorAutoSelectOnFocus,
         isFormulaEditing: editing.isFormulaEditing,
         sort: grid.sort,
         filters: grid.filters,
+        colorFilters: grid.colorFilters,
+        colorSort: grid.colorSort,
         clipboard: grid.clipboard,
         formatPainterClipboard: formatPainter.formatPainterClipboard,
         formatPainterMode: formatPainter.formatPainterMode,
@@ -105,6 +111,8 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         setEditingCell: grid.setEditingCell,
         setSort: grid.setSort,
         setFilters: grid.setFilters,
+        setColorFilters: grid.setColorFilters,
+        setColorSort: grid.setColorSort,
         setClipboard: grid.setClipboard,
         setFill: grid.setFill,
         setColumnWidths: grid.setColumnWidths,
@@ -133,7 +141,7 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
           ...props.style,
         }}
       >
-        <GridToolbar />
+        {showToolbar && <GridToolbar />}
         {grid.showFormulaBar && <FormulaBar />}
         <GridViewport />
         {grid.showStatusBar && <StatusBar />}

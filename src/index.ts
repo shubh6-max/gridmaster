@@ -23,6 +23,7 @@ export {
   readClipboardText,
   writeClipboardText,
 } from "./core/features/clipboard";
+export * from "./core/features/colorFiltering";
 export * from "./core/features/editing";
 export {
   applyFillFromSelection,

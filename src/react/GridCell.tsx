@@ -81,6 +81,7 @@ export function GridCell<T extends GridRow = GridRow>({
     editingCell,
     editingOrigin,
     editingValue,
+    editorAutoSelectOnFocus,
     setSelection,
     setEditingValue,
     startEditing,
@@ -197,6 +198,7 @@ export function GridCell<T extends GridRow = GridRow>({
       commit: () => commitEditing(),
       cancel: cancelEditing,
       requestViewportFocusAfterEdit,
+      autoSelectOnFocus: editorAutoSelectOnFocus,
     };
 
     return (

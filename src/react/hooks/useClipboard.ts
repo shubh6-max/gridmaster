@@ -36,6 +36,62 @@ export function useClipboard<T extends GridRow = GridRow>({
   setClipboard,
   updateRows,
 }: UseClipboardParams<T>) {
+  const applyValueToSelection = useCallback(
+    (inputRows: T[], rawValue: string) => {
+      let workingRows = inputRows;
+      let changed = false;
+
+      const applyCell = (displayRowIndex: number, columnIndex: number) => {
+        const sourceRowIndex = displayRowIndexes[displayRowIndex] ?? -1;
+        if (sourceRowIndex < 0 || sourceRowIndex >= workingRows.length) return;
+
+        const column = columns[columnIndex];
+        if (!column || column.readonly || !column.editable) return;
+
+        workingRows = updateCellValue(workingRows, sourceRowIndex, column, rawValue).rows;
+        changed = true;
+      };
+
+      if (selection.mode === "row") {
+        [...selection.selectedRows]
+          .sort((left, right) => left - right)
+          .forEach((displayRowIndex) => {
+            for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+              applyCell(displayRowIndex, columnIndex);
+            }
+          });
+      } else if (selection.mode === "column") {
+        [...selection.selectedCols]
+          .sort((left, right) => left - right)
+          .forEach((columnIndex) => {
+            for (let displayRowIndex = 0; displayRowIndex < displayRows.length; displayRowIndex++) {
+              applyCell(displayRowIndex, columnIndex);
+            }
+          });
+      } else {
+        const bounds = getSelectionBounds(selection, displayRows.length, columns.length);
+        if (!bounds) {
+          return {
+            rows: workingRows,
+            changed,
+          };
+        }
+
+        for (let displayRowIndex = bounds.startRow; displayRowIndex <= bounds.endRow; displayRowIndex++) {
+          for (let columnIndex = bounds.startCol; columnIndex <= bounds.endCol; columnIndex++) {
+            applyCell(displayRowIndex, columnIndex);
+          }
+        }
+      }
+
+      return {
+        rows: workingRows,
+        changed,
+      };
+    },
+    [columns, displayRowIndexes, displayRows.length, selection]
+  );
+
   const clearSelection = useCallback(() => {
     let workingRows = rows.map((row) => ({ ...row })) as T[];
     let changed = false;
@@ -107,8 +163,25 @@ export function useClipboard<T extends GridRow = GridRow>({
     const matrix = text ? textToClipboardMatrix(text) : clipboard?.data ?? [];
     if (!matrix.length || !matrix[0]?.length) return;
 
+    const selectionBounds = getSelectionBounds(selection, displayRows.length, columns.length);
+    const isSingleValuePaste = matrix.length === 1 && matrix[0].length === 1;
+    const selectionSpansMultipleCells =
+      selection.mode === "row" ||
+      selection.mode === "column" ||
+      selection.mode === "all" ||
+      (selectionBounds
+        ? selectionBounds.startRow !== selectionBounds.endRow ||
+          selectionBounds.startCol !== selectionBounds.endCol
+        : false);
+
     let workingRows = rows.map((row) => ({ ...row })) as T[];
     let changed = false;
+
+    if (isSingleValuePaste && selectionSpansMultipleCells) {
+      const result = applyValueToSelection(workingRows, matrix[0][0]);
+      if (result.changed) updateRows(result.rows);
+      return;
+    }
 
     for (let rowOffset = 0; rowOffset < matrix.length; rowOffset++) {
       const displayRowIndex = cursor.row + rowOffset;
@@ -133,7 +206,16 @@ export function useClipboard<T extends GridRow = GridRow>({
     }
 
     if (changed) updateRows(workingRows);
-  }, [clipboard, columns, displayRowIndexes, rows, selection.anchor, selection.cursor, updateRows]);
+  }, [
+    applyValueToSelection,
+    clipboard,
+    columns,
+    displayRowIndexes,
+    displayRows.length,
+    rows,
+    selection,
+    updateRows,
+  ]);
 
   return {
     clearSelection,

@@ -896,6 +896,11 @@
   color: #64748b;
 }
 
+.gm-menu-action.is-active {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 .gm-menu-action-icon {
   display: inline-flex;
   align-items: center;

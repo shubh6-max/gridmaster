@@ -2,6 +2,7 @@ import React from "react";
 import { ArrowDownAZ, ArrowUpAZ, ChevronsUpDown, Filter, Snowflake } from "lucide-react";
 import { DEFAULT_HEADER_HEIGHT, DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
 import { clearFilter, createValueSetFilter, getFilteredUniqueValuesForColumn } from "../core/features/filtering";
+import type { GridColorOption } from "../core/types";
 import { isFrozenColumnIndex, toggleFrozenThroughColumn } from "../core/features/freezing";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
 import { selectSingleColumn } from "../core/state/selectionState";
@@ -10,19 +11,12 @@ import { useGridContext } from "./context/GridContext";
 import { useColumnSizing } from "./hooks/useColumnSizing";
 import { useSelection } from "./hooks/useSelection";
 import { ColumnMenu } from "../menus/ColumnMenu";
-import { FilterMenu } from "../menus/FilterMenu";
 
 type ColumnMenuState = {
   columnKey: string;
   anchorEl: HTMLElement | null;
   anchorRect: DOMRect;
   mode: "column" | "visibility";
-} | null;
-
-type FilterMenuState = {
-  columnKey: string;
-  anchorEl: HTMLElement | null;
-  anchorRect: DOMRect;
 } | null;
 
 const SPREADSHEET_HEADER_HEIGHT = 24;
@@ -45,6 +39,10 @@ export function GridHeader() {
     setSort,
     filters,
     setFilters,
+    colorFilters,
+    setColorFilters,
+    colorSort,
+    setColorSort,
     setColumnHidden,
     headerHeight,
     enableSorting,
@@ -57,7 +55,11 @@ export function GridHeader() {
     openContextMenu,
   } = useGridContext();
   const [columnMenu, setColumnMenu] = React.useState<ColumnMenuState>(null);
-  const [filterMenu, setFilterMenu] = React.useState<FilterMenuState>(null);
+  const [resolvedColumnMenuFilterValues, setResolvedColumnMenuFilterValues] = React.useState<string[] | null>(null);
+  const [columnMenuFilterLoading, setColumnMenuFilterLoading] = React.useState(false);
+  const [resolvedColumnMenuColorOptions, setResolvedColumnMenuColorOptions] =
+    React.useState<GridColorOption[] | null>(null);
+  const [columnMenuColorLoading, setColumnMenuColorLoading] = React.useState(false);
 
   const { onColumnHeaderClick, onSelectAll } = useSelection({
     rows: displayRows,
@@ -86,29 +88,71 @@ export function GridHeader() {
     () => (columnMenu ? columns.find((column) => column.key === columnMenu.columnKey) ?? null : null),
     [columnMenu, columns]
   );
-  const filterMenuColumn = React.useMemo(
-    () => (filterMenu ? columns.find((column) => column.key === filterMenu.columnKey) ?? null : null),
-    [filterMenu, columns]
+  const columnMenuFilterColumn = React.useMemo(
+    () => {
+      if (columnMenu?.mode !== "column" || !columnMenuColumn) return null;
+      return columnMenuColumn.filterable ? columnMenuColumn : null;
+    },
+    [columnMenu?.mode, columnMenuColumn]
+  );
+  const columnMenuColorSourceKey = React.useMemo(
+    () => {
+      if (
+        columnMenu?.mode !== "column" ||
+        !columnMenuColumn ||
+        !props.resolveColorOptions ||
+        (props.isColorMenuEnabled && !props.isColorMenuEnabled(columnMenuColumn.key))
+      ) {
+        return null;
+      }
+      const sourceKey = props.getColorSourceColumnKey
+        ? props.getColorSourceColumnKey(columnMenuColumn.key)
+        : columnMenuColumn.key;
+      if (!sourceKey) return null;
+      return columnMenuColumn.filterable ? sourceKey : null;
+    },
+    [
+      columnMenu?.mode,
+      columnMenuColumn,
+      props.getColorSourceColumnKey,
+      props.isColorMenuEnabled,
+      props.resolveColorOptions,
+    ]
   );
 
-  const filterMenuValues = React.useMemo(
-    () =>
-      filterMenuColumn
-        ? getFilteredUniqueValuesForColumn(rows, columns, filterMenuColumn.key, filters)
-        : [],
-    [rows, columns, filterMenuColumn, filters]
+  const columnMenuFilterValues = React.useMemo(
+    () => {
+      if (!columnMenuFilterColumn) return [];
+      if (props.resolveFilterValues) return resolvedColumnMenuFilterValues ?? [];
+      return (
+        columnMenuFilterColumn.filterOptions ??
+        getFilteredUniqueValuesForColumn(rows, columns, columnMenuFilterColumn.key, filters)
+      );
+    },
+    [rows, columns, columnMenuFilterColumn, filters, props.resolveFilterValues, resolvedColumnMenuFilterValues]
   );
 
-  const selectedFilterValues = React.useMemo(() => {
-    if (!filterMenuColumn) return new Set<string>();
+  const selectedColumnMenuFilterValues = React.useMemo(() => {
+    if (!columnMenuFilterColumn) return new Set<string>();
 
-    const currentFilter = filters[filterMenuColumn.key];
+    const currentFilter = filters[columnMenuFilterColumn.key];
     if (currentFilter?.type === "valueSet") {
       return new Set(currentFilter.values);
     }
 
-    return new Set(filterMenuValues);
-  }, [filterMenuColumn, filterMenuValues, filters]);
+    return new Set(columnMenuFilterValues);
+  }, [columnMenuFilterColumn, columnMenuFilterValues, filters]);
+  const selectedColumnMenuColorFilterValues = React.useMemo(
+    () => new Set(colorFilters[columnMenuColorSourceKey ?? ""]?.values ?? []),
+    [colorFilters, columnMenuColorSourceKey]
+  );
+  const selectedColumnMenuColorSortValue = React.useMemo(
+    () =>
+      colorSort && columnMenuColorSourceKey && colorSort.columnKey === columnMenuColorSourceKey
+        ? colorSort.value
+        : null,
+    [colorSort, columnMenuColorSourceKey]
+  );
 
   React.useEffect(() => {
     if (
@@ -120,14 +164,64 @@ export function GridHeader() {
   }, [columnMenu, visibleColumns]);
 
   React.useEffect(() => {
-    if (filterMenu && !visibleColumns.some((column) => column.key === filterMenu.columnKey)) {
-      setFilterMenu(null);
+    if (!columnMenuFilterColumn || !props.resolveFilterValues) {
+      setResolvedColumnMenuFilterValues(null);
+      setColumnMenuFilterLoading(false);
+      return;
     }
-  }, [filterMenu, visibleColumns]);
+
+    let cancelled = false;
+    setColumnMenuFilterLoading(true);
+
+    Promise.resolve(props.resolveFilterValues(columnMenuFilterColumn.key, filters))
+      .then((values) => {
+        if (cancelled) return;
+        setResolvedColumnMenuFilterValues(Array.isArray(values) ? values : []);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setResolvedColumnMenuFilterValues([]);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setColumnMenuFilterLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [columnMenuFilterColumn, filters, props.resolveFilterValues]);
+  React.useEffect(() => {
+    if (!columnMenuColorSourceKey || !props.resolveColorOptions) {
+      setResolvedColumnMenuColorOptions(null);
+      setColumnMenuColorLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setColumnMenuColorLoading(true);
+
+    Promise.resolve(props.resolveColorOptions(columnMenuColorSourceKey, filters, colorFilters))
+      .then((options) => {
+        if (cancelled) return;
+        setResolvedColumnMenuColorOptions(Array.isArray(options) ? options : []);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setResolvedColumnMenuColorOptions([]);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setColumnMenuColorLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [columnMenuColorSourceKey, colorFilters, filters, props.resolveColorOptions]);
 
   const openColumnMenu = React.useCallback((columnKey: string, trigger: HTMLElement) => {
     const nextAnchor = trigger.getBoundingClientRect();
-    setFilterMenu(null);
     setColumnMenu((prev) =>
       prev?.columnKey === columnKey && prev.mode === "column"
         ? null
@@ -146,7 +240,6 @@ export function GridHeader() {
     const firstVisibleColumn = visibleColumns[0];
     if (!firstVisibleColumn) return;
 
-    setFilterMenu(null);
     setColumnMenu({
       columnKey: firstVisibleColumn.key,
       anchorEl: trigger,
@@ -154,23 +247,6 @@ export function GridHeader() {
       mode: "visibility",
     });
   }, [enableColumnVisibility, visibleColumns]);
-
-  const openFilterMenu = React.useCallback(
-    (columnKey: string, anchorEl: HTMLElement | null, anchorRect: DOMRect) => {
-    setColumnMenu(null);
-    setFilterMenu({
-      columnKey,
-      anchorEl,
-      anchorRect,
-    });
-    },
-    []
-  );
-
-  const closeMenus = React.useCallback(() => {
-    setColumnMenu(null);
-    setFilterMenu(null);
-  }, []);
 
   const columnsForMenu = React.useMemo(
     () =>
@@ -321,12 +397,22 @@ export function GridHeader() {
             const width = getColumnWidth(column, columnWidths);
             const isSelected = selection.selectedCols.has(index);
             const isSorted = sort?.columnKey === column.key;
+            const colorSourceKeyForColumn = props.getColorSourceColumnKey
+              ? props.getColorSourceColumnKey(column.key)
+              : column.key;
+            const isColorSorted =
+              Boolean(colorSourceKeyForColumn) && colorSort?.columnKey === colorSourceKeyForColumn;
             const sortDirection = isSorted ? sort.direction : null;
             const activeFilter = filters[column.key];
-            const isFiltered = Boolean(activeFilter);
-            const filterValueCount = activeFilter?.type === "valueSet" ? activeFilter.values.size : null;
-            const isMenuOpen =
-              columnMenu?.columnKey === column.key || filterMenu?.columnKey === column.key;
+            const activeColorFilter = colorSourceKeyForColumn
+              ? colorFilters[colorSourceKeyForColumn]
+              : undefined;
+            const isFiltered = Boolean(activeFilter || activeColorFilter);
+            const filterValueCount =
+              activeFilter?.type === "valueSet"
+                ? activeFilter.values.size + (activeColorFilter?.values.size ?? 0)
+                : activeColorFilter?.values.size ?? null;
+            const isMenuOpen = columnMenu?.columnKey === column.key;
             const showResizeHandle = enableColumnResize && column.resizable;
 
             return (
@@ -387,17 +473,25 @@ export function GridHeader() {
                       </span>
                     ) : null}
 
-                    {isSorted ? (
+                    {isSorted || isColorSorted ? (
                       <span
                         className="gm-header-badge gm-header-badge-sort"
-                        title={sortDirection === "asc" ? "Sorted ascending" : "Sorted descending"}
+                        title={
+                          isColorSorted
+                            ? "Sorted by color priority"
+                            : sortDirection === "asc"
+                              ? "Sorted ascending"
+                              : "Sorted descending"
+                        }
                       >
-                        {sortDirection === "asc" ? (
+                        {isColorSorted ? (
+                          <span style={{ fontSize: 10, fontWeight: 700 }}>Clr</span>
+                        ) : sortDirection === "asc" ? (
                           <ArrowUpAZ style={{ width: 11, height: 11 }} />
                         ) : (
                           <ArrowDownAZ style={{ width: 11, height: 11 }} />
                         )}
-                        <span>{sortDirection === "asc" ? "A-Z" : "Z-A"}</span>
+                        <span>{isColorSorted ? "Color" : sortDirection === "asc" ? "A-Z" : "Z-A"}</span>
                       </span>
                     ) : null}
                   </div>
@@ -457,10 +551,13 @@ export function GridHeader() {
           title={columnMenu.mode === "visibility" ? "Manage Columns" : columnMenuColumn.title}
           currentColumnKey={columnMenu.mode === "visibility" ? undefined : columnMenuColumn.key}
           currentVisibleColumnCount={visibleColumns.length}
-          showVisibilityControls={enableColumnVisibility}
+          showVisibilityControls={enableColumnVisibility && columnMenu.mode === "visibility"}
           columns={columnsForMenu}
           sortDirection={sort?.columnKey === columnMenuColumn.key ? sort.direction : null}
-          isFiltered={Boolean(filters[columnMenuColumn.key])}
+          isFiltered={Boolean(
+            filters[columnMenuColumn.key] ||
+              (columnMenuColorSourceKey ? colorFilters[columnMenuColorSourceKey] : null)
+          )}
           isFrozen={isFrozenColumnIndex(
             visibleColumns.findIndex((column) => column.key === columnMenuColumn.key),
             frozenColumns
@@ -499,14 +596,70 @@ export function GridHeader() {
               toggleFrozenThroughColumn(prev, columnIndex, visibleColumns.length)
             );
           }}
-          onOpenFilter={
-            enableFiltering && columnMenuColumn.filterable
-              ? () => openFilterMenu(columnMenuColumn.key, columnMenu.anchorEl, columnMenu.anchorRect)
-              : undefined
-          }
           onClearFilter={
             enableFiltering && filters[columnMenuColumn.key]
               ? () => setFilters((prev) => clearFilter(prev, columnMenuColumn.key))
+              : undefined
+          }
+          colorOptions={resolvedColumnMenuColorOptions ?? []}
+          colorLoading={columnMenuColorLoading}
+          selectedColorFilterValues={selectedColumnMenuColorFilterValues}
+          selectedColorSortValue={selectedColumnMenuColorSortValue}
+          onApplyColorFilterValues={
+            enableFiltering && columnMenuColorSourceKey && props.resolveColorOptions
+              ? (draftValues) => {
+                  setColorFilters((prev) => {
+                    if (!draftValues.size) {
+                      const next = { ...prev };
+                      delete next[columnMenuColorSourceKey];
+                      return next;
+                    }
+
+                    return {
+                      ...prev,
+                      [columnMenuColorSourceKey]: {
+                        values: new Set(draftValues),
+                      },
+                    };
+                  });
+                }
+              : undefined
+          }
+          onApplyColorSortValue={
+            enableSorting && columnMenuColorSourceKey && props.resolveColorOptions
+              ? (nextValue) => {
+                  if (nextValue === null) {
+                    setColorSort((prev) =>
+                      prev?.columnKey === columnMenuColorSourceKey ? null : prev
+                    );
+                    return;
+                  }
+
+                  setColorSort({
+                    columnKey: columnMenuColorSourceKey,
+                    value: nextValue,
+                  });
+                }
+              : undefined
+          }
+          filterValues={columnMenuFilterValues}
+          filterLoading={columnMenuFilterLoading}
+          selectedFilterValues={selectedColumnMenuFilterValues}
+          filterVisibleValueCount={props.filterMenuVisibleValueCount}
+          onApplyFilterValues={
+            enableFiltering && columnMenuFilterColumn
+              ? (draftValues) => {
+                  setFilters((prev) => {
+                    if (!draftValues.size || draftValues.size >= columnMenuFilterValues.length) {
+                      return clearFilter(prev, columnMenuFilterColumn.key);
+                    }
+
+                    return {
+                      ...prev,
+                      [columnMenuFilterColumn.key]: createValueSetFilter(draftValues),
+                    };
+                  });
+                }
               : undefined
           }
           onHideColumn={
@@ -531,34 +684,6 @@ export function GridHeader() {
               : undefined
           }
           onClose={() => setColumnMenu(null)}
-        />
-      ) : null}
-
-      {filterMenu && filterMenuColumn ? (
-        <FilterMenu
-          anchorEl={filterMenu.anchorEl}
-          anchorRect={filterMenu.anchorRect}
-          title={filterMenuColumn.title}
-          values={filterMenuValues}
-          selectedValues={selectedFilterValues}
-          onApply={(draftValues) => {
-            setFilters((prev) => {
-              if (!draftValues.size || draftValues.size >= filterMenuValues.length) {
-                return clearFilter(prev, filterMenuColumn.key);
-              }
-
-              return {
-                ...prev,
-                [filterMenuColumn.key]: createValueSetFilter(draftValues),
-              };
-            });
-            setFilterMenu(null);
-          }}
-          onClear={() => {
-            setFilters((prev) => clearFilter(prev, filterMenuColumn.key));
-            closeMenus();
-          }}
-          onClose={() => setFilterMenu(null)}
         />
       ) : null}
     </>

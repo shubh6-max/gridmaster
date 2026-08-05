@@ -71,6 +71,24 @@ export type GridSort = {
   direction: GridSortDirection;
 } | null;
 
+export type GridColorFilter = {
+  values: Set<string>;
+};
+
+export type GridColorFilters = Record<string, GridColorFilter>;
+
+export type GridColorSort = {
+  columnKey: string;
+  value: string;
+} | null;
+
+export type GridColorOption = {
+  value: string;
+  label: string;
+  count: number;
+  swatch?: string | null;
+};
+
 export type GridFilterOperator =
   | "includes"
   | "equals"
@@ -181,6 +199,7 @@ export type GridCellEditorProps<T extends GridRow = GridRow> = GridCellContext<T
   commit: () => void;
   cancel: () => void;
   requestViewportFocusAfterEdit?: () => void;
+  autoSelectOnFocus?: boolean;
 };
 
 /* =========================================================
@@ -206,6 +225,14 @@ export type GridSortChangeEvent = {
 
 export type GridFilterChangeEvent = {
   filters: GridFilters;
+};
+
+export type GridColorFilterChangeEvent = {
+  colorFilters: GridColorFilters;
+};
+
+export type GridColorSortChangeEvent = {
+  colorSort: GridColorSort;
 };
 
 export type GridColumnResizeEvent<T extends GridRow = GridRow> = {
@@ -261,6 +288,17 @@ export type GridRowIdGetter<T extends GridRow = GridRow> = (
   index: number
 ) => string;
 
+export type GridRowMetaGetter<T extends GridRow = GridRow> = (
+  row: T,
+  sourceRowIndex: number
+) => GridRowMeta | undefined;
+
+export type GridCellMetaGetter<T extends GridRow = GridRow> = (
+  row: T,
+  sourceRowIndex: number,
+  columnKey: string
+) => GridCellMeta | undefined;
+
 export type GridColumnDef<T extends GridRow = GridRow> = {
   key: string;
   title: string;
@@ -282,6 +320,7 @@ export type GridColumnDef<T extends GridRow = GridRow> = {
 
   placeholder?: string;
   options?: string[];
+  filterOptions?: string[];
 
   align?: "left" | "center" | "right";
 
@@ -405,6 +444,8 @@ export type GridState<T extends GridRow = GridRow> = {
   selection: GridSelectionState;
   sort: GridSort;
   filters: GridFilters;
+  colorFilters: GridColorFilters;
+  colorSort: GridColorSort;
   clipboard: GridClipboardData;
   fill: GridFillState;
   formatPainter: GridFormatPainterClipboard;
@@ -419,13 +460,34 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   rows: T[];
   columns: GridColumnDef<T>[];
   getRowId?: GridRowIdGetter<T>;
+  getRowMeta?: GridRowMetaGetter<T>;
+  getCellMeta?: GridCellMetaGetter<T>;
+  initialCellMeta?: Record<string, GridCellMeta>;
+  initialRowMeta?: Record<number, GridRowMeta>;
+  initialFilters?: GridFilters;
+  initialColorFilters?: GridColorFilters;
+  initialColorSort?: GridColorSort;
+  resolveFilterValues?: (columnKey: string, filters: GridFilters) => Promise<string[]> | string[];
+  filterMenuVisibleValueCount?: number;
+  isColorMenuEnabled?: (columnKey: string) => boolean;
+  getColorSourceColumnKey?: (columnKey: string) => string | null;
+  resolveColorOptions?: (
+    columnKey: string,
+    filters: GridFilters,
+    colorFilters: GridColorFilters
+  ) => Promise<GridColorOption[]> | GridColorOption[];
+  allowedRowIds?: Iterable<string> | null;
 
   onRowsChange?: (rows: T[]) => void;
   onColumnsChange?: (columns: GridColumnDef<T>[]) => void;
+  onSnapshotChange?: (snapshot: GridSnapshot<T>) => void;
   onCellChange?: (event: GridCellChangeEvent<T>) => void;
+  onSaveShortcut?: () => void;
   onSelectionChange?: (event: GridSelectionChangeEvent) => void;
   onSortChange?: (event: GridSortChangeEvent) => void;
   onFilterChange?: (event: GridFilterChangeEvent) => void;
+  onColorFilterChange?: (event: GridColorFilterChangeEvent) => void;
+  onColorSortChange?: (event: GridColorSortChangeEvent) => void;
   onColumnResize?: (event: GridColumnResizeEvent<T>) => void;
   onRowInsert?: (event: GridRowInsertEvent<T>) => void;
   onColumnInsert?: (event: GridColumnInsertEvent<T>) => void;
@@ -445,7 +507,12 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   headerHeight?: number;
 
   frozenColumns?: number;
+  virtualizeRows?: boolean;
+  overscanRowCount?: number;
+  historyLimit?: number;
+  rowPatchMode?: boolean;
 
+  showToolbar?: boolean;
   showFormulaBar?: boolean;
   showStatusBar?: boolean;
 
@@ -488,7 +555,11 @@ export type GridColumnFactory<T extends GridRow = GridRow> = {
   number: (key: string, options?: GridCreateColumnOptions<T> & { title?: string }) => GridColumnDef<T>;
   select: (
     key: string,
-    options?: GridCreateColumnOptions<T> & { title?: string; options?: string[] }
+    options?: GridCreateColumnOptions<T> & {
+      title?: string;
+      options?: string[];
+      filterOptions?: string[];
+    }
   ) => GridColumnDef<T>;
   checkbox: (
     key: string,

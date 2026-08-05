@@ -382,6 +382,7 @@ export function cloneColumns<T extends GridRow>(
   return columns.map((column) => ({
     ...column,
     options: column.options ? [...column.options] : column.options,
+    filterOptions: column.filterOptions ? [...column.filterOptions] : column.filterOptions,
   }));
 }
 
@@ -468,11 +469,12 @@ export function shallowEqualColumns<T extends GridRow>(
     if (leftColumn === rightColumn) continue;
     if (!leftColumn || !rightColumn) return false;
 
-    const { options: leftOptions, ...leftRest } = leftColumn;
-    const { options: rightOptions, ...rightRest } = rightColumn;
+    const { options: leftOptions, filterOptions: leftFilterOptions, ...leftRest } = leftColumn;
+    const { options: rightOptions, filterOptions: rightFilterOptions, ...rightRest } = rightColumn;
 
     if (!shallowEqualObjects(leftRest, rightRest)) return false;
     if (!shallowEqualStringArrays(leftOptions, rightOptions)) return false;
+    if (!shallowEqualStringArrays(leftFilterOptions, rightFilterOptions)) return false;
   }
 
   return true;

@@ -34,6 +34,8 @@ type UseKeyboardNavigationParams<T extends GridRow = GridRow> = {
   setSelection: React.Dispatch<React.SetStateAction<GridSelectionState>>;
   history: GridHistoryState;
   setHistory: React.Dispatch<React.SetStateAction<GridHistoryState>>;
+  historyLimit?: number;
+  preserveRowReferences?: boolean;
   enableUndoRedo?: boolean;
   enableClipboard?: boolean;
   enableEditing?: boolean;
@@ -42,7 +44,9 @@ type UseKeyboardNavigationParams<T extends GridRow = GridRow> = {
   onPaste?: () => void;
   onDelete?: () => void;
   onStartEdit?: (initialValue?: string) => void;
+  onCommitEdit?: () => void;
   onCancelEdit?: () => void;
+  onSaveShortcut?: () => void;
   onCopyFormat?: () => boolean | void;
   onPasteFormat?: () => boolean | void;
   onCancelFormatPainter?: () => void;
@@ -172,6 +176,8 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
   setSelection,
   history,
   setHistory,
+  historyLimit,
+  preserveRowReferences,
   enableUndoRedo = true,
   enableClipboard = true,
   enableEditing = true,
@@ -180,7 +186,9 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
   onPaste,
   onDelete,
   onStartEdit,
+  onCommitEdit,
   onCancelEdit,
+  onSaveShortcut,
   onCopyFormat,
   onPasteFormat,
   onCancelFormatPainter,
@@ -193,6 +201,7 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    const gridRoot = container.closest(".gm-root");
 
     const bounds: GridBounds = {
       totalRows: rows.length,
@@ -200,15 +209,28 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const activeElement = document.activeElement as HTMLElement | null;
+      const ctrlOrMeta = event.ctrlKey || event.metaKey;
+      const key = event.key;
       const activeInsideGrid =
-        document.activeElement === container || container.contains(document.activeElement);
+        activeElement === container ||
+        container.contains(activeElement) ||
+        Boolean(gridRoot?.contains(activeElement));
+      const targetInsideGrid =
+        target === container ||
+        container.contains(target) ||
+        Boolean(gridRoot?.contains(target)) ||
+        Boolean(
+          target?.closest(
+            "[data-gm-column-menu], [data-gm-filter-menu], [data-gm-context-menu], [data-gm-color-menu]"
+          )
+        );
 
-      if (!activeInsideGrid && !isTypingElement(event.target)) {
+      if ((!activeInsideGrid && !targetInsideGrid) || (isTypingElement(target) && !(ctrlOrMeta && key.toLowerCase() === "s"))) {
         return;
       }
 
-      const ctrlOrMeta = event.ctrlKey || event.metaKey;
-      const key = event.key;
       const altAndCtrlOrMeta = event.altKey && ctrlOrMeta;
 
       if (altAndCtrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.C) {
@@ -226,7 +248,12 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
       if (enableUndoRedo && ctrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.Z && !event.shiftKey) {
         event.preventDefault();
         if (canUndo(history)) {
-          setHistory((prev) => historyReducer(prev, undoHistory()));
+          setHistory((prev) =>
+            historyReducer(prev, undoHistory(), {
+              historyLimit,
+              preserveRowReferences,
+            })
+          );
         }
         return;
       }
@@ -239,7 +266,12 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
       ) {
         event.preventDefault();
         if (canRedo(history)) {
-          setHistory((prev) => historyReducer(prev, redoHistory()));
+          setHistory((prev) =>
+            historyReducer(prev, redoHistory(), {
+              historyLimit,
+              preserveRowReferences,
+            })
+          );
         }
         return;
       }
@@ -283,6 +315,19 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
       if (ctrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.A) {
         event.preventDefault();
         setSelection(selectAllCells(rows.length, columns.length));
+        return;
+      }
+
+      if (ctrlOrMeta && key.toLowerCase() === "s") {
+        event.preventDefault();
+        if (isEditing) {
+          onCommitEdit?.();
+          window.requestAnimationFrame(() => {
+            onSaveShortcut?.();
+          });
+          return;
+        }
+        onSaveShortcut?.();
         return;
       }
 
@@ -364,9 +409,9 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
       }
     };
 
-    container.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      container.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [
     containerRef,
@@ -384,7 +429,9 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
     onPaste,
     onDelete,
     onStartEdit,
+    onCommitEdit,
     onCancelEdit,
+    onSaveShortcut,
     onCopyFormat,
     onPasteFormat,
     onCancelFormatPainter,

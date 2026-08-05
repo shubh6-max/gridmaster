@@ -30,6 +30,8 @@ type UseCellFormattingParams<T extends GridRow = GridRow> = {
   displayRowIndexes: number[];
   visibleColumns: GridResolvedColumnDef<T>[];
   focusViewport: () => void;
+  historyLimit?: number;
+  preserveRowReferences?: boolean;
 };
 
 type ApplyCellMetaTransform<T extends GridRow = GridRow> = (
@@ -50,6 +52,8 @@ export function useCellFormatting<T extends GridRow = GridRow>({
   displayRowIndexes,
   visibleColumns,
   focusViewport,
+  historyLimit,
+  preserveRowReferences,
 }: UseCellFormattingParams<T>) {
   const bounds = useMemo(
     () => getSelectionBounds(selection, displayRows.length, visibleColumns.length),
@@ -94,6 +98,9 @@ export function useCellFormatting<T extends GridRow = GridRow>({
             cellMeta: nextCellMeta,
             rowMeta: prev.present.rowMeta,
           },
+        }, {
+          historyLimit,
+          preserveRowReferences,
         })
       );
 

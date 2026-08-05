@@ -12,8 +12,8 @@ import {
   ClipboardPaste,
   Columns2,
   Copy,
-  ListIndentDecrease,
-  ListIndentIncrease,
+  IndentDecrease,
+  IndentIncrease,
   Paintbrush,
   Scissors,
   TableCellsMerge,
@@ -610,7 +610,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
 
         <AlignmentToolRow>
           <RibbonToolButton
-            icon={<ListIndentDecrease style={{ width: 16, height: 16 }} />}
+            icon={<IndentDecrease style={{ width: 16, height: 16 }} />}
             title="Decrease Indent"
             disabled={!canDecreaseIndent}
             onClick={() => {
@@ -618,7 +618,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
             }}
           />
           <RibbonToolButton
-            icon={<ListIndentIncrease style={{ width: 16, height: 16 }} />}
+            icon={<IndentIncrease style={{ width: 16, height: 16 }} />}
             title="Increase Indent"
             onClick={() => {
               increaseIndent();
