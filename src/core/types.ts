@@ -4,7 +4,7 @@ import type React from "react";
    Base row type
    ========================================================= */
 
-export type GridRow = Record<string, any>;
+export type GridRow = Record<string, unknown>;
 
 /* =========================================================
    Primitive / value types
@@ -263,7 +263,7 @@ export type GridColumnDeleteEvent<T extends GridRow = GridRow> = {
 
 export type GridClipboardEvent<T extends GridRow = GridRow> = {
   selection: GridSelectionState;
-  rows: T[];
+  rows: readonly T[];
 };
 
 /* =========================================================
@@ -478,8 +478,8 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   ) => Promise<GridColorOption[]> | GridColorOption[];
   allowedRowIds?: Iterable<string> | null;
 
-  onRowsChange?: (rows: T[]) => void;
-  onColumnsChange?: (columns: GridColumnDef<T>[]) => void;
+  onRowsChange?: (rows: readonly T[]) => void;
+  onColumnsChange?: (columns: readonly GridColumnDef<T>[]) => void;
   onSnapshotChange?: (snapshot: GridSnapshot<T>) => void;
   onCellChange?: (event: GridCellChangeEvent<T>) => void;
   onSaveShortcut?: () => void;

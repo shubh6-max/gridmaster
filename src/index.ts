@@ -3,6 +3,21 @@ import "./styles/grid.css";
 
 export type * from "./core/types";
 
+export type {
+  GridCellChangeEvent,
+  GridSelectionChangeEvent,
+  GridSortChangeEvent,
+  GridFilterChangeEvent,
+  GridColorFilterChangeEvent,
+  GridColorSortChangeEvent,
+  GridColumnResizeEvent,
+  GridRowInsertEvent,
+  GridColumnInsertEvent,
+  GridRowDeleteEvent,
+  GridColumnDeleteEvent,
+  GridClipboardEvent,
+} from "./core/types";
+
 export * from "./core/constants";
 export * from "./core/utils";
 

@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
-      emptyOutDir: true,
+      emptyOutDir: false,
       lib: {
         entry: libraryEntry,
         name: "GridMaster",
