@@ -12,7 +12,6 @@ import type {
   GridSelectionState,
 } from "../../core/types";
 import { getRowValue, isFormulaValue } from "../../core/utils";
-import { getGridEditorAutoSelectOnFocus } from "./gridEditorFocusPolicy";
 
 export type GridEditingTarget<T extends GridRow = GridRow> = {
   displayRowIndex: number;
@@ -126,9 +125,7 @@ export function useEditing<T extends GridRow = GridRow>({
       const target = resolveEditingTarget(mode, rows, displayRowIndexes, visibleColumns, nextCell);
       if (!nextCell || !target || target.readonly) return false;
 
-      setEditorAutoSelectOnFocus(
-        getGridEditorAutoSelectOnFocus({ initialValueProvided: initialValue !== undefined })
-      );
+      setEditorAutoSelectOnFocus(initialValue === undefined);
 
       if (initialValue !== undefined) {
         preserveNextSyncRef.current = true;

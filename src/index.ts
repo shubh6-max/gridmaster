@@ -64,8 +64,6 @@ export * from "./core/features/structure";
 export * from "./core/transforms/columns";
 export * from "./core/transforms/rows";
 
-export * from "./columns/columnDefaults";
-export * from "./columns/columnTypes";
 export * from "./columns/createColumn";
 
 export * from "./editors";

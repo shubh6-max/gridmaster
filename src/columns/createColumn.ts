@@ -56,9 +56,3 @@ export function createColumnFactory<T extends GridRow = GridRow>(): GridColumnFa
     custom: (key, options) => buildColumn<T>("custom", key, options),
   };
 }
-
-/* =========================================================
-   Default factory export
-   ========================================================= */
-
-export const createColumn = createColumnFactory();
