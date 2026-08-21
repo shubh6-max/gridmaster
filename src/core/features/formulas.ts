@@ -9,6 +9,19 @@ import {
   toNumber,
 } from "../utils";
 
+function coerceToNumber(value: unknown, fallback: number | null = null): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "boolean") return value ? 1 : 0;
+  const num = toNumber(value);
+  return num ?? fallback;
+}
+
+function coerceToString(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value === null || value === undefined) return "";
+  return String(value);
+}
+
 type GridFormulaColumn<T extends GridRow = GridRow> =
   | GridColumnDef<T>
   | GridResolvedColumnDef<T>;
@@ -719,6 +732,146 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
 
           case "COUNT":
             return { value: numericValues.length, error: null };
+
+          case "COUNTA": {
+            const nonBlank = flatValues.filter((value) => {
+              const normalized = normalizeValue(value);
+              return normalized !== "";
+            }).length;
+            return { value: nonBlank, error: null };
+          }
+
+          case "ABS":
+            return {
+              value: Math.abs(numericValues[0] ?? 0),
+              error: null,
+            };
+
+          case "ROUND": {
+            const number = coerceToNumber(evaluatedArgs[0]);
+            const digits = coerceToNumber(evaluatedArgs[1], 0) ?? 0;
+            if (number === null) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const factor = Math.pow(10, Number(digits));
+            return { value: Math.round(number * factor) / factor, error: null };
+          }
+
+          case "CEILING": {
+            const number = coerceToNumber(evaluatedArgs[0]);
+            const significance = coerceToNumber(evaluatedArgs[1], 1) ?? 1;
+            if (number === null || significance === 0) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            return { value: Math.ceil(number / significance) * significance, error: null };
+          }
+
+          case "FLOOR": {
+            const number = coerceToNumber(evaluatedArgs[0]);
+            const significance = coerceToNumber(evaluatedArgs[1], 1) ?? 1;
+            if (number === null || significance === 0) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            return { value: Math.floor(number / significance) * significance, error: null };
+          }
+
+          case "POWER": {
+            const base = coerceToNumber(evaluatedArgs[0]);
+            const exponent = coerceToNumber(evaluatedArgs[1]);
+            if (base === null || exponent === null) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            return { value: Math.pow(base, exponent), error: null };
+          }
+
+          case "SQRT": {
+            const number = coerceToNumber(evaluatedArgs[0]);
+            if (number === null || number < 0) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            return { value: Math.sqrt(number), error: null };
+          }
+
+          case "MOD": {
+            const left = coerceToNumber(evaluatedArgs[0]);
+            const right = coerceToNumber(evaluatedArgs[1]);
+            if (left === null || right === null || right === 0) {
+              return { value: GRID_FORMULA_DIV_ZERO, error: GRID_FORMULA_DIV_ZERO };
+            }
+            return { value: left % right, error: null };
+          }
+
+          case "AND": {
+            const result = evaluatedArgs.every((value) => coerceFormulaBoolean(value));
+            return { value: result, error: null };
+          }
+
+          case "OR": {
+            const result = evaluatedArgs.some((value) => coerceFormulaBoolean(value));
+            return { value: result, error: null };
+          }
+
+          case "NOT": {
+            const value = coerceFormulaBoolean(evaluatedArgs[0]);
+            return { value: !value, error: null };
+          }
+
+          case "IFERROR": {
+            const primary = evaluateNode(node.arguments[0] ?? { type: "NumberLiteral", value: 0 }, stack);
+            if (!primary.error) return primary;
+            const fallback = node.arguments[1];
+            if (!fallback) return { value: primary.error, error: primary.error };
+            return evaluateNode(fallback, stack);
+          }
+
+          case "UPPER":
+            return { value: coerceToString(evaluatedArgs[0]).toUpperCase(), error: null };
+
+          case "LOWER":
+            return { value: coerceToString(evaluatedArgs[0]).toLowerCase(), error: null };
+
+          case "TRIM":
+            return { value: coerceToString(evaluatedArgs[0]).trim(), error: null };
+
+          case "LEN":
+            return { value: coerceToString(evaluatedArgs[0]).length, error: null };
+
+          case "LEFT": {
+            const text = coerceToString(evaluatedArgs[0]);
+            const count = coerceToNumber(evaluatedArgs[1], text.length) ?? text.length;
+            return { value: text.slice(0, Number(count)), error: null };
+          }
+
+          case "RIGHT": {
+            const text = coerceToString(evaluatedArgs[0]);
+            const count = coerceToNumber(evaluatedArgs[1], text.length) ?? text.length;
+            return { value: text.slice(-Number(count)), error: null };
+          }
+
+          case "MID": {
+            const text = coerceToString(evaluatedArgs[0]);
+            const start = coerceToNumber(evaluatedArgs[1], 1) ?? 1;
+            const length = coerceToNumber(evaluatedArgs[2], 0) ?? 0;
+            const index = Number(start) - 1;
+            return { value: text.slice(index, index + Number(length)), error: null };
+          }
+
+          case "CONCAT":
+            return { value: evaluatedArgs.map(coerceToString).join(""), error: null };
+
+          case "TEXT": {
+            const value = evaluatedArgs[0];
+            return { value: coerceToString(value), error: null };
+          }
+
+          case "ISBLANK":
+            return { value: normalizeValue(evaluatedArgs[0]) === "", error: null };
+
+          case "ISNUMBER":
+            return { value: coerceToNumber(evaluatedArgs[0], null) !== null, error: null };
+
+          case "ISTEXT":
+            return { value: typeof evaluatedArgs[0] === "string", error: null };
 
           default:
             return { value: GRID_FORMULA_NAME, error: GRID_FORMULA_NAME };

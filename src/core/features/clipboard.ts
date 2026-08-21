@@ -37,6 +37,31 @@ export type GridPasteResult<T extends GridRow = GridRow> = {
 };
 
 /* =========================================================
+   Paste modes
+   ========================================================= */
+
+export function transposeMatrix(matrix: string[][]): string[][] {
+  if (!matrix.length) return [];
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const result: string[][] = [];
+
+  for (let col = 0; col < cols; col++) {
+    const newRow: string[] = [];
+    for (let row = 0; row < rows; row++) {
+      newRow.push(matrix[row]?.[col] ?? "");
+    }
+    result.push(newRow);
+  }
+
+  return result;
+}
+
+export function coercePastedValues(matrix: string[][]): string[][] {
+  return matrix.map((row) => row.map((value) => value));
+}
+
+/* =========================================================
    Clipboard creators
    ========================================================= */
 

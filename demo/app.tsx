@@ -7,12 +7,27 @@ import {
   createReadonlyGridPreset,
   getFilteredColorOptionsForColumn,
   resolveColumns,
+  moveColumn,
+  clearConditionalFormats,
+  setConditionalFormats,
+  evaluateCondition,
+  validateCellValue,
+  clearValidations,
+  setColumnValidation,
+  generateFillSeries,
+  detectFillSeries,
+  transposeMatrix,
 } from "../src";
 import type {
   GridCellMeta,
   GridColorFilters,
   GridColorSort,
+  GridColumnValidation,
+  GridConditionalFormats,
+  GridConditionalFormat,
+  GridCondition,
   GridFilters,
+  GridValidations,
 } from "../src";
 import "./demo.css";
 
@@ -151,6 +166,14 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef(0);
 
+  const [validationEnabled, setValidationEnabled] = useState(false);
+  const [conditionalFormatEnabled, setConditionalFormatEnabled] = useState(false);
+  const [pasteMode, setPasteMode] = useState<"default" | "transpose" | "valuesOnly">("default");
+  const [dragReorderEnabled, setDragReorderEnabled] = useState(false);
+
+  const [validations, setValidations] = useState<GridValidations>({});
+  const [conditionalFormats, setConditionalFormats] = useState<GridConditionalFormats>({});
+
   const resolvedColumns = useMemo(() => resolveColumns(columns), []);
 
   const presetProps = useMemo(() => {
@@ -222,6 +245,53 @@ export default function App() {
     setViewEpoch((v) => v + 1);
   };
 
+  const spendValidation: GridColumnValidation = useMemo(
+    () => ({
+      rules: [
+        { type: "min", value: 5, message: "Minimum spend is $5M" },
+        { type: "max", value: 200, message: "Maximum spend is $200M" },
+      ],
+    }),
+    []
+  );
+
+  const highSpendCondition: GridConditionalFormat = useMemo(
+    () => ({
+      condition: { type: "cellValue", operator: ">=", value: 140 },
+      backgroundColor: "#E5F5EA",
+      bold: true,
+    }),
+    []
+  );
+
+  const lowSpendCondition: GridConditionalFormat = useMemo(
+    () => ({
+      condition: { type: "cellValue", operator: "<", value: 15 },
+      backgroundColor: "#FEE2E2",
+    }),
+    []
+  );
+
+  React.useEffect(() => {
+    if (validationEnabled) {
+      setValidations({
+        spend: spendValidation,
+      });
+    } else {
+      setValidations({});
+    }
+  }, [validationEnabled, spendValidation]);
+
+  React.useEffect(() => {
+    if (conditionalFormatEnabled) {
+      setConditionalFormats({
+        spend: [highSpendCondition, lowSpendCondition],
+      });
+    } else {
+      setConditionalFormats({});
+    }
+  }, [conditionalFormatEnabled, highSpendCondition, lowSpendCondition]);
+
   const rowKind = preset === "compact" ? "Compact" : preset === "readonly" ? "Read-only" : "Editable";
 
   return (
@@ -290,6 +360,30 @@ export default function App() {
         >
           {priorityFirst ? "★" : "☆"} Priority first
         </button>
+        <button
+          className={`demo-toggle ${validationEnabled ? "on" : ""}`}
+          onClick={() => setValidationEnabled((v) => !v)}
+          aria-pressed={validationEnabled}
+          type="button"
+        >
+          Validation
+        </button>
+        <button
+          className={`demo-toggle ${conditionalFormatEnabled ? "on" : ""}`}
+          onClick={() => setConditionalFormatEnabled((v) => !v)}
+          aria-pressed={conditionalFormatEnabled}
+          type="button"
+        >
+          Conditional format
+        </button>
+        <button
+          className={`demo-toggle ${dragReorderEnabled ? "on" : ""}`}
+          onClick={() => setDragReorderEnabled((v) => !v)}
+          aria-pressed={dragReorderEnabled}
+          type="button"
+        >
+          Drag reorder
+        </button>
         <button className="demo-text-btn" onClick={resetView} type="button">
           Reset
         </button>
@@ -354,6 +448,15 @@ export default function App() {
           getColorSourceColumnKey={getColorSourceColumnKey}
           isColorMenuEnabled={isColorMenuEnabled}
           allowedRowIds={allowedRowIds}
+          enableValidation={validationEnabled}
+          initialValidations={validations}
+          enableConditionalFormatting={conditionalFormatEnabled}
+          initialConditionalFormats={conditionalFormats}
+          enableRowDrag={dragReorderEnabled}
+          onRowReorder={(nextRows) => {
+            setRows(nextRows as DemoRow[]);
+            setToast("Rows reordered");
+          }}
           onSaveShortcut={handleSave}
           onSortChange={({ sort }) => setViewState((v) => ({ ...v, sort: !!sort }))}
           onFilterChange={({ filters }) =>

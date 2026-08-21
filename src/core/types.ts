@@ -132,6 +132,8 @@ export type GridClipboardData = {
   origin: GridClipboardOrigin;
 } | null;
 
+export type GridPasteMode = "default" | "valuesOnly" | "formulasOnly" | "transpose" | "formatOnly";
+
 export type GridFillState = {
   anchor: GridCellCoord;
   current: GridCellCoord;
@@ -161,6 +163,7 @@ export type GridCellMeta = {
   className?: string;
   style?: React.CSSProperties;
   error?: string | null;
+  conditionalFormat?: GridConditionalFormat | null;
 };
 
 export type GridRowMeta = {
@@ -170,6 +173,50 @@ export type GridRowMeta = {
   className?: string;
   style?: React.CSSProperties;
 };
+
+/* =========================================================
+   Validation types
+   ========================================================= */
+
+export type GridValidationRule =
+  | { type: "required"; message?: string }
+  | { type: "min"; value: number; message?: string }
+  | { type: "max"; value: number; message?: string }
+  | { type: "minLength"; value: number; message?: string }
+  | { type: "maxLength"; value: number; message?: string }
+  | { type: "pattern"; value: string; message?: string }
+  | {
+      type: "custom";
+      message?: string;
+      validator: (value: unknown, row: GridRow) => string | null;
+    };
+
+export type GridColumnValidation = {
+  rules: GridValidationRule[];
+};
+
+export type GridValidations = Record<string, GridColumnValidation>;
+
+/* =========================================================
+   Conditional formatting types
+   ========================================================= */
+
+export type GridCondition =
+  | { type: "cellValue"; operator: ">" | "<" | "=" | ">=" | "<=" | "<>"; value: unknown }
+  | { type: "between"; low: unknown; high: unknown }
+  | { type: "textContains"; value: string }
+  | { type: "timePeriod"; value: "today" | "yesterday" | "thisWeek" | "thisMonth" };
+
+export type GridConditionalFormat = {
+  condition: GridCondition;
+  backgroundColor?: string;
+  color?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+};
+
+export type GridConditionalFormats = Record<string, GridConditionalFormat[]>;
 
 /* =========================================================
    Renderer / editor props
@@ -329,6 +376,8 @@ export type GridColumnDef<T extends GridRow = GridRow> = {
   formatValue?: GridValueFormatter<T>;
   parseValue?: GridValueParser<T>;
   validate?: GridCellValidator<T>;
+
+  validations?: GridValidationRule[];
 
   cellClassName?: string;
   headerClassName?: string;
@@ -495,6 +544,8 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   onColumnDelete?: (event: GridColumnDeleteEvent<T>) => void;
   onCopy?: (event: GridClipboardEvent<T>) => void;
   onPaste?: (event: GridClipboardEvent<T>) => void;
+  onValidationChange?: (errors: Record<string, string>) => void;
+  onConditionalFormatsChange?: (formats: GridConditionalFormats) => void;
   createRowOnInsert?: GridInsertedRowFactory<T>;
   createColumnOnInsert?: GridInsertedColumnFactory<T>;
 
@@ -536,6 +587,13 @@ export type GridMasterProps<T extends GridRow = GridRow> = {
   enableInsertColumn?: boolean;
   enableDeleteRow?: boolean;
   enableDeleteColumn?: boolean;
+  enableValidation?: boolean;
+  enableConditionalFormatting?: boolean;
+  initialConditionalFormats?: GridConditionalFormats;
+  enableRowDrag?: boolean;
+  enableColumnDrag?: boolean;
+  onRowReorder?: (rows: readonly T[]) => void;
+  onColumnReorder?: (columns: readonly GridColumnDef<T>[]) => void;
 
   className?: string;
   style?: React.CSSProperties;

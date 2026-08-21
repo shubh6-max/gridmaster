@@ -53,6 +53,8 @@ export {
 } from "./core/features/fill";
 export * from "./core/features/filtering";
 export * from "./core/features/formatting";
+export * from "./core/features/conditionalFormatting";
+export * from "./core/features/dragDrop";
 export * from "./core/features/formulas";
 export * from "./core/features/formatPainter";
 export * from "./core/features/freezing";

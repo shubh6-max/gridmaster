@@ -406,3 +406,108 @@ export function applyFillFromSelection<T extends GridRow>(
 
   return fillRangeWithSource(rows, columns, sourceBounds, targetBounds);
 }
+
+/* =========================================================
+   Fill series helpers
+   ========================================================= */
+
+export type FillSeriesType = "copy" | "linear" | "date" | "weekday" | "none";
+
+export function detectFillSeries(values: unknown[]): FillSeriesType {
+  if (values.length < 2) return "copy";
+
+  const normalized = values.map((value) => {
+    const date = toDateInputString(value);
+    if (date) return { kind: "date" as const, value: date };
+    const number = toNumber(value);
+    if (number !== null) return { kind: "number" as const, value: number };
+    return { kind: "text" as const, value: String(value ?? "") };
+  });
+
+  const kinds = new Set(normalized.map((item) => item.kind));
+  if (kinds.size !== 1) return "copy";
+
+  if (normalized[0].kind === "text") return "copy";
+
+  if (normalized[0].kind === "date") {
+    const dates = normalized.map((item) => new Date(item.value).getTime());
+    const step = dates[1] - dates[0];
+    if (!Number.isFinite(step) || step === 0) return "copy";
+
+    const isWeekdayStep = Math.abs(step) === 24 * 60 * 60 * 1000;
+    if (isWeekdayStep) {
+      const weekdays = dates.map((timestamp) => new Date(timestamp).getUTCDay());
+      const isWeekdaySequence = weekdays.every((day) => day >= 1 && day <= 5);
+      if (isWeekdaySequence) return "weekday";
+    }
+
+    return "date";
+  }
+
+  const numbers = normalized.map((item) => (item as { kind: "number"; value: number }).value);
+  const step = numbers[1] - numbers[0];
+  if (!Number.isFinite(step) || step === 0) return "copy";
+  return "linear";
+}
+
+export function generateFillSeries(
+  series: FillSeriesType,
+  source: unknown[],
+  count: number
+): unknown[] {
+  if (series === "copy" || series === "none" || count <= 0) {
+    return source.slice(-count);
+  }
+
+  if (series === "linear") {
+    const numbers = source.map((value) => toNumber(value));
+    if (numbers.some((value) => value === null)) return source.slice(-count);
+
+    const numericSeries = numbers as number[];
+    const step = numericSeries[1] - numericSeries[0];
+
+    const result: unknown[] = [];
+    for (let index = 0; index < count; index++) {
+      const next = numericSeries[numericSeries.length - 1] + step * (index + 1);
+      result.push(next);
+    }
+
+    return result;
+  }
+
+  if (series === "date" || series === "weekday") {
+    const timestamps = source.map((value) => {
+      const normalized = toDateInputString(value);
+      if (!normalized) return null;
+      const [year, month, day] = normalized.split("-").map(Number);
+      return new Date(year, month - 1, day).getTime();
+    });
+
+    if (timestamps.some((value) => value === null)) return source.slice(-count);
+
+    const numericSeries = timestamps as number[];
+    const step = numericSeries[1] - numericSeries[0];
+
+    const result: unknown[] = [];
+    for (let index = 0; index < count; index++) {
+      let nextTimestamp = numericSeries[numericSeries.length - 1] + step * (index + 1);
+
+      if (series === "weekday") {
+        while (new Date(nextTimestamp).getUTCDay() === 0 || new Date(nextTimestamp).getUTCDay() === 6) {
+          nextTimestamp += Math.sign(step) * 24 * 60 * 60 * 1000;
+        }
+      }
+
+      const date = new Date(nextTimestamp);
+      result.push([
+        date.getUTCFullYear(),
+        String(date.getUTCMonth() + 1).padStart(2, "0"),
+        String(date.getUTCDate()).padStart(2, "0"),
+      ].join("-"));
+    }
+
+    return result;
+  }
+
+  return source.slice(-count);
+}

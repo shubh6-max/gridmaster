@@ -6,6 +6,7 @@ import type {
   GridClipboardData,
   GridColumnDef,
   GridColumnInsertPosition,
+  GridConditionalFormats,
   GridFilters,
   GridHistoryState,
   GridMasterProps,
@@ -25,6 +26,8 @@ import {
   DEFAULT_ENABLE_COLUMN_VISIBILITY,
   DEFAULT_ENABLE_DELETE_ROW,
   DEFAULT_ENABLE_DELETE_COLUMN,
+  DEFAULT_ENABLE_ROW_DRAG,
+  DEFAULT_ENABLE_COLUMN_DRAG,
   DEFAULT_ENABLE_EDITING,
   DEFAULT_ENABLE_FILL_HANDLE,
   DEFAULT_ENABLE_FILTERING,
@@ -49,6 +52,10 @@ import {
   EMPTY_SORT,
 } from "../../core/constants";
 import { clearColorFilters } from "../../core/features/colorFiltering";
+import {
+  clearConditionalFormats,
+  getMatchingConditionalFormat,
+} from "../../core/features/conditionalFormatting";
 import { clearFillState, type GridFillState } from "../../core/features/fill";
 import { createFormulaEvaluator, type GridFormulaEvaluator } from "../../core/features/formulas";
 import {
@@ -73,6 +80,7 @@ import {
   type GridColumnWidths,
 } from "../../core/features/sizing";
 import { deleteRowAt, insertRowAt } from "../../core/features/editing";
+import { moveColumn as moveColumnHelper, moveRow as moveRowHelper } from "../../core/features/dragDrop";
 import { createInitialHistoryState, historyReducer } from "../../core/state/historyReducer";
 import { getDisplayRowIndexes, getDisplayRows } from "../../core/state/gridState";
 import {
@@ -131,6 +139,9 @@ export type UseGridMasterResult<T extends GridRow = GridRow> = {
   colorSort: GridColorSort;
   setColorSort: React.Dispatch<React.SetStateAction<GridColorSort>>;
 
+  conditionalFormats: GridConditionalFormats;
+  setConditionalFormats: React.Dispatch<React.SetStateAction<GridConditionalFormats>>;
+
   clipboard: GridClipboardData;
   setClipboard: React.Dispatch<React.SetStateAction<GridClipboardData>>;
 
@@ -176,6 +187,12 @@ export type UseGridMasterResult<T extends GridRow = GridRow> = {
   enableInsertColumn: boolean;
   enableDeleteRow: boolean;
   enableDeleteColumn: boolean;
+  enableConditionalFormatting: boolean;
+  enableRowDrag: boolean;
+  enableColumnDrag: boolean;
+
+  moveRow: (fromIndex: number, toIndex: number) => void;
+  moveColumn: (fromKey: string, toKey: string) => void;
 
   updateRows: (nextRows: T[]) => void;
   updateColumns: (nextColumns: GridColumnDef<T>[]) => void;
@@ -222,6 +239,10 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const enableInsertColumn = props.enableInsertColumn ?? DEFAULT_ENABLE_INSERT_COLUMN;
   const enableDeleteRow = props.enableDeleteRow ?? DEFAULT_ENABLE_DELETE_ROW;
   const enableDeleteColumn = props.enableDeleteColumn ?? DEFAULT_ENABLE_DELETE_COLUMN;
+  const enableValidation = props.enableValidation ?? false;
+  const enableConditionalFormatting = props.enableConditionalFormatting ?? false;
+  const enableRowDrag = props.enableRowDrag ?? DEFAULT_ENABLE_ROW_DRAG;
+  const enableColumnDrag = props.enableColumnDrag ?? DEFAULT_ENABLE_COLUMN_DRAG;
   const rowPatchMode = props.rowPatchMode ?? false;
   const historyLimit = props.historyLimit;
 
@@ -399,6 +420,9 @@ export function useGridMaster<T extends GridRow = GridRow>(
     () => props.initialColorFilters ?? clearColorFilters()
   );
   const [colorSort, setColorSort] = useState<GridColorSort>(() => props.initialColorSort ?? null);
+  const [conditionalFormats, setConditionalFormats] = useState(() =>
+    props.initialConditionalFormats ?? clearConditionalFormats()
+  );
   const [clipboard, setClipboard] = useState(EMPTY_CLIPBOARD);
   const [fill, setFill] = useState<GridFillState>(clearFillState());
   const [columnWidths, setColumnWidths] = useState<GridColumnWidths>(() =>
@@ -679,6 +703,58 @@ export function useGridMaster<T extends GridRow = GridRow>(
       props.onColumnsChange?.(cloned);
     },
     [cloneGridRows, historyCloneOptions, props, rawColumns]
+  );
+
+  const handleMoveRow = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      if (!enableRowDrag) return;
+      if (fromIndex === toIndex) return;
+
+      const nextRows = moveRowHelper(rows, fromIndex, toIndex);
+
+      setHistory((prev) =>
+        historyReducer(prev, {
+          type: "PUSH",
+          payload: {
+            rows: nextRows,
+            columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+            cellMeta: prev.present.cellMeta,
+            rowMeta: prev.present.rowMeta,
+          },
+        }, historyCloneOptions)
+      );
+
+      lastEmittedRowsRef.current = nextRows;
+      props.onRowsChange?.(nextRows);
+      props.onRowReorder?.(nextRows);
+    },
+    [enableRowDrag, historyCloneOptions, props, rows]
+  );
+
+  const handleMoveColumn = useCallback(
+    (fromKey: string, toKey: string) => {
+      if (!enableColumnDrag) return;
+      if (fromKey === toKey) return;
+
+      const nextColumns = moveColumnHelper(rawColumns, fromKey, toKey);
+
+      setHistory((prev) =>
+        historyReducer(prev, {
+          type: "PUSH",
+          payload: {
+            rows: cloneGridRows(prev.present.rows as T[]),
+            columns: nextColumns,
+            cellMeta: prev.present.cellMeta,
+            rowMeta: prev.present.rowMeta,
+          },
+        }, historyCloneOptions)
+      );
+
+      lastEmittedColumnsRef.current = nextColumns;
+      props.onColumnsChange?.(nextColumns);
+      props.onColumnReorder?.(nextColumns);
+    },
+    [enableColumnDrag, historyCloneOptions, props, rawColumns]
   );
 
   const insertRow = useCallback(
@@ -1132,6 +1208,9 @@ export function useGridMaster<T extends GridRow = GridRow>(
     colorSort,
     setColorSort,
 
+    conditionalFormats,
+    setConditionalFormats,
+
     clipboard,
     setClipboard,
 
@@ -1177,6 +1256,12 @@ export function useGridMaster<T extends GridRow = GridRow>(
     enableInsertColumn,
     enableDeleteRow,
     enableDeleteColumn,
+    enableConditionalFormatting,
+    enableRowDrag,
+    enableColumnDrag,
+
+    moveRow: handleMoveRow,
+    moveColumn: handleMoveColumn,
 
     updateRows,
     updateColumns,

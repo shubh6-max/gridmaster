@@ -61,6 +61,9 @@ export const DEFAULT_ENABLE_INSERT_COLUMN = true;
 export const DEFAULT_ENABLE_DELETE_ROW = true;
 export const DEFAULT_ENABLE_DELETE_COLUMN = true;
 
+export const DEFAULT_ENABLE_ROW_DRAG = false;
+export const DEFAULT_ENABLE_COLUMN_DRAG = false;
+
 export const DEFAULT_SHOW_FORMULA_BAR = true;
 export const DEFAULT_SHOW_STATUS_BAR = true;
 
