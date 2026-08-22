@@ -265,9 +265,24 @@ Customize via CSS variables (all scoped to `.gm-root`):
 
 ## Formula Engine
 
-Hand-written tokenizer + recursive-descent parser + memoized evaluator.
+Hand-written tokenizer + recursive-descent parser + memoized evaluator. No external formula library — zero added bundle weight.
 
-**Supported:** literals, A1 refs (`A1`, `$A$1`), ranges (`A1:B10`), `+ - * /`, comparisons (`= <> > >= < <=`), `IF(cond, a, b)`, `SUM`, `AVG`/`AVERAGE`, `MIN`, `MAX`, `COUNT`, circular-reference detection.
+### Supported Functions
+
+| Category | Functions |
+|---|---|
+| **Aggregation** | `SUM`, `AVERAGE`/`AVG`, `MIN`, `MAX`, `COUNT`, `COUNTA` |
+| **Conditional** | `COUNTIF`, `SUMIF`, `AVERAGEIF` |
+| **Math** | `ABS`, `ROUND`, `CEILING`, `FLOOR`, `POWER`, `SQRT`, `MOD` |
+| **Logic** | `IF`, `AND`, `OR`, `NOT`, `IFERROR` |
+| **Lookup** | `VLOOKUP`, `INDEX`, `MATCH` |
+| **Text** | `UPPER`, `LOWER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `MID`, `CONCAT`, `TEXT`, `FIND`, `SUBSTITUTE` |
+| **Date** | `TODAY`, `NOW`, `DATE`, `YEAR`, `MONTH`, `DAY`, `DATEDIF` |
+| **Type checks** | `ISBLANK`, `ISNUMBER`, `ISTEXT` |
+
+**Operators:** `+ - * /`, `= <> > >= < <=`, unary `+ -`
+
+**Cell refs:** `A1`, `$A$1` (absolute), ranges `A1:B10` — circular-reference detection, memoized evaluation.
 
 **Example:**
 ```tsx
@@ -279,7 +294,7 @@ Hand-written tokenizer + recursive-descent parser + memoized evaluator.
 />
 ```
 
-Type `=SUM(B2:B10)` in the formula bar or directly in a cell.
+Type `=SUMIF(B2:B10,">100",C2:C10)` or `=VLOOKUP(A1,D2:F10,2,0)` in the formula bar or directly in a cell.
 
 ---
 

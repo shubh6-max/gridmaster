@@ -527,7 +527,49 @@ function normalizeFormulaErrorResult(
   };
 }
 
+function matchFormulaCriteria(value: unknown, criteria: unknown): boolean {
+  if (criteria === null || criteria === undefined) return false;
+  const criteriaStr = String(criteria);
+  const opMatch = /^(>=|<=|<>|>|<|=)(.*)$/.exec(criteriaStr);
+  if (opMatch) {
+    const [, op, rhs] = opMatch;
+    const left = coerceToNumber(value);
+    const right = coerceToNumber(rhs);
+    if (left !== null && right !== null) {
+      switch (op) {
+        case ">": return left > right;
+        case ">=": return left >= right;
+        case "<": return left < right;
+        case "<=": return left <= right;
+        case "<>": return left !== right;
+        case "=": return left === right;
+      }
+    }
+    const ls = normalizeValue(value).toLowerCase();
+    const rs = rhs.toLowerCase();
+    if (op === "=") return ls === rs;
+    if (op === "<>") return ls !== rs;
+    return false;
+  }
+  if (criteriaStr.includes("*") || criteriaStr.includes("?")) {
+    const pattern = criteriaStr
+      .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+      .replace(/\*/g, ".*")
+      .replace(/\?/g, ".");
+    return new RegExp(`^${pattern}$`, "i").test(normalizeValue(value));
+  }
+  return normalizeValue(value).toLowerCase() === criteriaStr.toLowerCase();
+}
+
+function toDateValue(value: unknown): Date | null {
+  if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+  if (typeof value === "number") { const d = new Date(value); return isNaN(d.getTime()) ? null : d; }
+  if (typeof value === "string") { const d = new Date(value); return isNaN(d.getTime()) ? null : d; }
+  return null;
+}
+
 export function createFormulaEvaluator<T extends GridRow = GridRow>(
+
   rows: T[],
   columns: GridFormulaColumn<T>[]
 ): GridFormulaEvaluator<T> {
@@ -741,7 +783,46 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
             return { value: nonBlank, error: null };
           }
 
+          case "COUNTIF": {
+            const rangeVals = flattenFormulaValues([evaluatedArgs[0]]);
+            const criteria = evaluatedArgs[1];
+            return { value: rangeVals.filter((v) => matchFormulaCriteria(v, criteria)).length, error: null };
+          }
+
+          case "SUMIF": {
+            const rangeVals = flattenFormulaValues([evaluatedArgs[0]]);
+            const criteria = evaluatedArgs[1];
+            const sumRange = evaluatedArgs[2] !== undefined
+              ? flattenFormulaValues([evaluatedArgs[2]])
+              : rangeVals;
+            let total = 0;
+            for (let i = 0; i < rangeVals.length; i++) {
+              if (matchFormulaCriteria(rangeVals[i], criteria)) {
+                total += coerceToNumber(sumRange[i]) ?? 0;
+              }
+            }
+            return { value: total, error: null };
+          }
+
+          case "AVERAGEIF": {
+            const rangeVals = flattenFormulaValues([evaluatedArgs[0]]);
+            const criteria = evaluatedArgs[1];
+            const avgRange = evaluatedArgs[2] !== undefined
+              ? flattenFormulaValues([evaluatedArgs[2]])
+              : rangeVals;
+            const nums: number[] = [];
+            for (let i = 0; i < rangeVals.length; i++) {
+              if (matchFormulaCriteria(rangeVals[i], criteria)) {
+                const n = coerceToNumber(avgRange[i]);
+                if (n !== null) nums.push(n);
+              }
+            }
+            if (!nums.length) return { value: GRID_FORMULA_DIV_ZERO, error: GRID_FORMULA_DIV_ZERO };
+            return { value: nums.reduce((s, n) => s + n, 0) / nums.length, error: null };
+          }
+
           case "ABS":
+
             return {
               value: Math.abs(numericValues[0] ?? 0),
               error: null,
@@ -873,9 +954,154 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
           case "ISTEXT":
             return { value: typeof evaluatedArgs[0] === "string", error: null };
 
+          // ── Lookup ──────────────────────────────────────────────────
+          case "MATCH": {
+            const lookupValue = evaluatedArgs[0];
+            const lookupArray = flattenFormulaValues([evaluatedArgs[1]]);
+            const matchType = coerceToNumber(evaluatedArgs[2], 0) ?? 0;
+            const lvNorm = normalizeValue(lookupValue).toLowerCase();
+            for (let i = 0; i < lookupArray.length; i++) {
+              const cellNorm = normalizeValue(lookupArray[i]).toLowerCase();
+              if (matchType === 0 && cellNorm === lvNorm) return { value: i + 1, error: null };
+              if (matchType === 1) {
+                const cellNum = coerceToNumber(lookupArray[i]);
+                const lvNum = coerceToNumber(lookupValue);
+                if (cellNum !== null && lvNum !== null && cellNum <= lvNum) return { value: i + 1, error: null };
+              }
+              if (matchType === -1) {
+                const cellNum = coerceToNumber(lookupArray[i]);
+                const lvNum = coerceToNumber(lookupValue);
+                if (cellNum !== null && lvNum !== null && cellNum >= lvNum) return { value: i + 1, error: null };
+              }
+            }
+            return { value: "#N/A", error: "#N/A" };
+          }
+
+          case "INDEX": {
+            const arr = flattenFormulaValues([evaluatedArgs[0]]);
+            const rowNum = coerceToNumber(evaluatedArgs[1]) ?? 1;
+            const idx = Number(rowNum) - 1;
+            if (idx < 0 || idx >= arr.length) return { value: GRID_FORMULA_REF, error: GRID_FORMULA_REF };
+            return { value: arr[idx], error: null };
+          }
+
+          case "VLOOKUP": {
+            const lookupValue = evaluatedArgs[0];
+            const tableFlat = flattenFormulaValues([evaluatedArgs[1]]);
+            const colIndex = coerceToNumber(evaluatedArgs[2]) ?? 1;
+            const exactMatch = evaluatedArgs[3] === 0 || evaluatedArgs[3] === false;
+            const lvNorm = normalizeValue(lookupValue).toLowerCase();
+            // tableFlat is row-major; we don't know width here, so scan by colIndex stride
+            // Best we can do without range metadata: treat tableFlat as rows of colIndex cols
+            const stride = Math.max(1, Number(colIndex));
+            for (let i = 0; i < tableFlat.length; i += stride) {
+              const cellNorm = normalizeValue(tableFlat[i]).toLowerCase();
+              if (exactMatch ? cellNorm === lvNorm : true) {
+                if (!exactMatch || cellNorm === lvNorm) {
+                  const colVal = tableFlat[i + Number(colIndex) - 1];
+                  return colVal !== undefined
+                    ? { value: colVal, error: null }
+                    : { value: GRID_FORMULA_REF, error: GRID_FORMULA_REF };
+                }
+              }
+            }
+            return { value: "#N/A", error: "#N/A" };
+          }
+
+          // ── Date ────────────────────────────────────────────────────
+          case "TODAY":
+            return { value: new Date(new Date().toDateString()).getTime(), error: null };
+
+          case "NOW":
+            return { value: Date.now(), error: null };
+
+          case "DATE": {
+            const y = coerceToNumber(evaluatedArgs[0]);
+            const m = coerceToNumber(evaluatedArgs[1]);
+            const d = coerceToNumber(evaluatedArgs[2]);
+            if (y === null || m === null || d === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: new Date(Number(y), Number(m) - 1, Number(d)).getTime(), error: null };
+          }
+
+          case "YEAR": {
+            const d = toDateValue(evaluatedArgs[0]);
+            if (!d) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: d.getFullYear(), error: null };
+          }
+
+          case "MONTH": {
+            const d = toDateValue(evaluatedArgs[0]);
+            if (!d) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: d.getMonth() + 1, error: null };
+          }
+
+          case "DAY": {
+            const d = toDateValue(evaluatedArgs[0]);
+            if (!d) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: d.getDate(), error: null };
+          }
+
+          case "DATEDIF": {
+            const start = toDateValue(evaluatedArgs[0]);
+            const end = toDateValue(evaluatedArgs[1]);
+            const unit = coerceToString(evaluatedArgs[2]).toUpperCase();
+            if (!start || !end) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            const msPerDay = 86400000;
+            const totalDays = Math.floor((end.getTime() - start.getTime()) / msPerDay);
+            switch (unit) {
+              case "D": return { value: totalDays, error: null };
+              case "M": {
+                const months =
+                  (end.getFullYear() - start.getFullYear()) * 12 +
+                  (end.getMonth() - start.getMonth());
+                return { value: months, error: null };
+              }
+              case "Y":
+                return { value: end.getFullYear() - start.getFullYear(), error: null };
+              default:
+                return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+          }
+
+          // ── Additional Text ──────────────────────────────────────────
+          case "FIND": {
+            const findText = coerceToString(evaluatedArgs[0]);
+            const withinText = coerceToString(evaluatedArgs[1]);
+            const startNum = coerceToNumber(evaluatedArgs[2], 1) ?? 1;
+            const idx = withinText.indexOf(findText, Number(startNum) - 1);
+            if (idx < 0) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: idx + 1, error: null };
+          }
+
+          case "SUBSTITUTE": {
+            const text = coerceToString(evaluatedArgs[0]);
+            const oldText = coerceToString(evaluatedArgs[1]);
+            const newText = coerceToString(evaluatedArgs[2]);
+            const instanceNum = evaluatedArgs[3] !== undefined ? coerceToNumber(evaluatedArgs[3]) : null;
+            if (!oldText) return { value: text, error: null };
+            if (instanceNum !== null) {
+              let count = 0;
+              let result = text;
+              let searchFrom = 0;
+              while (true) {
+                const idx = result.indexOf(oldText, searchFrom);
+                if (idx < 0) break;
+                count++;
+                if (count === Number(instanceNum)) {
+                  result = result.slice(0, idx) + newText + result.slice(idx + oldText.length);
+                  break;
+                }
+                searchFrom = idx + oldText.length;
+              }
+              return { value: result, error: null };
+            }
+            return { value: text.split(oldText).join(newText), error: null };
+          }
+
           default:
             return { value: GRID_FORMULA_NAME, error: GRID_FORMULA_NAME };
         }
+
       }
 
       default:
