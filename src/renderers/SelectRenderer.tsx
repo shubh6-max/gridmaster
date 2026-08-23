@@ -12,9 +12,7 @@ export function SelectRenderer<T extends GridRow = GridRow>({
 
   return (
     <span className="gm-select-cell" title={formattedValue || column.placeholder || ""}>
-      <span className="gm-select-cell-value">
-        {formattedValue || column.placeholder || ""}
-      </span>
+      <span className="gm-select-cell-value">{formattedValue || column.placeholder || ""}</span>
       {isReadonly ? (
         <span className="gm-select-cell-caret" aria-hidden="true">
           <ChevronDown style={{ width: 14, height: 14 }} />

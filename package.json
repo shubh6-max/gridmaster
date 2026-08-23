@@ -1,58 +1,37 @@
 {
-  "name": "gridmaster-react",
-  "version": "0.2.0",
-  "description": "Excel-like React grid library with selection, editing, sorting, filtering, clipboard, and spreadsheet-style UX.",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./styles.css": "./dist/styles.css"
-  },
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "name": "gridmaster",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
   "scripts": {
-    "dev": "vite --mode demo --configLoader native",
-    "build": "npm run build:lib && npm run build:types",
-    "build:lib": "vite build --configLoader native",
-    "build:types": "tsc -p tsconfig.build.json",
-    "build:demo": "vite build --mode demo --configLoader native",
-    "dev:test-app": "npm --prefix test-app run dev",
-    "build:test-app": "npm --prefix test-app run build",
-    "prepare": "npm run build",
-    "test": "npm run build && node tests/run.mjs",
-    "prepublishOnly": "npm run test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/shubh6-max/gridmaster.git"
-  },
-  "homepage": "https://github.com/shubh6-max/gridmaster#readme",
-  "bugs": {
-    "url": "https://github.com/shubh6-max/gridmaster/issues"
-  },
-  "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
-  },
-  "dependencies": {
-    "lucide-react": "^1.7.0"
+    "format:check": "biome check . --formatter-enabled=true --linter-enabled=false --organize-imports-enabled=true",
+    "lint": "biome lint .",
+    "typecheck": "tsc -b",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "build": "npm run build --workspaces --if-present",
+    "pack:smoke": "npm run pack:smoke --workspaces --if-present",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test:unit && npm run build"
   },
   "devDependencies": {
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "typescript": "^6.0.2",
-    "vite": "^8.0.3"
-  }
+    "@axe-core/playwright": "^4.10.0",
+    "@biomejs/biome": "1.9.4",
+    "@changesets/cli": "^2.27.11",
+    "@playwright/test": "^1.49.0",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^22.9.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/coverage-v8": "^2.1.5",
+    "playwright": "^1.49.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.5"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "npm@10.9.0"
 }

@@ -38,10 +38,7 @@ function isSameBounds(left: GridFillBounds, right: GridFillBounds): boolean {
 
 function isCellInsideBounds(row: number, col: number, bounds: GridFillBounds): boolean {
   return (
-    row >= bounds.startRow &&
-    row <= bounds.endRow &&
-    col >= bounds.startCol &&
-    col <= bounds.endCol
+    row >= bounds.startRow && row <= bounds.endRow && col >= bounds.startCol && col <= bounds.endCol
   );
 }
 
@@ -50,8 +47,14 @@ function resolveAutoFillDownRow<T extends GridRow>(
   columns: GridResolvedColumnDef<T>[],
   sourceBounds: GridFillBounds
 ): number {
-  const candidateColumns = [sourceBounds.startCol - 1, sourceBounds.endCol + 1, sourceBounds.startCol]
-    .filter((value, index, values) => value >= 0 && value < columns.length && values.indexOf(value) === index);
+  const candidateColumns = [
+    sourceBounds.startCol - 1,
+    sourceBounds.endCol + 1,
+    sourceBounds.startCol,
+  ].filter(
+    (value, index, values) =>
+      value >= 0 && value < columns.length && values.indexOf(value) === index
+  );
 
   for (const columnIndex of candidateColumns) {
     let lastRow = sourceBounds.endRow;
@@ -108,7 +111,11 @@ export function useFillHandle<T extends GridRow = GridRow>({
 
       const nextRows = cloneRows(rows);
 
-      for (let displayRowIndex = affectedBounds.startRow; displayRowIndex <= affectedBounds.endRow; displayRowIndex++) {
+      for (
+        let displayRowIndex = affectedBounds.startRow;
+        displayRowIndex <= affectedBounds.endRow;
+        displayRowIndex++
+      ) {
         const sourceRowIndex = displayRowIndexes[displayRowIndex] ?? -1;
         if (sourceRowIndex < 0 || sourceRowIndex >= nextRows.length) continue;
 
@@ -221,11 +228,7 @@ export function useFillHandle<T extends GridRow = GridRow>({
 
   const isFillHandleCell = useCallback(
     (rowIndex: number, colIndex: number) =>
-      Boolean(
-        sourceBounds &&
-          rowIndex === sourceBounds.endRow &&
-          colIndex === sourceBounds.endCol
-      ),
+      Boolean(sourceBounds && rowIndex === sourceBounds.endRow && colIndex === sourceBounds.endCol),
     [sourceBounds]
   );
 

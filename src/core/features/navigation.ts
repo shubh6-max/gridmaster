@@ -150,9 +150,7 @@ export function moveEnter(
   const current = getCurrentCell(state);
   const lastRow = Math.max(bounds.totalRows - 1, 0);
 
-  const nextRow = reverse
-    ? clamp(current.row - 1, 0, lastRow)
-    : clamp(current.row + 1, 0, lastRow);
+  const nextRow = reverse ? clamp(current.row - 1, 0, lastRow) : clamp(current.row + 1, 0, lastRow);
 
   return setActiveCell(state, { row: nextRow, col: current.col });
 }

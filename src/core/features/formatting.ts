@@ -140,9 +140,7 @@ export function getEffectiveVerticalAlign(meta: GridCellMeta | undefined): GridV
   return meta?.verticalAlign ?? "middle";
 }
 
-export function getEffectiveTextOrientation(
-  meta: GridCellMeta | undefined
-): GridTextOrientation {
+export function getEffectiveTextOrientation(meta: GridCellMeta | undefined): GridTextOrientation {
   return meta?.textOrientation ?? "horizontal";
 }
 
@@ -196,8 +194,8 @@ export function applyCellMetaPatchToBounds<T extends GridRow>(
         style: metaPatch.style
           ? mergeStylePatch(currentMeta.style, metaPatch.style)
           : currentMeta.style
-          ? { ...currentMeta.style }
-          : undefined,
+            ? { ...currentMeta.style }
+            : undefined,
       };
 
       if (hasPatchKey(metaPatch, "backgroundColor")) {
@@ -243,10 +241,7 @@ export function applyCellMetaPatchToBounds<T extends GridRow>(
 
 export function transformCellMetaInBounds<T extends GridRow>(
   cellMetaMap: Record<string, GridCellMeta>,
-  transform: (
-    currentMeta: GridCellMeta,
-    context: GridCellFormatterContext<T>
-  ) => GridCellMeta,
+  transform: (currentMeta: GridCellMeta, context: GridCellFormatterContext<T>) => GridCellMeta,
   bounds: GridDisplayBounds,
   displayRowIndexes: number[],
   columns: GridResolvedColumnDef<T>[]
@@ -324,16 +319,16 @@ export function summarizeSelectionFormatting<T extends GridRow>(
         typeof style.border === "string" && style.border.trim()
           ? style.border
           : typeof style.borderTop === "string" && style.borderTop.trim()
-          ? style.borderTop
-          : typeof style.borderBottom === "string" && style.borderBottom.trim()
-          ? style.borderBottom
-          : undefined;
+            ? style.borderTop
+            : typeof style.borderBottom === "string" && style.borderBottom.trim()
+              ? style.borderBottom
+              : undefined;
       const fontSizeValue =
         typeof style.fontSize === "number"
           ? style.fontSize
           : typeof style.fontSize === "string" && style.fontSize.trim()
-          ? Number.parseInt(style.fontSize, 10) || undefined
-          : undefined;
+            ? Number.parseInt(style.fontSize, 10) || undefined
+            : undefined;
 
       backgroundColor = updateSelectionSummary(backgroundColor, meta?.backgroundColor || undefined);
       wrapText = updateSelectionSummary(wrapText, getEffectiveWrapText(meta, column));
@@ -342,10 +337,7 @@ export function summarizeSelectionFormatting<T extends GridRow>(
         getEffectiveHorizontalAlign(meta, column)
       );
       verticalAlign = updateSelectionSummary(verticalAlign, getEffectiveVerticalAlign(meta));
-      textOrientation = updateSelectionSummary(
-        textOrientation,
-        getEffectiveTextOrientation(meta)
-      );
+      textOrientation = updateSelectionSummary(textOrientation, getEffectiveTextOrientation(meta));
       indentLevel = updateSelectionSummary(indentLevel, getEffectiveIndentLevel(meta));
       fontFamily = updateSelectionSummary(
         fontFamily,
@@ -370,7 +362,9 @@ export function summarizeSelectionFormatting<T extends GridRow>(
       );
       isUnderline = updateSelectionSummary(
         isUnderline,
-        String(style.textDecoration ?? "").toLowerCase().includes("underline")
+        String(style.textDecoration ?? "")
+          .toLowerCase()
+          .includes("underline")
       );
       hasBorder = updateSelectionSummary(hasBorder, Boolean(borderValue));
     }

@@ -1,6 +1,8 @@
 import type { GridMasterProps, GridRow } from "../core/types";
 
-export function createEditableGridPreset<T extends GridRow = GridRow>(): Partial<GridMasterProps<T>> {
+export function createEditableGridPreset<T extends GridRow = GridRow>(): Partial<
+  GridMasterProps<T>
+> {
   return {
     mode: "editable",
     enableEditing: true,

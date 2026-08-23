@@ -22,11 +22,7 @@ import {
 } from "lucide-react";
 import type { GridSelectionFormattingValue } from "../core/features/formatting";
 import { DEFAULT_COLOR_LABELS, DEFAULT_COLOR_PALETTE } from "../core/constants";
-import type {
-  GridHorizontalAlign,
-  GridTextOrientation,
-  GridVerticalAlign,
-} from "../core/types";
+import type { GridHorizontalAlign, GridTextOrientation, GridVerticalAlign } from "../core/types";
 import { ColorMenu } from "../menus/ColorMenu";
 import { useGridContext } from "./context/GridContext";
 import { useClipboard } from "./hooks/useClipboard";
@@ -78,11 +74,7 @@ function RibbonGroup({
 }) {
   return (
     <section
-      className={[
-        "gm-ribbon-group",
-        label ? "has-footer" : "is-footerless",
-        className,
-      ]
+      className={["gm-ribbon-group", label ? "has-footer" : "is-footerless", className]
         .filter(Boolean)
         .join(" ")}
     >
@@ -160,11 +152,7 @@ function RibbonSelectField({
 
   return (
     <label
-      className={[
-        "gm-ribbon-select-field",
-        compact ? "is-compact" : "",
-        mixed ? "is-mixed" : "",
-      ]
+      className={["gm-ribbon-select-field", compact ? "is-compact" : "", mixed ? "is-mixed" : ""]
         .filter(Boolean)
         .join(" ")}
       title={title}

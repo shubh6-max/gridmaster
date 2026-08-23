@@ -348,9 +348,7 @@ export function createCellMetaKey(rowIndex: number, columnKey: string): string {
   return `${rowIndex}::${columnKey}`;
 }
 
-export function cloneCellMetaMap(
-  map: Record<string, GridCellMeta>
-): Record<string, GridCellMeta> {
+export function cloneCellMetaMap(map: Record<string, GridCellMeta>): Record<string, GridCellMeta> {
   const next: Record<string, GridCellMeta> = {};
   for (const key of Object.keys(map)) {
     next[key] = { ...map[key] };
@@ -358,9 +356,7 @@ export function cloneCellMetaMap(
   return next;
 }
 
-export function cloneRowMetaMap(
-  map: Record<number, GridRowMeta>
-): Record<number, GridRowMeta> {
+export function cloneRowMetaMap(map: Record<number, GridRowMeta>): Record<number, GridRowMeta> {
   const next: Record<number, GridRowMeta> = {};
   for (const key of Object.keys(map)) {
     next[Number(key)] = { ...map[Number(key)] };

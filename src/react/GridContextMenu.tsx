@@ -1,13 +1,6 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { Z_INDEX } from "../core/constants";
 import { useFloatingAnchorRect, useFloatingPortal } from "./hooks/useFloatingPortal";
 import { useGridContext } from "./context/GridContext";
@@ -100,7 +93,8 @@ export function GridContextMenu() {
       ? visibleColumns[contextMenu.visibleColumnIndex]?.key
       : undefined);
 
-  const rowActionCount = Number(enableInsertRow && hasRowTarget) * 2 + Number(enableDeleteRow && hasRowTarget);
+  const rowActionCount =
+    Number(enableInsertRow && hasRowTarget) * 2 + Number(enableDeleteRow && hasRowTarget);
   const columnActionCount =
     Number(enableInsertColumn && hasColumnTarget && Boolean(columnKey)) * 2 +
     Number(enableDeleteColumn && hasColumnTarget && Boolean(columnKey));

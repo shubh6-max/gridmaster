@@ -1,9 +1,4 @@
-import type {
-  GridColumnFilter,
-  GridFilters,
-  GridResolvedColumnDef,
-  GridRow,
-} from "../types";
+import type { GridColumnFilter, GridFilters, GridResolvedColumnDef, GridRow } from "../types";
 import { getRowValue, normalizeValue, toNumber } from "../utils";
 import { createFormulaEvaluator, type GridFormulaEvaluator } from "./formulas";
 
@@ -87,22 +82,16 @@ export function matchesConditionFilter(
 
   switch (filter.operator) {
     case "includes":
-      return normalized
-        .toLowerCase()
-        .includes(normalizeValue(filter.value).toLowerCase());
+      return normalized.toLowerCase().includes(normalizeValue(filter.value).toLowerCase());
 
     case "equals":
       return normalized.toLowerCase() === normalizeValue(filter.value).toLowerCase();
 
     case "startsWith":
-      return normalized
-        .toLowerCase()
-        .startsWith(normalizeValue(filter.value).toLowerCase());
+      return normalized.toLowerCase().startsWith(normalizeValue(filter.value).toLowerCase());
 
     case "endsWith":
-      return normalized
-        .toLowerCase()
-        .endsWith(normalizeValue(filter.value).toLowerCase());
+      return normalized.toLowerCase().endsWith(normalizeValue(filter.value).toLowerCase());
 
     case "isEmpty":
       return normalized === "";
@@ -178,7 +167,9 @@ export function rowMatchesFilters<T extends GridRow>(
     if (!column) continue;
 
     const value =
-      evaluator && rowIndex >= 0 ? evaluator.getCellValue(rowIndex, column.key) : getRowValue(row, column);
+      evaluator && rowIndex >= 0
+        ? evaluator.getCellValue(rowIndex, column.key)
+        : getRowValue(row, column);
     if (!matchesFilter(value, filter)) return false;
   }
 

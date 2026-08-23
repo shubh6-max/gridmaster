@@ -84,11 +84,7 @@ function ColumnMenuAction({
     <button
       type="button"
       onClick={onClick}
-      className={[
-        "gm-menu-action",
-        subtle ? "is-subtle" : "",
-        active ? "is-active" : "",
-      ]
+      className={["gm-menu-action", subtle ? "is-subtle" : "", active ? "is-active" : ""]
         .filter(Boolean)
         .join(" ")}
     >
@@ -168,21 +164,24 @@ function ColorMenuPanel({
                 <button
                   key={option.value || "__no_fill__"}
                   type="button"
-                  className={["gm-menu-check-row", checked ? "is-current" : ""].filter(Boolean).join(" ")}
+                  className={["gm-menu-check-row", checked ? "is-current" : ""]
+                    .filter(Boolean)
+                    .join(" ")}
                   onClick={() =>
                     mode === "sort" ? onSelectSortValue(option.value) : onToggleValue(option.value)
                   }
                 >
                   <span
-                    className={[
-                      "gm-menu-check",
-                      checked && mode === "filter" ? "is-checked" : "",
-                    ]
+                    className={["gm-menu-check", checked && mode === "filter" ? "is-checked" : ""]
                       .filter(Boolean)
                       .join(" ")}
                   >
-                    {mode === "filter" && checked ? <Check style={{ width: 10, height: 10 }} /> : null}
-                    {mode === "sort" && checked ? <ChevronRight style={{ width: 10, height: 10 }} /> : null}
+                    {mode === "filter" && checked ? (
+                      <Check style={{ width: 10, height: 10 }} />
+                    ) : null}
+                    {mode === "sort" && checked ? (
+                      <ChevronRight style={{ width: 10, height: 10 }} />
+                    ) : null}
                   </span>
                   <span
                     aria-hidden="true"
@@ -306,7 +305,8 @@ export function ColumnMenu({
   if (!target) return null;
 
   const menuWidth = 304;
-  const maxMenuHeight = typeof window === "undefined" ? 720 : Math.min(window.innerHeight * 0.88, 720);
+  const maxMenuHeight =
+    typeof window === "undefined" ? 720 : Math.min(window.innerHeight * 0.88, 720);
   const hiddenColumnCount = Math.max(columns.length - currentVisibleColumnCount, 0);
   const manageVisibilityOnly = mode === "visibility" && showVisibilityControls;
   const showInlineFilter = !manageVisibilityOnly && Boolean(onApplyFilterValues);
@@ -392,7 +392,13 @@ export function ColumnMenu({
               label="Sort by Color"
               icon={<Palette style={{ width: 14, height: 14 }} />}
               active={openColorMenu === "sort" || draftColorSortValue !== null}
-              trailing={openColorMenu === "sort" ? <ChevronDown style={{ width: 14, height: 14 }} /> : <ChevronRight style={{ width: 14, height: 14 }} />}
+              trailing={
+                openColorMenu === "sort" ? (
+                  <ChevronDown style={{ width: 14, height: 14 }} />
+                ) : (
+                  <ChevronRight style={{ width: 14, height: 14 }} />
+                )
+              }
               onClick={
                 onApplyColorSortValue
                   ? () => setOpenColorMenu((current) => (current === "sort" ? null : "sort"))
@@ -448,10 +454,17 @@ export function ColumnMenu({
                   label="Filter by Color"
                   icon={<Palette style={{ width: 14, height: 14 }} />}
                   active={openColorMenu === "filter" || draftColorFilterValues.size > 0}
-                  trailing={openColorMenu === "filter" ? <ChevronDown style={{ width: 14, height: 14 }} /> : <ChevronRight style={{ width: 14, height: 14 }} />}
+                  trailing={
+                    openColorMenu === "filter" ? (
+                      <ChevronDown style={{ width: 14, height: 14 }} />
+                    ) : (
+                      <ChevronRight style={{ width: 14, height: 14 }} />
+                    )
+                  }
                   onClick={
                     onApplyColorFilterValues
-                      ? () => setOpenColorMenu((current) => (current === "filter" ? null : "filter"))
+                      ? () =>
+                          setOpenColorMenu((current) => (current === "filter" ? null : "filter"))
                       : undefined
                   }
                 />
@@ -549,7 +562,9 @@ export function ColumnMenu({
                       <button
                         key={value || "__empty__"}
                         type="button"
-                        className={["gm-menu-check-row", checked ? "is-current" : ""].filter(Boolean).join(" ")}
+                        className={["gm-menu-check-row", checked ? "is-current" : ""]
+                          .filter(Boolean)
+                          .join(" ")}
                         onClick={() => {
                           setDraftFilterValues((prev) => {
                             const next = new Set(prev);
@@ -559,7 +574,11 @@ export function ColumnMenu({
                           });
                         }}
                       >
-                        <span className={["gm-menu-check", checked ? "is-checked" : ""].filter(Boolean).join(" ")}>
+                        <span
+                          className={["gm-menu-check", checked ? "is-checked" : ""]
+                            .filter(Boolean)
+                            .join(" ")}
+                        >
                           {checked ? <Check style={{ width: 10, height: 10 }} /> : null}
                         </span>
                         <span className="gm-menu-check-label">{value || "(empty)"}</span>
@@ -595,15 +614,15 @@ export function ColumnMenu({
             <div className="gm-menu-footer shrink-0 border-t bg-white">
               <div className="gm-menu-footer-note">
                 {draftFilterValues.size} of {filterValues.length} selected
-                {draftColorFilterValues.size > 0 ? ` · ${draftColorFilterValues.size} color${draftColorFilterValues.size === 1 ? "" : "s"}` : ""}
+                {draftColorFilterValues.size > 0
+                  ? ` · ${draftColorFilterValues.size} color${draftColorFilterValues.size === 1 ? "" : "s"}`
+                  : ""}
                 {draftColorSortValue !== null ? " · color sort" : ""}
               </div>
-              <button
-                type="button"
-                className="gm-button gm-button-secondary"
-                onClick={resetAll}
-              >
-                {isFiltered || draftColorFilterValues.size > 0 || draftColorSortValue !== null ? "Reset" : "Reset"}
+              <button type="button" className="gm-button gm-button-secondary" onClick={resetAll}>
+                {isFiltered || draftColorFilterValues.size > 0 || draftColorSortValue !== null
+                  ? "Reset"
+                  : "Reset"}
               </button>
               <button
                 type="button"
@@ -635,7 +654,10 @@ export function ColumnMenu({
           <div className="gm-menu-section-note shrink-0">
             {currentVisibleColumnCount} visible / {hiddenColumnCount} hidden
           </div>
-          <div className="gm-menu-scroll flex-1 min-h-0 overflow-y-auto" style={{ maxHeight: "none" }}>
+          <div
+            className="gm-menu-scroll flex-1 min-h-0 overflow-y-auto"
+            style={{ maxHeight: "none" }}
+          >
             {columns.map((column) => {
               const visible = !column.hidden;
               const disableHide = visible && currentVisibleColumnCount <= 1;
@@ -656,7 +678,11 @@ export function ColumnMenu({
                     onToggleColumnVisibility(column.key, !visible);
                   }}
                 >
-                  <span className={["gm-menu-check", visible ? "is-checked" : ""].filter(Boolean).join(" ")}>
+                  <span
+                    className={["gm-menu-check", visible ? "is-checked" : ""]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
                     {visible ? <Check style={{ width: 10, height: 10 }} /> : null}
                   </span>
                   <span className="gm-menu-check-label">{column.title}</span>

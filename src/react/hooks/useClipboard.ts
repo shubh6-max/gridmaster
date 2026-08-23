@@ -77,7 +77,11 @@ export function useClipboard<T extends GridRow = GridRow>({
           };
         }
 
-        for (let displayRowIndex = bounds.startRow; displayRowIndex <= bounds.endRow; displayRowIndex++) {
+        for (
+          let displayRowIndex = bounds.startRow;
+          displayRowIndex <= bounds.endRow;
+          displayRowIndex++
+        ) {
           for (let columnIndex = bounds.startCol; columnIndex <= bounds.endCol; columnIndex++) {
             applyCell(displayRowIndex, columnIndex);
           }
@@ -127,7 +131,11 @@ export function useClipboard<T extends GridRow = GridRow>({
       const bounds = getSelectionBounds(selection, displayRows.length, columns.length);
       if (!bounds) return;
 
-      for (let displayRowIndex = bounds.startRow; displayRowIndex <= bounds.endRow; displayRowIndex++) {
+      for (
+        let displayRowIndex = bounds.startRow;
+        displayRowIndex <= bounds.endRow;
+        displayRowIndex++
+      ) {
         for (let columnIndex = bounds.startCol; columnIndex <= bounds.endCol; columnIndex++) {
           clearCell(displayRowIndex, columnIndex);
         }
@@ -160,7 +168,7 @@ export function useClipboard<T extends GridRow = GridRow>({
     if (!cursor) return;
 
     const text = await readClipboardText();
-    const matrix = text ? textToClipboardMatrix(text) : clipboard?.data ?? [];
+    const matrix = text ? textToClipboardMatrix(text) : (clipboard?.data ?? []);
     if (!matrix.length || !matrix[0]?.length) return;
 
     const selectionBounds = getSelectionBounds(selection, displayRows.length, columns.length);

@@ -29,5 +29,6 @@ export const defaultCellEditors: Record<GridColumnType, GridDefaultCellEditor<an
 export function getDefaultCellEditor<T extends GridRow = GridRow>(
   columnType?: GridColumnType
 ): GridDefaultCellEditor<T> {
-  return (defaultCellEditors[columnType ?? "text"] ?? defaultCellEditors.text) as GridDefaultCellEditor<T>;
+  return (defaultCellEditors[columnType ?? "text"] ??
+    defaultCellEditors.text) as GridDefaultCellEditor<T>;
 }

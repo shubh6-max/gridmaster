@@ -1,8 +1,4 @@
-import type {
-  GridCellCoord,
-  GridSelectionRange,
-  GridSelectionState,
-} from "../types";
+import type { GridCellCoord, GridSelectionRange, GridSelectionState } from "../types";
 import { INITIAL_SELECTION_STATE } from "../constants";
 import { clamp, createRange, isCoordInRange, isSameCoord, normalizeRange } from "../utils";
 
@@ -14,10 +10,7 @@ export function createCellCoord(row: number, col: number): GridCellCoord {
   return { row, col };
 }
 
-export function createSelectionRange(
-  start: GridCellCoord,
-  end: GridCellCoord
-): GridSelectionRange {
+export function createSelectionRange(start: GridCellCoord, end: GridCellCoord): GridSelectionRange {
   return createRange(start, end);
 }
 
@@ -81,10 +74,7 @@ export function clearSelection(): GridSelectionState {
   };
 }
 
-export function setActiveCell(
-  state: GridSelectionState,
-  cell: GridCellCoord
-): GridSelectionState {
+export function setActiveCell(state: GridSelectionState, cell: GridCellCoord): GridSelectionState {
   return {
     mode: "cell",
     anchor: { ...cell },
@@ -365,11 +355,7 @@ export function moveToCell(
    Query helpers
    ========================================================= */
 
-export function isCellSelected(
-  state: GridSelectionState,
-  row: number,
-  col: number
-): boolean {
+export function isCellSelected(state: GridSelectionState, row: number, col: number): boolean {
   if (state.mode === "row") return state.selectedRows.has(row);
   if (state.mode === "column") return state.selectedCols.has(col);
   if (state.mode === "all") return true;
@@ -378,11 +364,7 @@ export function isCellSelected(
   return isCoordInRange({ row, col }, state.range);
 }
 
-export function isCellActive(
-  state: GridSelectionState,
-  row: number,
-  col: number
-): boolean {
+export function isCellActive(state: GridSelectionState, row: number, col: number): boolean {
   if (!state.cursor) return false;
   return state.cursor.row === row && state.cursor.col === col;
 }
@@ -398,10 +380,7 @@ export function hasColumnSelection(state: GridSelectionState): boolean {
 export function hasRangeSelection(state: GridSelectionState): boolean {
   if (!state.range) return false;
   const normalized = normalizeRange(state.range);
-  return (
-    normalized.startRow !== normalized.endRow ||
-    normalized.startCol !== normalized.endCol
-  );
+  return normalized.startRow !== normalized.endRow || normalized.startCol !== normalized.endCol;
 }
 
 export function getSelectionBounds(state: GridSelectionState): {

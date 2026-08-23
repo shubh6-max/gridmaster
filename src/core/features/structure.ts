@@ -69,9 +69,7 @@ export function createDefaultInsertedColumn<T extends GridRow>(
   }
 
   const nextType =
-    referenceColumn?.type && referenceColumn.type !== "custom"
-      ? referenceColumn.type
-      : "text";
+    referenceColumn?.type && referenceColumn.type !== "custom" ? referenceColumn.type : "text";
 
   return {
     key: nextKey,
@@ -139,10 +137,7 @@ export function deleteColumnAtIndex<T extends GridRow>(
   return next;
 }
 
-export function deleteColumnValueFromRows<T extends GridRow>(
-  rows: T[],
-  columnKey: string
-): T[] {
+export function deleteColumnValueFromRows<T extends GridRow>(rows: T[], columnKey: string): T[] {
   return rows.map((row) => {
     const { [columnKey]: _deletedValue, ...rest } = row;
     return rest as T;

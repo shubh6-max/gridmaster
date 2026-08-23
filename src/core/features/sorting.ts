@@ -1,9 +1,4 @@
-import type {
-  GridResolvedColumnDef,
-  GridRow,
-  GridSort,
-  GridSortDirection,
-} from "../types";
+import type { GridResolvedColumnDef, GridRow, GridSort, GridSortDirection } from "../types";
 import { compareValues, getRowValue } from "../utils";
 import { createFormulaEvaluator } from "./formulas";
 
@@ -11,10 +6,7 @@ import { createFormulaEvaluator } from "./formulas";
    Sort state helpers
    ========================================================= */
 
-export function createSort(
-  columnKey: string,
-  direction: GridSortDirection
-): GridSort {
+export function createSort(columnKey: string, direction: GridSortDirection): GridSort {
   return {
     columnKey,
     direction,
@@ -30,10 +22,7 @@ export function toggleSortDirection(direction?: GridSortDirection): GridSortDire
   return direction === "asc" ? "desc" : "asc";
 }
 
-export function toggleColumnSort(
-  currentSort: GridSort,
-  columnKey: string
-): GridSort {
+export function toggleColumnSort(currentSort: GridSort, columnKey: string): GridSort {
   if (!currentSort || currentSort.columnKey !== columnKey) {
     return createSort(columnKey, "asc");
   }

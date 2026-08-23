@@ -5,6 +5,7 @@ import { runFormattingTests } from "./formatting.test.mjs";
 import { runFormulaTests } from "./formulas.test.mjs";
 import { runStructureTests } from "./structure.test.mjs";
 import { runColorFilteringTests } from "./color-filtering.test.mjs";
+import { runIntegrationTests } from "./integration.test.mjs";
 
 const suites = [
   ["row id and selection", runRowIdAndSelectionTests],
@@ -14,6 +15,7 @@ const suites = [
   ["formulas", runFormulaTests],
   ["structure", runStructureTests],
   ["color filtering", runColorFilteringTests],
+  ["integration", runIntegrationTests],
 ];
 
 for (const [label, suite] of suites) {

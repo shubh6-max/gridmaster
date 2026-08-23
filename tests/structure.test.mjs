@@ -64,7 +64,10 @@ export function runStructureTests() {
     1,
     createColumn.checkbox("live", { title: "Live" })
   );
-  assert.deepEqual(nextColumns.map((column) => column.key), ["account", "live", "value"]);
+  assert.deepEqual(
+    nextColumns.map((column) => column.key),
+    ["account", "live", "value"]
+  );
 
   assert.deepEqual(
     deleteColumnAtIndex(
@@ -107,10 +110,7 @@ export function runStructureTests() {
   );
 
   assert.deepEqual(
-    shiftCellMetaForInsertedRow(
-      { "0::account": { error: null }, "2::value": { error: "bad" } },
-      1
-    ),
+    shiftCellMetaForInsertedRow({ "0::account": { error: null }, "2::value": { error: "bad" } }, 1),
     {
       "0::account": { error: null },
       "3::value": { error: "bad" },

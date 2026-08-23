@@ -22,9 +22,7 @@ function coerceToString(value: unknown): string {
   return String(value);
 }
 
-type GridFormulaColumn<T extends GridRow = GridRow> =
-  | GridColumnDef<T>
-  | GridResolvedColumnDef<T>;
+type GridFormulaColumn<T extends GridRow = GridRow> = GridColumnDef<T> | GridResolvedColumnDef<T>;
 
 type GridFormulaTokenType =
   | "number"
@@ -98,10 +96,7 @@ export const GRID_FORMULA_DIV_ZERO = "#DIV/0!";
 export const GRID_FORMULA_NAME = "#NAME?";
 export const GRID_FORMULA_VALUE = "#VALUE!";
 
-export function insertCellReferenceIntoFormula(
-  formula: string,
-  reference: string
-): string {
+export function insertCellReferenceIntoFormula(formula: string, reference: string): string {
   const current = String(formula ?? "");
   const trimmedStart = current.trimStart();
 
@@ -114,19 +109,14 @@ export function insertCellReferenceIntoFormula(
   }
 
   const trimmedEnd = current.replace(/\s+$/, "");
-  const trailingReferenceMatch =
-    /([A-Z]+[1-9][0-9]*(?::[A-Z]+[1-9][0-9]*)?)$/i.exec(trimmedEnd);
+  const trailingReferenceMatch = /([A-Z]+[1-9][0-9]*(?::[A-Z]+[1-9][0-9]*)?)$/i.exec(trimmedEnd);
 
   if (trailingReferenceMatch) {
     const matchIndex = trailingReferenceMatch.index;
     const prefix = trimmedEnd.slice(0, matchIndex);
     const previousChar = prefix.trimEnd().slice(-1);
 
-    if (
-      !previousChar ||
-      previousChar === "=" ||
-      "+-*/(,<>:".includes(previousChar)
-    ) {
+    if (!previousChar || previousChar === "=" || "+-*/(,<>:".includes(previousChar)) {
       return `${prefix}${reference}`;
     }
   }
@@ -134,10 +124,7 @@ export function insertCellReferenceIntoFormula(
   return `${trimmedEnd}${reference}`;
 }
 
-export function createFormulaCellReference(
-  rowIndex: number,
-  columnIndex: number
-): string {
+export function createFormulaCellReference(rowIndex: number, columnIndex: number): string {
   return cellAddress(rowIndex, columnIndex);
 }
 
@@ -537,12 +524,18 @@ function matchFormulaCriteria(value: unknown, criteria: unknown): boolean {
     const right = coerceToNumber(rhs);
     if (left !== null && right !== null) {
       switch (op) {
-        case ">": return left > right;
-        case ">=": return left >= right;
-        case "<": return left < right;
-        case "<=": return left <= right;
-        case "<>": return left !== right;
-        case "=": return left === right;
+        case ">":
+          return left > right;
+        case ">=":
+          return left >= right;
+        case "<":
+          return left < right;
+        case "<=":
+          return left <= right;
+        case "<>":
+          return left !== right;
+        case "=":
+          return left === right;
       }
     }
     const ls = normalizeValue(value).toLowerCase();
@@ -563,13 +556,18 @@ function matchFormulaCriteria(value: unknown, criteria: unknown): boolean {
 
 function toDateValue(value: unknown): Date | null {
   if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
-  if (typeof value === "number") { const d = new Date(value); return isNaN(d.getTime()) ? null : d; }
-  if (typeof value === "string") { const d = new Date(value); return isNaN(d.getTime()) ? null : d; }
+  if (typeof value === "number") {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof value === "string") {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
   return null;
 }
 
 export function createFormulaEvaluator<T extends GridRow = GridRow>(
-
   rows: T[],
   columns: GridFormulaColumn<T>[]
 ): GridFormulaEvaluator<T> {
@@ -720,8 +718,9 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
             : { value: false, error: null };
           if (condition.error) return condition;
 
-          const branch =
-            coerceFormulaBoolean(condition.value) ? node.arguments[1] : node.arguments[2];
+          const branch = coerceFormulaBoolean(condition.value)
+            ? node.arguments[1]
+            : node.arguments[2];
 
           if (!branch) {
             return { value: "", error: null };
@@ -755,8 +754,7 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
               return { value: GRID_FORMULA_DIV_ZERO, error: GRID_FORMULA_DIV_ZERO };
             }
             return {
-              value:
-                numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length,
+              value: numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length,
               error: null,
             };
 
@@ -786,15 +784,17 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
           case "COUNTIF": {
             const rangeVals = flattenFormulaValues([evaluatedArgs[0]]);
             const criteria = evaluatedArgs[1];
-            return { value: rangeVals.filter((v) => matchFormulaCriteria(v, criteria)).length, error: null };
+            return {
+              value: rangeVals.filter((v) => matchFormulaCriteria(v, criteria)).length,
+              error: null,
+            };
           }
 
           case "SUMIF": {
             const rangeVals = flattenFormulaValues([evaluatedArgs[0]]);
             const criteria = evaluatedArgs[1];
-            const sumRange = evaluatedArgs[2] !== undefined
-              ? flattenFormulaValues([evaluatedArgs[2]])
-              : rangeVals;
+            const sumRange =
+              evaluatedArgs[2] !== undefined ? flattenFormulaValues([evaluatedArgs[2]]) : rangeVals;
             let total = 0;
             for (let i = 0; i < rangeVals.length; i++) {
               if (matchFormulaCriteria(rangeVals[i], criteria)) {
@@ -807,9 +807,8 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
           case "AVERAGEIF": {
             const rangeVals = flattenFormulaValues([evaluatedArgs[0]]);
             const criteria = evaluatedArgs[1];
-            const avgRange = evaluatedArgs[2] !== undefined
-              ? flattenFormulaValues([evaluatedArgs[2]])
-              : rangeVals;
+            const avgRange =
+              evaluatedArgs[2] !== undefined ? flattenFormulaValues([evaluatedArgs[2]]) : rangeVals;
             const nums: number[] = [];
             for (let i = 0; i < rangeVals.length; i++) {
               if (matchFormulaCriteria(rangeVals[i], criteria)) {
@@ -822,7 +821,6 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
           }
 
           case "ABS":
-
             return {
               value: Math.abs(numericValues[0] ?? 0),
               error: null,
@@ -898,7 +896,10 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
           }
 
           case "IFERROR": {
-            const primary = evaluateNode(node.arguments[0] ?? { type: "NumberLiteral", value: 0 }, stack);
+            const primary = evaluateNode(
+              node.arguments[0] ?? { type: "NumberLiteral", value: 0 },
+              stack
+            );
             if (!primary.error) return primary;
             const fallback = node.arguments[1];
             if (!fallback) return { value: primary.error, error: primary.error };
@@ -966,12 +967,14 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
               if (matchType === 1) {
                 const cellNum = coerceToNumber(lookupArray[i]);
                 const lvNum = coerceToNumber(lookupValue);
-                if (cellNum !== null && lvNum !== null && cellNum <= lvNum) return { value: i + 1, error: null };
+                if (cellNum !== null && lvNum !== null && cellNum <= lvNum)
+                  return { value: i + 1, error: null };
               }
               if (matchType === -1) {
                 const cellNum = coerceToNumber(lookupArray[i]);
                 const lvNum = coerceToNumber(lookupValue);
-                if (cellNum !== null && lvNum !== null && cellNum >= lvNum) return { value: i + 1, error: null };
+                if (cellNum !== null && lvNum !== null && cellNum >= lvNum)
+                  return { value: i + 1, error: null };
               }
             }
             return { value: "#N/A", error: "#N/A" };
@@ -981,7 +984,8 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
             const arr = flattenFormulaValues([evaluatedArgs[0]]);
             const rowNum = coerceToNumber(evaluatedArgs[1]) ?? 1;
             const idx = Number(rowNum) - 1;
-            if (idx < 0 || idx >= arr.length) return { value: GRID_FORMULA_REF, error: GRID_FORMULA_REF };
+            if (idx < 0 || idx >= arr.length)
+              return { value: GRID_FORMULA_REF, error: GRID_FORMULA_REF };
             return { value: arr[idx], error: null };
           }
 
@@ -1019,7 +1023,8 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
             const y = coerceToNumber(evaluatedArgs[0]);
             const m = coerceToNumber(evaluatedArgs[1]);
             const d = coerceToNumber(evaluatedArgs[2]);
-            if (y === null || m === null || d === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            if (y === null || m === null || d === null)
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
             return { value: new Date(Number(y), Number(m) - 1, Number(d)).getTime(), error: null };
           }
 
@@ -1049,7 +1054,8 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
             const msPerDay = 86400000;
             const totalDays = Math.floor((end.getTime() - start.getTime()) / msPerDay);
             switch (unit) {
-              case "D": return { value: totalDays, error: null };
+              case "D":
+                return { value: totalDays, error: null };
               case "M": {
                 const months =
                   (end.getFullYear() - start.getFullYear()) * 12 +
@@ -1077,7 +1083,8 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
             const text = coerceToString(evaluatedArgs[0]);
             const oldText = coerceToString(evaluatedArgs[1]);
             const newText = coerceToString(evaluatedArgs[2]);
-            const instanceNum = evaluatedArgs[3] !== undefined ? coerceToNumber(evaluatedArgs[3]) : null;
+            const instanceNum =
+              evaluatedArgs[3] !== undefined ? coerceToNumber(evaluatedArgs[3]) : null;
             if (!oldText) return { value: text, error: null };
             if (instanceNum !== null) {
               let count = 0;
@@ -1101,7 +1108,6 @@ export function createFormulaEvaluator<T extends GridRow = GridRow>(
           default:
             return { value: GRID_FORMULA_NAME, error: GRID_FORMULA_NAME };
         }
-
       }
 
       default:

@@ -83,8 +83,7 @@ export function useEditing<T extends GridRow = GridRow>({
   const shouldFocusViewportAfterEditRef = useRef(false);
 
   const activeTarget = useMemo(
-    () =>
-      resolveEditingTarget(mode, rows, displayRowIndexes, visibleColumns, editingCell),
+    () => resolveEditingTarget(mode, rows, displayRowIndexes, visibleColumns, editingCell),
     [mode, rows, displayRowIndexes, visibleColumns, editingCell]
   );
 
@@ -138,7 +137,15 @@ export function useEditing<T extends GridRow = GridRow>({
       setEditingOrigin(origin);
       return true;
     },
-    [displayRowIndexes, mode, rows, selection.anchor, selection.cursor, setEditingCell, visibleColumns]
+    [
+      displayRowIndexes,
+      mode,
+      rows,
+      selection.anchor,
+      selection.cursor,
+      setEditingCell,
+      visibleColumns,
+    ]
   );
 
   const insertFormulaReference = useCallback(

@@ -76,9 +76,7 @@ export function runFormulaTests() {
   );
   assert.deepEqual(sortedIndexes, [2, 0, 1]);
 
-  const cycleRows = [
-    { base: "=B1", delta: "=A1", result: 0 },
-  ];
+  const cycleRows = [{ base: "=B1", delta: "=A1", result: 0 }];
   const cycleEvaluator = createFormulaEvaluator(cycleRows, columns);
 
   assert.equal(cycleEvaluator.evaluateCell(0, "base").error, "#CYCLE!");

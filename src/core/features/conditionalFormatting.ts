@@ -1,4 +1,9 @@
-import type { GridConditionalFormats, GridConditionalFormat, GridCondition, GridRow } from "../types";
+import type {
+  GridConditionalFormats,
+  GridConditionalFormat,
+  GridCondition,
+  GridRow,
+} from "../types";
 import { compareValues, normalizeValue, toNumber } from "../utils";
 
 export function clearConditionalFormats(): GridConditionalFormats {

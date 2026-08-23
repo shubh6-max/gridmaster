@@ -261,10 +261,7 @@ export async function writeClipboardText(text: string): Promise<void> {
   }
 }
 
-export function getPasteMatrix(
-  text?: string,
-  clipboard?: GridClipboardData | null
-): string[][] {
+export function getPasteMatrix(text?: string, clipboard?: GridClipboardData | null): string[][] {
   if (text && text.trim() !== "") {
     return textToClipboardMatrix(text);
   }

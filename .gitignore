@@ -30,6 +30,9 @@ freellmapi.config.json
 
 # Local automation scratch (personal scripts/data — never commit)
 automation/
+*.vsix
+run_every_*.sh
+stop_wrapper.sh
 
 # Superpowers plan artifacts
 docs/superpowers/plans/

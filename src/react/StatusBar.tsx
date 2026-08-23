@@ -42,17 +42,11 @@ export function StatusBar() {
     >
       <span>
         Cell:{" "}
-        <strong style={{ color: "#ffffff" }}>
-          {cellAddress(activeRowIndex, activeColIndex)}
-        </strong>
+        <strong style={{ color: "#ffffff" }}>{cellAddress(activeRowIndex, activeColIndex)}</strong>
       </span>
 
       <span>
-        Rows:{" "}
-        <strong style={{ color: "#ffffff" }}>
-          {displayRows.length}
-        </strong>{" "}
-        / {rows.length}
+        Rows: <strong style={{ color: "#ffffff" }}>{displayRows.length}</strong> / {rows.length}
       </span>
 
       <span>
@@ -63,25 +57,16 @@ export function StatusBar() {
       </span>
 
       <span>
-        Columns:{" "}
-        <strong style={{ color: "#ffffff" }}>
-          {visibleColumns.length}
-        </strong>{" "}
-        / {columns.length}
+        Columns: <strong style={{ color: "#ffffff" }}>{visibleColumns.length}</strong> /{" "}
+        {columns.length}
       </span>
 
       <span>
-        Sort:{" "}
-        <strong style={{ color: sort ? "#fde68a" : "#94a3b8" }}>
-          {sortLabel}
-        </strong>
+        Sort: <strong style={{ color: sort ? "#fde68a" : "#94a3b8" }}>{sortLabel}</strong>
       </span>
 
       <span>
-        Frozen:{" "}
-        <strong style={{ color: "#a5b4fc" }}>
-          {frozenColumns || "None"}
-        </strong>
+        Frozen: <strong style={{ color: "#a5b4fc" }}>{frozenColumns || "None"}</strong>
       </span>
 
       <span>

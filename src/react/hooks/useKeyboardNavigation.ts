@@ -5,14 +5,8 @@ import type {
   GridRow,
   GridSelectionState,
 } from "../../core/types";
-import {
-  KEYBOARD_KEYS,
-} from "../../core/constants";
-import {
-  navigateByKey,
-  getCurrentCell,
-  type GridBounds,
-} from "../../core/features/navigation";
+import { KEYBOARD_KEYS } from "../../core/constants";
+import { navigateByKey, getCurrentCell, type GridBounds } from "../../core/features/navigation";
 import {
   canRedo,
   canUndo,
@@ -61,11 +55,7 @@ function isTypingElement(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null;
   if (!el) return false;
   const tag = el.tagName;
-  return (
-    tag === "INPUT" ||
-    tag === "TEXTAREA" ||
-    (el as HTMLElement).isContentEditable === true
-  );
+  return tag === "INPUT" || tag === "TEXTAREA" || (el as HTMLElement).isContentEditable === true;
 }
 
 function selectAxisByArrowShortcut(
@@ -95,8 +85,7 @@ function selectAxisByArrowShortcut(
         startCol: colIndex,
         endCol: colIndex,
       };
-  const isSingleCell =
-    range.startRow === range.endRow && range.startCol === range.endCol;
+  const isSingleCell = range.startRow === range.endRow && range.startCol === range.endCol;
 
   let startRow = range.startRow;
   let endRow = range.endRow;
@@ -151,12 +140,12 @@ function selectAxisByArrowShortcut(
       fullWidth && fullHeight
         ? "all"
         : fullWidth
-        ? "row"
-        : fullHeight
-        ? "column"
-        : isSingleCell
-        ? "cell"
-        : "range",
+          ? "row"
+          : fullHeight
+            ? "column"
+            : isSingleCell
+              ? "cell"
+              : "range",
     anchor: { row: startRow, col: startCol },
     cursor: { row: endRow, col: endCol },
     range: {
@@ -227,7 +216,10 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
           )
         );
 
-      if ((!activeInsideGrid && !targetInsideGrid) || (isTypingElement(target) && !(ctrlOrMeta && key.toLowerCase() === "s"))) {
+      if (
+        (!activeInsideGrid && !targetInsideGrid) ||
+        (isTypingElement(target) && !(ctrlOrMeta && key.toLowerCase() === "s"))
+      ) {
         return;
       }
 
@@ -245,7 +237,12 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
         return;
       }
 
-      if (enableUndoRedo && ctrlOrMeta && key.toLowerCase() === KEYBOARD_KEYS.Z && !event.shiftKey) {
+      if (
+        enableUndoRedo &&
+        ctrlOrMeta &&
+        key.toLowerCase() === KEYBOARD_KEYS.Z &&
+        !event.shiftKey
+      ) {
         event.preventDefault();
         if (canUndo(history)) {
           setHistory((prev) =>
@@ -376,8 +373,8 @@ export function useKeyboardNavigation<T extends GridRow = GridRow>({
               key === KEYBOARD_KEYS.TAB
                 ? event.shiftKey
                 : key === KEYBOARD_KEYS.ENTER
-                ? event.shiftKey
-                : false,
+                  ? event.shiftKey
+                  : false,
           })
         );
         return;

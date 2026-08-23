@@ -1,8 +1,4 @@
-import type {
-  GridCellCoord,
-  GridResolvedColumnDef,
-  GridRow,
-} from "../types";
+import type { GridCellCoord, GridResolvedColumnDef, GridRow } from "../types";
 import {
   normalizeRange,
   getRowValue,
@@ -37,10 +33,7 @@ export type GridFillResult<T extends GridRow = GridRow> = {
    Fill state helpers
    ========================================================= */
 
-export function createFillState(
-  anchor: GridCellCoord,
-  current?: GridCellCoord
-): GridFillState {
+export function createFillState(anchor: GridCellCoord, current?: GridCellCoord): GridFillState {
   return {
     anchor: { ...anchor },
     current: current ? { ...current } : { ...anchor },
@@ -51,10 +44,7 @@ export function clearFillState(): GridFillState {
   return null;
 }
 
-export function updateFillState(
-  state: GridFillState,
-  current: GridCellCoord
-): GridFillState {
+export function updateFillState(state: GridFillState, current: GridCellCoord): GridFillState {
   if (!state) return null;
 
   return {
@@ -211,7 +201,10 @@ function createSeriesProjector<T extends GridRow>(
   };
 }
 
-function shouldUseVerticalSeries(sourceBounds: GridFillBounds, targetBounds: GridFillBounds): boolean {
+function shouldUseVerticalSeries(
+  sourceBounds: GridFillBounds,
+  targetBounds: GridFillBounds
+): boolean {
   return (
     sourceBounds.startCol === targetBounds.startCol &&
     sourceBounds.endCol === targetBounds.endCol &&
@@ -219,7 +212,10 @@ function shouldUseVerticalSeries(sourceBounds: GridFillBounds, targetBounds: Gri
   );
 }
 
-function shouldUseHorizontalSeries(sourceBounds: GridFillBounds, targetBounds: GridFillBounds): boolean {
+function shouldUseHorizontalSeries(
+  sourceBounds: GridFillBounds,
+  targetBounds: GridFillBounds
+): boolean {
   return (
     sourceBounds.startRow === targetBounds.startRow &&
     sourceBounds.endRow === targetBounds.endRow &&
@@ -250,9 +246,13 @@ export function fillRangeWithSource<T extends GridRow>(
   const sourceRowCount = sourceMatrix.length;
   const sourceColCount = sourceMatrix[0].length;
   const useVerticalSeries =
-    sourceRowCount >= 2 && sourceColCount >= 1 && shouldUseVerticalSeries(sourceBounds, targetBounds);
+    sourceRowCount >= 2 &&
+    sourceColCount >= 1 &&
+    shouldUseVerticalSeries(sourceBounds, targetBounds);
   const useHorizontalSeries =
-    sourceColCount >= 2 && sourceRowCount >= 1 && shouldUseHorizontalSeries(sourceBounds, targetBounds);
+    sourceColCount >= 2 &&
+    sourceRowCount >= 1 &&
+    shouldUseHorizontalSeries(sourceBounds, targetBounds);
 
   const verticalSeriesProjectors = useVerticalSeries
     ? Array.from({ length: sourceColCount }, (_, columnOffset) =>
@@ -493,17 +493,22 @@ export function generateFillSeries(
       let nextTimestamp = numericSeries[numericSeries.length - 1] + step * (index + 1);
 
       if (series === "weekday") {
-        while (new Date(nextTimestamp).getUTCDay() === 0 || new Date(nextTimestamp).getUTCDay() === 6) {
+        while (
+          new Date(nextTimestamp).getUTCDay() === 0 ||
+          new Date(nextTimestamp).getUTCDay() === 6
+        ) {
           nextTimestamp += Math.sign(step) * 24 * 60 * 60 * 1000;
         }
       }
 
       const date = new Date(nextTimestamp);
-      result.push([
-        date.getUTCFullYear(),
-        String(date.getUTCMonth() + 1).padStart(2, "0"),
-        String(date.getUTCDate()).padStart(2, "0"),
-      ].join("-"));
+      result.push(
+        [
+          date.getUTCFullYear(),
+          String(date.getUTCMonth() + 1).padStart(2, "0"),
+          String(date.getUTCDate()).padStart(2, "0"),
+        ].join("-")
+      );
     }
 
     return result;

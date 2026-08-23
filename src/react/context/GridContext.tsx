@@ -23,15 +23,13 @@ import type { GridColumnWidths } from "../../core/features/sizing";
 import type { GridFillState } from "../../core/features/fill";
 import type { GridFormulaEvaluator } from "../../core/features/formulas";
 
-export type GridContextMenuState =
-  | {
-      kind: "cell" | "row" | "column";
-      anchorRect: DOMRect;
-      displayRowIndex?: number;
-      visibleColumnIndex?: number;
-      columnKey?: string;
-    }
-  | null;
+export type GridContextMenuState = {
+  kind: "cell" | "row" | "column";
+  anchorRect: DOMRect;
+  displayRowIndex?: number;
+  visibleColumnIndex?: number;
+  columnKey?: string;
+} | null;
 
 export type GridContextValue<T extends GridRow = GridRow> = {
   props: GridMasterProps<T>;
@@ -83,10 +81,7 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   updateColumns: (columns: GridColumnDef<T>[]) => void;
   insertRow: (sourceRowIndex: number, position: GridRowInsertPosition) => T | null;
   deleteRow: (sourceRowIndex: number) => T | null;
-  insertColumn: (
-    columnKey: string,
-    position: GridColumnInsertPosition
-  ) => GridColumnDef<T> | null;
+  insertColumn: (columnKey: string, position: GridColumnInsertPosition) => GridColumnDef<T> | null;
   deleteColumn: (columnKey: string) => GridColumnDef<T> | null;
   emitCellChange?: (event: GridCellChangeEvent<T>) => void;
   setEditingValue: React.Dispatch<React.SetStateAction<unknown>>;

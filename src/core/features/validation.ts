@@ -1,9 +1,4 @@
-import type {
-  GridCellMeta,
-  GridColumnDef,
-  GridResolvedColumnDef,
-  GridRow,
-} from "../types";
+import type { GridCellMeta, GridColumnDef, GridResolvedColumnDef, GridRow } from "../types";
 import { isNil, normalizeValue, toNumber } from "../utils";
 
 /* =========================================================
@@ -72,21 +67,29 @@ function validateRule<T extends GridRow>(
 
   switch (rule.type) {
     case "required":
-      return normalized ? null : rule.message ?? "Required";
+      return normalized ? null : (rule.message ?? "Required");
     case "min": {
       const num = toNumber(value);
-      return num !== null && num >= rule.value ? null : rule.message ?? `Minimum is ${rule.value}`;
+      return num !== null && num >= rule.value
+        ? null
+        : (rule.message ?? `Minimum is ${rule.value}`);
     }
     case "max": {
       const num = toNumber(value);
-      return num !== null && num <= rule.value ? null : rule.message ?? `Maximum is ${rule.value}`;
+      return num !== null && num <= rule.value
+        ? null
+        : (rule.message ?? `Maximum is ${rule.value}`);
     }
     case "minLength":
-      return normalized.length >= rule.value ? null : rule.message ?? `Min length is ${rule.value}`;
+      return normalized.length >= rule.value
+        ? null
+        : (rule.message ?? `Min length is ${rule.value}`);
     case "maxLength":
-      return normalized.length <= rule.value ? null : rule.message ?? `Max length is ${rule.value}`;
+      return normalized.length <= rule.value
+        ? null
+        : (rule.message ?? `Max length is ${rule.value}`);
     case "pattern":
-      return new RegExp(rule.value).test(normalized) ? null : rule.message ?? "Invalid format";
+      return new RegExp(rule.value).test(normalized) ? null : (rule.message ?? "Invalid format");
     case "custom":
       return rule.validator?.(value, row) ?? null;
     default:

@@ -80,7 +80,10 @@ import {
   type GridColumnWidths,
 } from "../../core/features/sizing";
 import { deleteRowAt, insertRowAt } from "../../core/features/editing";
-import { moveColumn as moveColumnHelper, moveRow as moveRowHelper } from "../../core/features/dragDrop";
+import {
+  moveColumn as moveColumnHelper,
+  moveRow as moveRowHelper,
+} from "../../core/features/dragDrop";
 import { createInitialHistoryState, historyReducer } from "../../core/state/historyReducer";
 import { getDisplayRowIndexes, getDisplayRows } from "../../core/state/gridState";
 import {
@@ -231,8 +234,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const enableFiltering = props.enableFiltering ?? DEFAULT_ENABLE_FILTERING;
   const enableColumnResize = props.enableColumnResize ?? DEFAULT_ENABLE_COLUMN_RESIZE;
   const enableColumnAutoFit = props.enableColumnAutoFit ?? DEFAULT_ENABLE_COLUMN_AUTOFIT;
-  const enableColumnVisibility =
-    props.enableColumnVisibility ?? DEFAULT_ENABLE_COLUMN_VISIBILITY;
+  const enableColumnVisibility = props.enableColumnVisibility ?? DEFAULT_ENABLE_COLUMN_VISIBILITY;
   const enableCellColoring = props.enableCellColoring ?? DEFAULT_ENABLE_CELL_COLORING;
   const enableWrapText = props.enableWrapText ?? DEFAULT_ENABLE_WRAP_TEXT;
   const enableInsertRow = props.enableInsertRow ?? DEFAULT_ENABLE_INSERT_ROW;
@@ -268,12 +270,15 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const lastEmittedColumnsRef = useRef<GridColumnDef<T>[] | null>(null);
 
   const [history, setHistory] = useState<GridHistoryState<T>>(() =>
-    createInitialHistoryState({
-      rows: cloneGridRows(props.rows ?? []),
-      columns: cloneColumns(props.columns ?? []),
-      cellMeta: cloneCellMetaMap(props.initialCellMeta ?? {}),
-      rowMeta: cloneRowMetaMap(props.initialRowMeta ?? {}),
-    }, historyCloneOptions)
+    createInitialHistoryState(
+      {
+        rows: cloneGridRows(props.rows ?? []),
+        columns: cloneColumns(props.columns ?? []),
+        cellMeta: cloneCellMetaMap(props.initialCellMeta ?? {}),
+        rowMeta: cloneRowMetaMap(props.initialRowMeta ?? {}),
+      },
+      historyCloneOptions
+    )
   );
 
   const rows = history.present.rows as T[];
@@ -281,10 +286,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const resolvedColumns = useMemo(() => resolveColumns(rawColumns), [rawColumns]);
 
   const [hiddenColumnKeys, setHiddenColumnKeys] = useState<Set<string>>(
-    () =>
-      new Set(
-        resolvedColumns.filter((column) => column.hidden).map((column) => column.key)
-      )
+    () => new Set(resolvedColumns.filter((column) => column.hidden).map((column) => column.key))
   );
 
   useEffect(() => {
@@ -344,12 +346,15 @@ export function useGridMaster<T extends GridRow = GridRow>(
     setPreservedFilteredRowIds(null);
 
     setHistory((prev) =>
-      createInitialHistoryState({
-        rows: nextRows,
-        columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-        cellMeta: cloneCellMetaMap(props.initialCellMeta ?? prev.present.cellMeta ?? {}),
-        rowMeta: cloneRowMetaMap(props.initialRowMeta ?? prev.present.rowMeta ?? {}),
-      }, historyCloneOptions)
+      createInitialHistoryState(
+        {
+          rows: nextRows,
+          columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+          cellMeta: cloneCellMetaMap(props.initialCellMeta ?? prev.present.cellMeta ?? {}),
+          rowMeta: cloneRowMetaMap(props.initialRowMeta ?? prev.present.rowMeta ?? {}),
+        },
+        historyCloneOptions
+      )
     );
   }, [
     cloneGridRows,
@@ -382,12 +387,15 @@ export function useGridMaster<T extends GridRow = GridRow>(
     }
 
     setHistory((prev) =>
-      createInitialHistoryState({
-        rows: cloneGridRows(prev.present.rows as T[]),
-        columns: nextColumns,
-        cellMeta: prev.present.cellMeta ?? {},
-        rowMeta: prev.present.rowMeta ?? {},
-      }, historyCloneOptions)
+      createInitialHistoryState(
+        {
+          rows: cloneGridRows(prev.present.rows as T[]),
+          columns: nextColumns,
+          cellMeta: prev.present.cellMeta ?? {},
+          rowMeta: prev.present.rowMeta ?? {},
+        },
+        historyCloneOptions
+      )
     );
   }, [cloneGridRows, history.present.columns, historyCloneOptions, props.columns]);
 
@@ -400,12 +408,15 @@ export function useGridMaster<T extends GridRow = GridRow>(
     lastPropInitialRowMetaRef.current = props.initialRowMeta;
 
     setHistory((prev) =>
-      createInitialHistoryState({
-        rows: cloneGridRows(prev.present.rows as T[]),
-        columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-        cellMeta: cloneCellMetaMap(props.initialCellMeta ?? {}),
-        rowMeta: cloneRowMetaMap(props.initialRowMeta ?? {}),
-      }, historyCloneOptions)
+      createInitialHistoryState(
+        {
+          rows: cloneGridRows(prev.present.rows as T[]),
+          columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+          cellMeta: cloneCellMetaMap(props.initialCellMeta ?? {}),
+          rowMeta: cloneRowMetaMap(props.initialRowMeta ?? {}),
+        },
+        historyCloneOptions
+      )
     );
   }, [cloneGridRows, historyCloneOptions, props.initialCellMeta, props.initialRowMeta]);
 
@@ -415,13 +426,15 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
 
   const [sort, setSort] = useState<GridSort>(EMPTY_SORT);
-  const [filters, setFiltersState] = useState<GridFilters>(() => props.initialFilters ?? EMPTY_FILTERS);
+  const [filters, setFiltersState] = useState<GridFilters>(
+    () => props.initialFilters ?? EMPTY_FILTERS
+  );
   const [colorFilters, setColorFiltersState] = useState<GridColorFilters>(
     () => props.initialColorFilters ?? clearColorFilters()
   );
   const [colorSort, setColorSort] = useState<GridColorSort>(() => props.initialColorSort ?? null);
-  const [conditionalFormats, setConditionalFormats] = useState(() =>
-    props.initialConditionalFormats ?? clearConditionalFormats()
+  const [conditionalFormats, setConditionalFormats] = useState(
+    () => props.initialConditionalFormats ?? clearConditionalFormats()
   );
   const [clipboard, setClipboard] = useState(EMPTY_CLIPBOARD);
   const [fill, setFill] = useState<GridFillState>(clearFillState());
@@ -446,10 +459,13 @@ export function useGridMaster<T extends GridRow = GridRow>(
     setFiltersState(next);
   }, []);
 
-  const setColorFilters = useCallback<React.Dispatch<React.SetStateAction<GridColorFilters>>>((next) => {
-    setPreservedFilteredRowIds(null);
-    setColorFiltersState(next);
-  }, []);
+  const setColorFilters = useCallback<React.Dispatch<React.SetStateAction<GridColorFilters>>>(
+    (next) => {
+      setPreservedFilteredRowIds(null);
+      setColorFiltersState(next);
+    },
+    []
+  );
 
   const computeDisplayRowIndexes = useCallback(
     (
@@ -466,17 +482,25 @@ export function useGridMaster<T extends GridRow = GridRow>(
         preservedRowIds?: Iterable<string> | null;
       }
     ) =>
-      getDisplayRowIndexes(sourceRows, sourceColumns, sourceFilters, sourceSort, sourceColorFilters, sourceColorSort, {
-        allowedRowIds:
-          overrides?.allowedRowIds !== undefined ? overrides.allowedRowIds : props.allowedRowIds,
-        enableFiltering: overrides?.enableFiltering ?? enableFiltering,
-        enableSorting: overrides?.enableSorting ?? enableSorting,
-        preservedRowIds:
-          overrides?.preservedRowIds !== undefined
-            ? overrides.preservedRowIds
-            : preservedFilteredRowIds,
-        getRowId: props.getRowId,
-      }),
+      getDisplayRowIndexes(
+        sourceRows,
+        sourceColumns,
+        sourceFilters,
+        sourceSort,
+        sourceColorFilters,
+        sourceColorSort,
+        {
+          allowedRowIds:
+            overrides?.allowedRowIds !== undefined ? overrides.allowedRowIds : props.allowedRowIds,
+          enableFiltering: overrides?.enableFiltering ?? enableFiltering,
+          enableSorting: overrides?.enableSorting ?? enableSorting,
+          preservedRowIds:
+            overrides?.preservedRowIds !== undefined
+              ? overrides.preservedRowIds
+              : preservedFilteredRowIds,
+          getRowId: props.getRowId,
+        }
+      ),
     [
       columns,
       colorFilters,
@@ -529,10 +553,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
     () => getDisplayRows(rows, displayRowIndexes),
     [rows, displayRowIndexes]
   );
-  const formulaEvaluator = useMemo(
-    () => createFormulaEvaluator(rows, columns),
-    [columns, rows]
-  );
+  const formulaEvaluator = useMemo(() => createFormulaEvaluator(rows, columns), [columns, rows]);
 
   useEffect(() => {
     props.onSnapshotChange?.(history.present as GridSnapshot<T>);
@@ -616,12 +637,15 @@ export function useGridMaster<T extends GridRow = GridRow>(
       setPreservedFilteredRowIds(null);
 
       setHistory(
-        createInitialHistoryState({
-          rows: cloned,
-          columns: cloneColumns(rawColumns),
-          cellMeta: {},
-          rowMeta: {},
-        }, historyCloneOptions)
+        createInitialHistoryState(
+          {
+            rows: cloned,
+            columns: cloneColumns(rawColumns),
+            cellMeta: {},
+            rowMeta: {},
+          },
+          historyCloneOptions
+        )
       );
 
       lastEmittedRowsRef.current = cloned;
@@ -635,18 +659,28 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const cloned = cloneColumns(nextColumns);
 
       setHistory(
-        createInitialHistoryState({
-          rows: cloneGridRows(rows),
-          columns: cloned,
-          cellMeta: history.present.cellMeta,
-          rowMeta: history.present.rowMeta,
-        }, historyCloneOptions)
+        createInitialHistoryState(
+          {
+            rows: cloneGridRows(rows),
+            columns: cloned,
+            cellMeta: history.present.cellMeta,
+            rowMeta: history.present.rowMeta,
+          },
+          historyCloneOptions
+        )
       );
 
       lastEmittedColumnsRef.current = cloned;
       props.onColumnsChange?.(cloned);
     },
-    [cloneGridRows, history.present.cellMeta, history.present.rowMeta, historyCloneOptions, props, rows]
+    [
+      cloneGridRows,
+      history.present.cellMeta,
+      history.present.rowMeta,
+      historyCloneOptions,
+      props,
+      rows,
+    ]
   );
 
   const updateRows = useCallback(
@@ -665,15 +699,19 @@ export function useGridMaster<T extends GridRow = GridRow>(
       }
 
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: cloned,
-            columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-            cellMeta: prev.present.cellMeta,
-            rowMeta: prev.present.rowMeta,
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: cloned,
+              columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+              cellMeta: prev.present.cellMeta,
+              rowMeta: prev.present.rowMeta,
+            },
           },
-        }, historyCloneOptions)
+          historyCloneOptions
+        )
       );
 
       lastEmittedRowsRef.current = cloned;
@@ -688,15 +726,19 @@ export function useGridMaster<T extends GridRow = GridRow>(
       if (shallowEqualColumns(cloned, rawColumns)) return;
 
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: cloneGridRows(prev.present.rows as T[]),
-            columns: cloned,
-            cellMeta: prev.present.cellMeta,
-            rowMeta: prev.present.rowMeta,
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: cloneGridRows(prev.present.rows as T[]),
+              columns: cloned,
+              cellMeta: prev.present.cellMeta,
+              rowMeta: prev.present.rowMeta,
+            },
           },
-        }, historyCloneOptions)
+          historyCloneOptions
+        )
       );
 
       lastEmittedColumnsRef.current = cloned;
@@ -713,15 +755,19 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const nextRows = moveRowHelper(rows, fromIndex, toIndex);
 
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: nextRows,
-            columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-            cellMeta: prev.present.cellMeta,
-            rowMeta: prev.present.rowMeta,
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: nextRows,
+              columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+              cellMeta: prev.present.cellMeta,
+              rowMeta: prev.present.rowMeta,
+            },
           },
-        }, historyCloneOptions)
+          historyCloneOptions
+        )
       );
 
       lastEmittedRowsRef.current = nextRows;
@@ -739,15 +785,19 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const nextColumns = moveColumnHelper(rawColumns, fromKey, toKey);
 
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: cloneGridRows(prev.present.rows as T[]),
-            columns: nextColumns,
-            cellMeta: prev.present.cellMeta,
-            rowMeta: prev.present.rowMeta,
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: cloneGridRows(prev.present.rows as T[]),
+              columns: nextColumns,
+              cellMeta: prev.present.cellMeta,
+              rowMeta: prev.present.rowMeta,
+            },
           },
-        }, historyCloneOptions)
+          historyCloneOptions
+        )
       );
 
       lastEmittedColumnsRef.current = nextColumns;
@@ -775,15 +825,19 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const nextRows = insertRowAt(rows, insertAt, nextRow);
 
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: nextRows,
-            columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-            cellMeta: shiftCellMetaForInsertedRow(prev.present.cellMeta, insertAt),
-            rowMeta: shiftRowMetaForInsertedRow(prev.present.rowMeta, insertAt),
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: nextRows,
+              columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+              cellMeta: shiftCellMetaForInsertedRow(prev.present.cellMeta, insertAt),
+              rowMeta: shiftRowMetaForInsertedRow(prev.present.rowMeta, insertAt),
+            },
           },
-        }, historyCloneOptions)
+          historyCloneOptions
+        )
       );
 
       lastEmittedRowsRef.current = nextRows;
@@ -801,11 +855,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
         colorFilters,
         colorSort,
         {
-        allowedRowIds: props.allowedRowIds,
-        enableFiltering,
-        enableSorting,
-        preservedRowIds: preservedFilteredRowIds,
-        getRowId: props.getRowId,
+          allowedRowIds: props.allowedRowIds,
+          enableFiltering,
+          enableSorting,
+          preservedRowIds: preservedFilteredRowIds,
+          getRowId: props.getRowId,
         }
       );
       const insertedDisplayRowIndex = nextDisplayRowIndexes.findIndex(
@@ -861,15 +915,19 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const nextRows = insertColumnValueIntoRows(rows, nextColumn);
 
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: nextRows,
-            columns: nextColumns,
-            cellMeta: prev.present.cellMeta,
-            rowMeta: prev.present.rowMeta,
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: nextRows,
+              columns: nextColumns,
+              cellMeta: prev.present.cellMeta,
+              rowMeta: prev.present.rowMeta,
+            },
           },
-        }, historyCloneOptions)
+          historyCloneOptions
+        )
       );
 
       lastEmittedRowsRef.current = nextRows;
@@ -898,11 +956,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
         colorFilters,
         colorSort,
         {
-        allowedRowIds: props.allowedRowIds,
-        enableFiltering,
-        enableSorting,
-        preservedRowIds: preservedFilteredRowIds,
-        getRowId: props.getRowId,
+          allowedRowIds: props.allowedRowIds,
+          enableFiltering,
+          enableSorting,
+          preservedRowIds: preservedFilteredRowIds,
+          getRowId: props.getRowId,
         }
       ).length;
 
@@ -943,15 +1001,19 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const nextRows = deleteRowAt(rows, sourceRowIndex);
 
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: nextRows,
-            columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-            cellMeta: shiftCellMetaForDeletedRow(prev.present.cellMeta, sourceRowIndex),
-            rowMeta: shiftRowMetaForDeletedRow(prev.present.rowMeta, sourceRowIndex),
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: nextRows,
+              columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
+              cellMeta: shiftCellMetaForDeletedRow(prev.present.cellMeta, sourceRowIndex),
+              rowMeta: shiftRowMetaForDeletedRow(prev.present.rowMeta, sourceRowIndex),
+            },
           },
-        }, historyCloneOptions)
+          historyCloneOptions
+        )
       );
 
       setEditingCell(null);
@@ -971,11 +1033,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
         colorFilters,
         colorSort,
         {
-        allowedRowIds: props.allowedRowIds,
-        enableFiltering,
-        enableSorting,
-        preservedRowIds: preservedFilteredRowIds,
-        getRowId: props.getRowId,
+          allowedRowIds: props.allowedRowIds,
+          enableFiltering,
+          enableSorting,
+          preservedRowIds: preservedFilteredRowIds,
+          getRowId: props.getRowId,
         }
       );
 
@@ -1035,27 +1097,27 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const nextColorSort = colorSort?.columnKey === columnKey ? null : colorSort;
       const nextFilters =
         columnKey in filters
-          ? Object.fromEntries(
-              Object.entries(filters).filter(([key]) => key !== columnKey)
-            )
+          ? Object.fromEntries(Object.entries(filters).filter(([key]) => key !== columnKey))
           : filters;
       const nextColorFilters =
         columnKey in colorFilters
-          ? Object.fromEntries(
-              Object.entries(colorFilters).filter(([key]) => key !== columnKey)
-            )
+          ? Object.fromEntries(Object.entries(colorFilters).filter(([key]) => key !== columnKey))
           : colorFilters;
 
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: nextRows,
-            columns: nextColumns,
-            cellMeta: deleteCellMetaForColumn(prev.present.cellMeta, columnKey),
-            rowMeta: prev.present.rowMeta,
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: nextRows,
+              columns: nextColumns,
+              cellMeta: deleteCellMetaForColumn(prev.present.cellMeta, columnKey),
+              rowMeta: prev.present.rowMeta,
+            },
           },
-        }, historyCloneOptions)
+          historyCloneOptions
+        )
       );
 
       setEditingCell(null);
@@ -1094,11 +1156,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
         nextColorFilters,
         nextColorSort,
         {
-        allowedRowIds: props.allowedRowIds,
-        enableFiltering,
-        enableSorting,
-        preservedRowIds: nextFilters === filters ? preservedFilteredRowIds : null,
-        getRowId: props.getRowId,
+          allowedRowIds: props.allowedRowIds,
+          enableFiltering,
+          enableSorting,
+          preservedRowIds: nextFilters === filters ? preservedFilteredRowIds : null,
+          getRowId: props.getRowId,
         }
       ).length;
 

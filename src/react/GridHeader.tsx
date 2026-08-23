@@ -1,7 +1,11 @@
 import React from "react";
 import { ArrowDownAZ, ArrowUpAZ, ChevronsUpDown, Filter, Snowflake } from "lucide-react";
 import { DEFAULT_HEADER_HEIGHT, DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
-import { clearFilter, createValueSetFilter, getFilteredUniqueValuesForColumn } from "../core/features/filtering";
+import {
+  clearFilter,
+  createValueSetFilter,
+  getFilteredUniqueValuesForColumn,
+} from "../core/features/filtering";
 import type { GridColorOption } from "../core/types";
 import { isFrozenColumnIndex, toggleFrozenThroughColumn } from "../core/features/freezing";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
@@ -55,10 +59,13 @@ export function GridHeader() {
     openContextMenu,
   } = useGridContext();
   const [columnMenu, setColumnMenu] = React.useState<ColumnMenuState>(null);
-  const [resolvedColumnMenuFilterValues, setResolvedColumnMenuFilterValues] = React.useState<string[] | null>(null);
+  const [resolvedColumnMenuFilterValues, setResolvedColumnMenuFilterValues] = React.useState<
+    string[] | null
+  >(null);
   const [columnMenuFilterLoading, setColumnMenuFilterLoading] = React.useState(false);
-  const [resolvedColumnMenuColorOptions, setResolvedColumnMenuColorOptions] =
-    React.useState<GridColorOption[] | null>(null);
+  const [resolvedColumnMenuColorOptions, setResolvedColumnMenuColorOptions] = React.useState<
+    GridColorOption[] | null
+  >(null);
   const [columnMenuColorLoading, setColumnMenuColorLoading] = React.useState(false);
 
   const { onColumnHeaderClick, onSelectAll } = useSelection({
@@ -85,52 +92,51 @@ export function GridHeader() {
   );
 
   const columnMenuColumn = React.useMemo(
-    () => (columnMenu ? columns.find((column) => column.key === columnMenu.columnKey) ?? null : null),
+    () =>
+      columnMenu ? (columns.find((column) => column.key === columnMenu.columnKey) ?? null) : null,
     [columnMenu, columns]
   );
-  const columnMenuFilterColumn = React.useMemo(
-    () => {
-      if (columnMenu?.mode !== "column" || !columnMenuColumn) return null;
-      return columnMenuColumn.filterable ? columnMenuColumn : null;
-    },
-    [columnMenu?.mode, columnMenuColumn]
-  );
-  const columnMenuColorSourceKey = React.useMemo(
-    () => {
-      if (
-        columnMenu?.mode !== "column" ||
-        !columnMenuColumn ||
-        !props.resolveColorOptions ||
-        (props.isColorMenuEnabled && !props.isColorMenuEnabled(columnMenuColumn.key))
-      ) {
-        return null;
-      }
-      const sourceKey = props.getColorSourceColumnKey
-        ? props.getColorSourceColumnKey(columnMenuColumn.key)
-        : columnMenuColumn.key;
-      if (!sourceKey) return null;
-      return columnMenuColumn.filterable ? sourceKey : null;
-    },
-    [
-      columnMenu?.mode,
-      columnMenuColumn,
-      props.getColorSourceColumnKey,
-      props.isColorMenuEnabled,
-      props.resolveColorOptions,
-    ]
-  );
+  const columnMenuFilterColumn = React.useMemo(() => {
+    if (columnMenu?.mode !== "column" || !columnMenuColumn) return null;
+    return columnMenuColumn.filterable ? columnMenuColumn : null;
+  }, [columnMenu?.mode, columnMenuColumn]);
+  const columnMenuColorSourceKey = React.useMemo(() => {
+    if (
+      columnMenu?.mode !== "column" ||
+      !columnMenuColumn ||
+      !props.resolveColorOptions ||
+      (props.isColorMenuEnabled && !props.isColorMenuEnabled(columnMenuColumn.key))
+    ) {
+      return null;
+    }
+    const sourceKey = props.getColorSourceColumnKey
+      ? props.getColorSourceColumnKey(columnMenuColumn.key)
+      : columnMenuColumn.key;
+    if (!sourceKey) return null;
+    return columnMenuColumn.filterable ? sourceKey : null;
+  }, [
+    columnMenu?.mode,
+    columnMenuColumn,
+    props.getColorSourceColumnKey,
+    props.isColorMenuEnabled,
+    props.resolveColorOptions,
+  ]);
 
-  const columnMenuFilterValues = React.useMemo(
-    () => {
-      if (!columnMenuFilterColumn) return [];
-      if (props.resolveFilterValues) return resolvedColumnMenuFilterValues ?? [];
-      return (
-        columnMenuFilterColumn.filterOptions ??
-        getFilteredUniqueValuesForColumn(rows, columns, columnMenuFilterColumn.key, filters)
-      );
-    },
-    [rows, columns, columnMenuFilterColumn, filters, props.resolveFilterValues, resolvedColumnMenuFilterValues]
-  );
+  const columnMenuFilterValues = React.useMemo(() => {
+    if (!columnMenuFilterColumn) return [];
+    if (props.resolveFilterValues) return resolvedColumnMenuFilterValues ?? [];
+    return (
+      columnMenuFilterColumn.filterOptions ??
+      getFilteredUniqueValuesForColumn(rows, columns, columnMenuFilterColumn.key, filters)
+    );
+  }, [
+    rows,
+    columns,
+    columnMenuFilterColumn,
+    filters,
+    props.resolveFilterValues,
+    resolvedColumnMenuFilterValues,
+  ]);
 
   const selectedColumnMenuFilterValues = React.useMemo(() => {
     if (!columnMenuFilterColumn) return new Set<string>();
@@ -234,19 +240,22 @@ export function GridHeader() {
     );
   }, []);
 
-  const openVisibilityMenu = React.useCallback((trigger: HTMLElement) => {
-    if (!enableColumnVisibility) return;
+  const openVisibilityMenu = React.useCallback(
+    (trigger: HTMLElement) => {
+      if (!enableColumnVisibility) return;
 
-    const firstVisibleColumn = visibleColumns[0];
-    if (!firstVisibleColumn) return;
+      const firstVisibleColumn = visibleColumns[0];
+      if (!firstVisibleColumn) return;
 
-    setColumnMenu({
-      columnKey: firstVisibleColumn.key,
-      anchorEl: trigger,
-      anchorRect: trigger.getBoundingClientRect(),
-      mode: "visibility",
-    });
-  }, [enableColumnVisibility, visibleColumns]);
+      setColumnMenu({
+        columnKey: firstVisibleColumn.key,
+        anchorEl: trigger,
+        anchorRect: trigger.getBoundingClientRect(),
+        mode: "visibility",
+      });
+    },
+    [enableColumnVisibility, visibleColumns]
+  );
 
   const columnsForMenu = React.useMemo(
     () =>
@@ -261,8 +270,7 @@ export function GridHeader() {
   const allSelected = selection.mode === "all";
   const hiddenColumnCount = hiddenColumnKeys.size;
   const spreadsheetColumnIndexes = React.useMemo(
-    () =>
-      Object.fromEntries(columns.map((column, index) => [column.key, index])),
+    () => Object.fromEntries(columns.map((column, index) => [column.key, index])),
     [columns]
   );
   const openColumnContextMenu = React.useCallback(
@@ -310,11 +318,7 @@ export function GridHeader() {
             return (
               <th
                 key={`${column.key}-spreadsheet`}
-                className={[
-                  "gm-th",
-                  "gm-th-spreadsheet",
-                  isSelected ? "gm-th-selected" : "",
-                ]
+                className={["gm-th", "gm-th-spreadsheet", isSelected ? "gm-th-selected" : ""]
                   .filter(Boolean)
                   .join(" ")}
                 onClick={(event) => {
@@ -343,9 +347,7 @@ export function GridHeader() {
                 }}
                 title={`Spreadsheet column ${columnLetter(spreadsheetIndex)}`}
               >
-                <div className="gm-spreadsheet-header-label">
-                  {columnLetter(spreadsheetIndex)}
-                </div>
+                <div className="gm-spreadsheet-header-label">{columnLetter(spreadsheetIndex)}</div>
               </th>
             );
           })}
@@ -411,7 +413,7 @@ export function GridHeader() {
             const filterValueCount =
               activeFilter?.type === "valueSet"
                 ? activeFilter.values.size + (activeColorFilter?.values.size ?? 0)
-                : activeColorFilter?.values.size ?? null;
+                : (activeColorFilter?.values.size ?? null);
             const isMenuOpen = columnMenu?.columnKey === column.key;
             const showResizeHandle = enableColumnResize && column.resizable;
 
@@ -434,7 +436,9 @@ export function GridHeader() {
                   height: headerHeight ?? DEFAULT_HEADER_HEIGHT,
                   position: "sticky",
                   top: SPREADSHEET_HEADER_HEIGHT,
-                  left: isFrozen ? DEFAULT_ROW_NUMBER_WIDTH + (colOffsets[column.key] ?? 0) : undefined,
+                  left: isFrozen
+                    ? DEFAULT_ROW_NUMBER_WIDTH + (colOffsets[column.key] ?? 0)
+                    : undefined,
                   zIndex: isFrozen ? Z_INDEX.FROZEN_HEADER : Z_INDEX.HEADER,
                   boxShadow:
                     isFrozen && index === frozenColumns - 1
@@ -454,7 +458,10 @@ export function GridHeader() {
 
                   <div className="gm-header-badges">
                     {isFrozen ? (
-                      <span className="gm-header-badge gm-header-badge-frozen" title="Frozen column">
+                      <span
+                        className="gm-header-badge gm-header-badge-frozen"
+                        title="Frozen column"
+                      >
                         <Snowflake style={{ width: 10, height: 10 }} />
                       </span>
                     ) : null}
@@ -491,7 +498,9 @@ export function GridHeader() {
                         ) : (
                           <ArrowDownAZ style={{ width: 11, height: 11 }} />
                         )}
-                        <span>{isColorSorted ? "Color" : sortDirection === "asc" ? "A-Z" : "Z-A"}</span>
+                        <span>
+                          {isColorSorted ? "Color" : sortDirection === "asc" ? "A-Z" : "Z-A"}
+                        </span>
                       </span>
                     ) : null}
                   </div>
@@ -533,7 +542,11 @@ export function GridHeader() {
                         event.stopPropagation();
                         autoFit(column.key);
                       }}
-                      title={enableColumnAutoFit ? "Drag to resize. Double-click to auto-fit." : "Drag to resize."}
+                      title={
+                        enableColumnAutoFit
+                          ? "Drag to resize. Double-click to auto-fit."
+                          : "Drag to resize."
+                      }
                     />
                   ) : null}
                 </div>
@@ -581,7 +594,9 @@ export function GridHeader() {
               : undefined
           }
           onClearSort={
-            enableSorting && sort?.columnKey === columnMenuColumn.key ? () => setSort(null) : undefined
+            enableSorting && sort?.columnKey === columnMenuColumn.key
+              ? () => setSort(null)
+              : undefined
           }
           onAutoFit={
             enableColumnAutoFit && columnMenuColumn.resizable
@@ -589,7 +604,9 @@ export function GridHeader() {
               : undefined
           }
           onFreezeToggle={() => {
-            const columnIndex = visibleColumns.findIndex((column) => column.key === columnMenuColumn.key);
+            const columnIndex = visibleColumns.findIndex(
+              (column) => column.key === columnMenuColumn.key
+            );
             if (columnIndex < 0) return;
 
             setFrozenColumns((prev) =>

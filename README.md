@@ -1,4 +1,6 @@
 # GridMaster
+ 
+Last updated: 2026-08-22
 
 <p align="center">
   <a href="https://www.npmjs.com/package/gridmaster-react"><img src="https://img.shields.io/npm/v/gridmaster-react?label=gridmaster-react" alt="npm version"></a>

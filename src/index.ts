@@ -82,6 +82,7 @@ export * from "./react/hooks/useEditing";
 export * from "./react/hooks/useFormatPainter";
 export * from "./react/hooks/useFloatingPortal";
 export * from "./react/hooks/useGridMaster";
+export { GridProvider } from "./react/context/GridContext";
 
 export { GridMaster } from "./react/GridMaster";
 export { GridContextMenu } from "./react/GridContextMenu";

@@ -118,13 +118,7 @@ export function applyColorSortToRowIndexes<T extends GridRow>(
 
   indexes.forEach((rowIndex) => {
     const value = normalizeValue(
-      resolveColorFieldValue(
-        rows[rowIndex],
-        rowIndex,
-        columns,
-        colorSort.columnKey,
-        evaluator
-      )
+      resolveColorFieldValue(rows[rowIndex], rowIndex, columns, colorSort.columnKey, evaluator)
     );
     if (value === targetValue) {
       matching.push(rowIndex);
@@ -165,5 +159,7 @@ export function getFilteredColorOptionsForColumn<T extends GridRow>(
 
   return Array.from(counts.entries())
     .map(([value, count]) => ({ value, count }))
-    .sort((left, right) => left.value.localeCompare(right.value, undefined, { sensitivity: "base" }));
+    .sort((left, right) =>
+      left.value.localeCompare(right.value, undefined, { sensitivity: "base" })
+    );
 }

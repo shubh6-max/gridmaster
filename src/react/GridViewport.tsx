@@ -40,11 +40,7 @@ export function GridViewport() {
     pasteFormatToSelection,
     stopFormatPainter,
   } = useGridContext();
-  const {
-    toggleBold,
-    toggleItalic,
-    toggleUnderline,
-  } = useCellFormatting({
+  const { toggleBold, toggleItalic, toggleUnderline } = useCellFormatting({
     history,
     setHistory,
     selection,
@@ -120,7 +116,16 @@ export function GridViewport() {
         anchor: { row: 0, col: 0 },
       };
     });
-  }, [colorFilters, colorSort, displayRows.length, filters, setSelection, sort, viewportRef, visibleColumns.length]);
+  }, [
+    colorFilters,
+    colorSort,
+    displayRows.length,
+    filters,
+    setSelection,
+    sort,
+    viewportRef,
+    visibleColumns.length,
+  ]);
 
   React.useEffect(() => {
     const container = viewportRef.current;
@@ -191,10 +196,7 @@ export function GridViewport() {
         nextScrollTop += cellRect.bottom - visibleBottom;
       }
 
-      if (
-        nextScrollLeft !== container.scrollLeft ||
-        nextScrollTop !== container.scrollTop
-      ) {
+      if (nextScrollLeft !== container.scrollLeft || nextScrollTop !== container.scrollTop) {
         container.scrollTo({
           left: Math.max(nextScrollLeft, 0),
           top: Math.max(nextScrollTop, 0),
@@ -225,8 +227,7 @@ export function GridViewport() {
           tag === "SELECT" ||
           tag === "BUTTON" ||
           tag === "A";
-        const isGridCellTarget =
-          target?.closest?.(".gm-td") || target?.closest?.(".gm-rh");
+        const isGridCellTarget = target?.closest?.(".gm-td") || target?.closest?.(".gm-rh");
 
         if (!isInteractive && !(isFormulaEditing && isGridCellTarget)) {
           viewportRef.current?.focus({ preventScroll: true });

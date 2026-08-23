@@ -71,7 +71,8 @@ export function FilterMenu({
     return query ? values.filter((value) => value.toLowerCase().includes(query)) : values;
   }, [search, values]);
 
-  const allValuesSelected = draft.size > 0 && values.length > 0 && values.every((value) => draft.has(value));
+  const allValuesSelected =
+    draft.size > 0 && values.length > 0 && values.every((value) => draft.has(value));
   const allVisibleSelected =
     visibleValues.length > 0 && visibleValues.every((value) => draft.has(value));
 
@@ -157,7 +158,9 @@ export function FilterMenu({
               <button
                 key={value || "__empty__"}
                 type="button"
-                className={["gm-menu-check-row", checked ? "is-current" : ""].filter(Boolean).join(" ")}
+                className={["gm-menu-check-row", checked ? "is-current" : ""]
+                  .filter(Boolean)
+                  .join(" ")}
                 onClick={() => {
                   setDraft((prev) => {
                     const next = new Set(prev);
@@ -167,7 +170,11 @@ export function FilterMenu({
                   });
                 }}
               >
-                <span className={["gm-menu-check", checked ? "is-checked" : ""].filter(Boolean).join(" ")}>
+                <span
+                  className={["gm-menu-check", checked ? "is-checked" : ""]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
                   {checked ? <Check style={{ width: 10, height: 10 }} /> : null}
                 </span>
                 <span className="gm-menu-check-label">{value || "(empty)"}</span>

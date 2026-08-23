@@ -1,9 +1,6 @@
 import React from "react";
 import { DEFAULT_ROW_NUMBER_WIDTH, Z_INDEX } from "../core/constants";
-import {
-  getEffectiveVerticalAlign,
-  getEffectiveWrapText,
-} from "../core/features/formatting";
+import { getEffectiveVerticalAlign, getEffectiveWrapText } from "../core/features/formatting";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
 import {
   isCellActive,
@@ -164,7 +161,12 @@ export function GridBody() {
     : displayRows;
 
   const openCellContextMenu = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>, rowIndex: number, colIndex: number, columnKey: string) => {
+    (
+      event: React.MouseEvent<HTMLElement>,
+      rowIndex: number,
+      colIndex: number,
+      columnKey: string
+    ) => {
       if (!enableInsertRow && !enableInsertColumn && !enableDeleteRow && !enableDeleteColumn) {
         return;
       }
@@ -276,34 +278,33 @@ export function GridBody() {
               {rowIndex + 1}
             </td>
 
-              {visibleColumns.map((column, colIndex: number) => {
-                const isFrozen = colIndex < frozenColumns;
-                const width = getColumnWidth(column, columnWidths);
-                const selected = isCellSelected(selection, rowIndex, colIndex);
-                const active = isCellActive(selection, rowIndex, colIndex);
-                const preview = isPreviewCell(rowIndex, colIndex);
-                const showFillHandle = isFillHandleCell(rowIndex, colIndex);
-                const metaKey = createCellMetaKey(sourceRowIndex, column.key);
-                const historyCellMeta = cellMetaMap[metaKey];
-                const dynamicCellMeta = props.getCellMeta?.(row, sourceRowIndex, column.key);
-                const cellMeta =
-                  historyCellMeta || dynamicCellMeta
-                    ? {
-                        ...(historyCellMeta ?? {}),
-                        ...(dynamicCellMeta ?? {}),
-                        style: {
-                          ...(historyCellMeta?.style ?? {}),
-                          ...(dynamicCellMeta?.style ?? {}),
-                        },
-                      }
-                    : undefined;
-                const isMetaReadonly = Boolean(cellMeta?.readonly);
-                const isReadonly = Boolean(column.readonly || isMetaReadonly || isRowReadonly);
-                const shouldWrap = getEffectiveWrapText(cellMeta, column);
-                const backgroundColor =
-                active
-                  ? "#ffffff"
-                  : selected
+            {visibleColumns.map((column, colIndex: number) => {
+              const isFrozen = colIndex < frozenColumns;
+              const width = getColumnWidth(column, columnWidths);
+              const selected = isCellSelected(selection, rowIndex, colIndex);
+              const active = isCellActive(selection, rowIndex, colIndex);
+              const preview = isPreviewCell(rowIndex, colIndex);
+              const showFillHandle = isFillHandleCell(rowIndex, colIndex);
+              const metaKey = createCellMetaKey(sourceRowIndex, column.key);
+              const historyCellMeta = cellMetaMap[metaKey];
+              const dynamicCellMeta = props.getCellMeta?.(row, sourceRowIndex, column.key);
+              const cellMeta =
+                historyCellMeta || dynamicCellMeta
+                  ? {
+                      ...(historyCellMeta ?? {}),
+                      ...(dynamicCellMeta ?? {}),
+                      style: {
+                        ...(historyCellMeta?.style ?? {}),
+                        ...(dynamicCellMeta?.style ?? {}),
+                      },
+                    }
+                  : undefined;
+              const isMetaReadonly = Boolean(cellMeta?.readonly);
+              const isReadonly = Boolean(column.readonly || isMetaReadonly || isRowReadonly);
+              const shouldWrap = getEffectiveWrapText(cellMeta, column);
+              const backgroundColor = active
+                ? "#ffffff"
+                : selected
                   ? "#dbeafe"
                   : cellMeta?.backgroundColor || rowBackgroundColor || "#ffffff";
               const verticalAlign = getEffectiveVerticalAlign(cellMeta);
@@ -323,28 +324,26 @@ export function GridBody() {
                   ]
                     .filter(Boolean)
                     .join(" ")}
-                  onMouseDown={(e) =>
-                    {
-                      if (isFormulaEditing) {
-                        e.preventDefault();
-                        setSelection((prev) => setActiveCell(prev, { row: rowIndex, col: colIndex }));
-                        insertFormulaReference(rowIndex, colIndex);
-                        return;
-                      }
-
-                      if (formatPainterMode !== "idle") {
-                        e.preventDefault();
-                        paintFormatAtCell(rowIndex, colIndex);
-                        return;
-                      }
-
-                      onCellMouseDown(rowIndex, colIndex, {
-                        shiftKey: e.shiftKey,
-                        ctrlKey: e.ctrlKey,
-                        metaKey: e.metaKey,
-                      });
+                  onMouseDown={(e) => {
+                    if (isFormulaEditing) {
+                      e.preventDefault();
+                      setSelection((prev) => setActiveCell(prev, { row: rowIndex, col: colIndex }));
+                      insertFormulaReference(rowIndex, colIndex);
+                      return;
                     }
-                  }
+
+                    if (formatPainterMode !== "idle") {
+                      e.preventDefault();
+                      paintFormatAtCell(rowIndex, colIndex);
+                      return;
+                    }
+
+                    onCellMouseDown(rowIndex, colIndex, {
+                      shiftKey: e.shiftKey,
+                      ctrlKey: e.ctrlKey,
+                      metaKey: e.metaKey,
+                    });
+                  }}
                   onMouseEnter={() => {
                     onCellMouseEnter(rowIndex, colIndex);
                     onFillMouseEnter(rowIndex, colIndex);
@@ -358,7 +357,9 @@ export function GridBody() {
                     maxWidth: width,
                     height: shouldWrap ? undefined : rowHeight,
                     position: isFrozen ? "sticky" : undefined,
-                    left: isFrozen ? DEFAULT_ROW_NUMBER_WIDTH + (colOffsets[column.key] ?? 0) : undefined,
+                    left: isFrozen
+                      ? DEFAULT_ROW_NUMBER_WIDTH + (colOffsets[column.key] ?? 0)
+                      : undefined,
                     zIndex: isFrozen ? Z_INDEX.FROZEN_CELL : undefined,
                     background: backgroundColor,
                     borderRight: "1px solid #e2e8f0",
@@ -368,20 +369,14 @@ export function GridBody() {
                     textOverflow: shouldWrap ? "clip" : "ellipsis",
                     whiteSpace: shouldWrap ? "normal" : "nowrap",
                     verticalAlign,
-                    boxShadow:
-                      active
-                        ? "inset 0 0 0 2px #2563eb"
-                        : isFrozen && colIndex === frozenColumns - 1
+                    boxShadow: active
+                      ? "inset 0 0 0 2px #2563eb"
+                      : isFrozen && colIndex === frozenColumns - 1
                         ? "3px 0 8px rgba(15, 23, 42, 0.08)"
                         : undefined,
                     color: isReadonly ? "#64748b" : "#0f172a",
                     fontSize: 12,
-                    cursor:
-                      formatPainterMode !== "idle"
-                        ? "copy"
-                        : isReadonly
-                        ? "default"
-                        : "cell",
+                    cursor: formatPainterMode !== "idle" ? "copy" : isReadonly ? "default" : "cell",
                     ...(cellMeta?.style ?? {}),
                   }}
                 >

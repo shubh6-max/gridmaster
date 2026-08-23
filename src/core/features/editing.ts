@@ -1,9 +1,4 @@
-import type {
-  GridCellChangeEvent,
-  GridResolvedColumnDef,
-  GridRow,
-  GridSnapshot,
-} from "../types";
+import type { GridCellChangeEvent, GridResolvedColumnDef, GridRow, GridSnapshot } from "../types";
 import {
   cloneCellMetaMap,
   cloneRowMetaMap,
@@ -18,22 +13,14 @@ import {
    Row helpers
    ========================================================= */
 
-export function updateRowAt<T extends GridRow>(
-  rows: T[],
-  rowIndex: number,
-  nextRow: T
-): T[] {
+export function updateRowAt<T extends GridRow>(rows: T[], rowIndex: number, nextRow: T): T[] {
   if (rowIndex < 0 || rowIndex >= rows.length) return rows;
   const next = [...rows];
   next[rowIndex] = nextRow;
   return next;
 }
 
-export function insertRowAt<T extends GridRow>(
-  rows: T[],
-  rowIndex: number,
-  newRow: T
-): T[] {
+export function insertRowAt<T extends GridRow>(rows: T[], rowIndex: number, newRow: T): T[] {
   const next = [...rows];
   const safeIndex = Math.max(0, Math.min(rowIndex, next.length));
   next.splice(safeIndex, 0, newRow);
@@ -293,7 +280,5 @@ export function createMultipleEmptyRows<T extends GridRow>(
   columns: GridResolvedColumnDef<T>[],
   defaults?: Partial<T>
 ): T[] {
-  return Array.from({ length: Math.max(0, count) }, () =>
-    createEmptyRow(columns, defaults)
-  );
+  return Array.from({ length: Math.max(0, count) }, () => createEmptyRow(columns, defaults));
 }

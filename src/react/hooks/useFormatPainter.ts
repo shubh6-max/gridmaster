@@ -50,11 +50,9 @@ export function useFormatPainter<T extends GridRow = GridRow>({
 }: UseFormatPainterParams<T>) {
   const [formatPainterClipboard, setFormatPainterClipboard] =
     useState<GridFormatPainterClipboard>(null);
-  const [formatPainterMode, setFormatPainterMode] =
-    useState<GridFormatPainterMode>("idle");
+  const [formatPainterMode, setFormatPainterMode] = useState<GridFormatPainterMode>("idle");
 
-  const isFormatPainterActive =
-    formatPainterMode !== "idle" && Boolean(formatPainterClipboard);
+  const isFormatPainterActive = formatPainterMode !== "idle" && Boolean(formatPainterClipboard);
 
   const copyFormat = useCallback(() => {
     const clipboard = copyFormatFromSelection(
@@ -69,13 +67,7 @@ export function useFormatPainter<T extends GridRow = GridRow>({
 
     setFormatPainterClipboard(clipboard);
     return true;
-  }, [
-    displayRowIndexes,
-    displayRows.length,
-    history.present.cellMeta,
-    selection,
-    visibleColumns,
-  ]);
+  }, [displayRowIndexes, displayRows.length, history.present.cellMeta, selection, visibleColumns]);
 
   const stopFormatPainter = useCallback(() => {
     setFormatPainterMode("idle");
@@ -98,24 +90,28 @@ export function useFormatPainter<T extends GridRow = GridRow>({
       if (!formatPainterClipboard) return false;
 
       pushCellMetaHistory(setHistory, (prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: prev.present.rows,
-            columns: prev.present.columns,
-            cellMeta: applyFormatPainterToBounds(
-              prev.present.cellMeta,
-              formatPainterClipboard,
-              bounds,
-              displayRowIndexes,
-              visibleColumns
-            ),
-            rowMeta: prev.present.rowMeta,
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: prev.present.rows,
+              columns: prev.present.columns,
+              cellMeta: applyFormatPainterToBounds(
+                prev.present.cellMeta,
+                formatPainterClipboard,
+                bounds,
+                displayRowIndexes,
+                visibleColumns
+              ),
+              rowMeta: prev.present.rowMeta,
+            },
           },
-        }, {
-          historyLimit,
-          preserveRowReferences,
-        })
+          {
+            historyLimit,
+            preserveRowReferences,
+          }
+        )
       );
 
       if (bounds.startRow === bounds.endRow && bounds.startCol === bounds.endCol) {

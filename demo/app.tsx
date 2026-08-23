@@ -35,17 +35,92 @@ import "./demo.css";
 /*  Data constants                                                     */
 /* ------------------------------------------------------------------ */
 
-const CORP = ["Helios","Nova","Atlas","Vantage","Quanta","Meridian","Orbital","Lumen","Falcon","Solstice","Vertex","Harbor","Cobalt","Prism","Tundra","Ember","Zenith","Alpine","Ironbridge","Cascade"] as const;
-const SUFFIX = ["Pharma","Retail","Industries","Capital","Health","Logistics","Energy","Group","Tech","Mobility"] as const;
-const INDUSTRIES = ["Pharmaceuticals","Retail","Consumer Goods","Manufacturing","Financial Services","Healthcare","Energy","Technology"] as const;
-const REGIONS = ["US","LATAM","EU","APAC","Middle-east","ROW"] as const;
-const BIZ_UNITS = ["Commercial","Consumer","Finance","Manufacturing","Market access","Marketing","Medical affairs","Operations","Revenue","Supply Chain"] as const;
-const OWNERS = ["Shashank K","Ayush J","Pradeep V","Prashanth S","Andy S","Srilekha K","Chandler J","Indu S","Pawan V","Pradipt D","Vedant P","William D","Abhinav S","Jayeeta S"] as const;
-const STATUSES = ["Stakeholder","DND","M1 generated","Grey Response","Unsubscribe"] as const;
-const HEALTH = ["On track","At risk","Off track"] as const;
+const CORP = [
+  "Helios",
+  "Nova",
+  "Atlas",
+  "Vantage",
+  "Quanta",
+  "Meridian",
+  "Orbital",
+  "Lumen",
+  "Falcon",
+  "Solstice",
+  "Vertex",
+  "Harbor",
+  "Cobalt",
+  "Prism",
+  "Tundra",
+  "Ember",
+  "Zenith",
+  "Alpine",
+  "Ironbridge",
+  "Cascade",
+] as const;
+const SUFFIX = [
+  "Pharma",
+  "Retail",
+  "Industries",
+  "Capital",
+  "Health",
+  "Logistics",
+  "Energy",
+  "Group",
+  "Tech",
+  "Mobility",
+] as const;
+const INDUSTRIES = [
+  "Pharmaceuticals",
+  "Retail",
+  "Consumer Goods",
+  "Manufacturing",
+  "Financial Services",
+  "Healthcare",
+  "Energy",
+  "Technology",
+] as const;
+const REGIONS = ["US", "LATAM", "EU", "APAC", "Middle-east", "ROW"] as const;
+const BIZ_UNITS = [
+  "Commercial",
+  "Consumer",
+  "Finance",
+  "Manufacturing",
+  "Market access",
+  "Marketing",
+  "Medical affairs",
+  "Operations",
+  "Revenue",
+  "Supply Chain",
+] as const;
+const OWNERS = [
+  "Shashank K",
+  "Ayush J",
+  "Pradeep V",
+  "Prashanth S",
+  "Andy S",
+  "Srilekha K",
+  "Chandler J",
+  "Indu S",
+  "Pawan V",
+  "Pradipt D",
+  "Vedant P",
+  "William D",
+  "Abhinav S",
+  "Jayeeta S",
+] as const;
+const STATUSES = ["Stakeholder", "DND", "M1 generated", "Grey Response", "Unsubscribe"] as const;
+const HEALTH = ["On track", "At risk", "Off track"] as const;
 
-const HEALTH_TINT: Record<string, string> = { "On track": "#E5F5EA", "At risk": "#FEF1DB", "Off track": "#FEE2E2" };
-const HEALTH_SWATCH: Record<string, string> = { "On track": "#17A34A", "At risk": "#D97706", "Off track": "#DC2626" };
+const HEALTH_TINT: Record<string, string> = {
+  "On track": "#E5F5EA",
+  "At risk": "#FEF1DB",
+  "Off track": "#FEE2E2",
+};
+const HEALTH_SWATCH: Record<string, string> = {
+  "On track": "#17A34A",
+  "At risk": "#D97706",
+  "Off track": "#DC2626",
+};
 
 const NOTES = [
   "Strategic account — priority outreach scheduled.",
@@ -105,8 +180,11 @@ function buildRows(count: number): DemoRow[] {
     const health = roll < 0.55 ? "On track" : roll < 0.85 ? "At risk" : "Off track";
     const spend =
       Math.round(
-        (health === "On track" ? 40 + rng() * 160 : health === "At risk" ? 15 + rng() * 80 : 5 + rng() * 30) *
-          10,
+        (health === "On track"
+          ? 40 + rng() * 160
+          : health === "At risk"
+            ? 15 + rng() * 80
+            : 5 + rng() * 30) * 10
       ) / 10;
     const account = `${pick(CORP, rng)} ${pick(SUFFIX, rng)}`;
     rows.push({
@@ -135,15 +213,69 @@ function buildRows(count: number): DemoRow[] {
 const createColumn = createColumnFactory<DemoRow>();
 
 const columns = [
-  createColumn.text("account", { title: "Account", frozen: true, width: 190, sortable: true, filterable: true }),
-  createColumn.select("industry", { title: "Industry", options: [...INDUSTRIES], width: 160, sortable: true, filterable: true }),
-  createColumn.select("region", { title: "Region", options: [...REGIONS], filterOptions: [...REGIONS], width: 120, sortable: true, filterable: true }),
-  createColumn.select("businessUnit", { title: "Business unit", options: [...BIZ_UNITS], width: 170, sortable: true, filterable: true }),
-  createColumn.select("owner", { title: "Owner", options: [...OWNERS], width: 150, sortable: true, filterable: true }),
-  createColumn.select("status", { title: "Status", options: [...STATUSES], filterOptions: [...STATUSES], width: 140, sortable: true, filterable: true }),
-  createColumn.text("health", { title: "Health", readonly: true, filterable: true, sortable: true, width: 115 }),
-  createColumn.number("spend", { title: "Annual spend ($M)", width: 155, sortable: true, filterable: true }),
-  createColumn.date("lastEngagement", { title: "Last engagement", width: 140, sortable: true, filterable: true }),
+  createColumn.text("account", {
+    title: "Account",
+    frozen: true,
+    width: 190,
+    sortable: true,
+    filterable: true,
+  }),
+  createColumn.select("industry", {
+    title: "Industry",
+    options: [...INDUSTRIES],
+    width: 160,
+    sortable: true,
+    filterable: true,
+  }),
+  createColumn.select("region", {
+    title: "Region",
+    options: [...REGIONS],
+    filterOptions: [...REGIONS],
+    width: 120,
+    sortable: true,
+    filterable: true,
+  }),
+  createColumn.select("businessUnit", {
+    title: "Business unit",
+    options: [...BIZ_UNITS],
+    width: 170,
+    sortable: true,
+    filterable: true,
+  }),
+  createColumn.select("owner", {
+    title: "Owner",
+    options: [...OWNERS],
+    width: 150,
+    sortable: true,
+    filterable: true,
+  }),
+  createColumn.select("status", {
+    title: "Status",
+    options: [...STATUSES],
+    filterOptions: [...STATUSES],
+    width: 140,
+    sortable: true,
+    filterable: true,
+  }),
+  createColumn.text("health", {
+    title: "Health",
+    readonly: true,
+    filterable: true,
+    sortable: true,
+    width: 115,
+  }),
+  createColumn.number("spend", {
+    title: "Annual spend ($M)",
+    width: 155,
+    sortable: true,
+    filterable: true,
+  }),
+  createColumn.date("lastEngagement", {
+    title: "Last engagement",
+    width: 140,
+    sortable: true,
+    filterable: true,
+  }),
   createColumn.link("email", { title: "Email", width: 210 }),
   createColumn.text("notes", { title: "Notes", width: 220 }),
 ];
@@ -193,12 +325,16 @@ export default function App() {
 
   const getCellMeta = React.useCallback(
     (row: DemoRow, _idx: number, key: string): GridCellMeta | undefined => {
-      if (key === "health") return { backgroundColor: HEALTH_TINT[row.health] ?? undefined, horizontalAlign: "center" as const };
+      if (key === "health")
+        return {
+          backgroundColor: HEALTH_TINT[row.health] ?? undefined,
+          horizontalAlign: "center" as const,
+        };
       if (key === "spend") return { horizontalAlign: "right" as const };
       if (key === "notes") return { wrap: true };
       return undefined;
     },
-    [],
+    []
   );
 
   const getRowMeta = React.useCallback((row: DemoRow) => {
@@ -210,19 +346,26 @@ export default function App() {
   const resolveColorOptions = React.useCallback(
     (key: string, filters: GridFilters, colorFilters: GridColorFilters) => {
       if (key !== "health") return [];
-      return getFilteredColorOptionsForColumn(rows, resolvedColumns, "health", filters, colorFilters).map(
-        (o) => ({
-          value: o.value,
-          label: o.value,
-          count: o.count,
-          swatch: HEALTH_SWATCH[o.value] ?? null,
-        }),
-      );
+      return getFilteredColorOptionsForColumn(
+        rows,
+        resolvedColumns,
+        "health",
+        filters,
+        colorFilters
+      ).map((o) => ({
+        value: o.value,
+        label: o.value,
+        count: o.count,
+        swatch: HEALTH_SWATCH[o.value] ?? null,
+      }));
     },
-    [rows, resolvedColumns],
+    [rows, resolvedColumns]
   );
 
-  const getColorSourceColumnKey = React.useCallback((key: string) => (key === "health" ? "health" : null), []);
+  const getColorSourceColumnKey = React.useCallback(
+    (key: string) => (key === "health" ? "health" : null),
+    []
+  );
   const isColorMenuEnabled = React.useCallback((key: string) => key === "health", []);
 
   const handleSave = React.useCallback(() => {
@@ -292,7 +435,8 @@ export default function App() {
     }
   }, [conditionalFormatEnabled, highSpendCondition, lowSpendCondition]);
 
-  const rowKind = preset === "compact" ? "Compact" : preset === "readonly" ? "Read-only" : "Editable";
+  const rowKind =
+    preset === "compact" ? "Compact" : preset === "readonly" ? "Read-only" : "Editable";
 
   return (
     <div className="demo-shell">
@@ -398,17 +542,23 @@ export default function App() {
           <span className="dot dot-on" aria-hidden="true" /> virtualized
         </span>
         <span className="demo-chip">
-          <span className={`dot ${viewState.sort ? "dot-on" : ""}`} aria-hidden="true" /> sort {viewState.sort ? "on" : "off"}
+          <span className={`dot ${viewState.sort ? "dot-on" : ""}`} aria-hidden="true" /> sort{" "}
+          {viewState.sort ? "on" : "off"}
         </span>
         <span className="demo-chip">
           <span className={`dot ${viewState.filters ? "dot-on" : ""}`} aria-hidden="true" />{" "}
           {viewState.filters} filter{viewState.filters === 1 ? "" : "s"}
         </span>
         <span className="demo-chip">
-          <span className={`dot ${viewState.colorSort ? "dot-signal" : ""}`} aria-hidden="true" /> color {viewState.colorSort ? viewState.colorSort.split(":")[1] : "sort off"}
+          <span className={`dot ${viewState.colorSort ? "dot-signal" : ""}`} aria-hidden="true" />{" "}
+          color {viewState.colorSort ? viewState.colorSort.split(":")[1] : "sort off"}
         </span>
         <span className="demo-chip">
-          <span className={`dot ${viewState.colorFilters ? "dot-signal" : ""}`} aria-hidden="true" /> {viewState.colorFilters} color
+          <span
+            className={`dot ${viewState.colorFilters ? "dot-signal" : ""}`}
+            aria-hidden="true"
+          />{" "}
+          {viewState.colorFilters} color
         </span>
         <span className="demo-chip">
           <span className="dot dot-on" aria-hidden="true" /> {rowKind}

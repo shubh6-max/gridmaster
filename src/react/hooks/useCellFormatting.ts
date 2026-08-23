@@ -90,18 +90,22 @@ export function useCellFormatting<T extends GridRow = GridRow>({
   const pushCellMetaHistory = useCallback(
     (nextCellMeta: Record<string, GridCellMeta>) => {
       setHistory((prev) =>
-        historyReducer(prev, {
-          type: "PUSH",
-          payload: {
-            rows: prev.present.rows,
-            columns: prev.present.columns,
-            cellMeta: nextCellMeta,
-            rowMeta: prev.present.rowMeta,
+        historyReducer(
+          prev,
+          {
+            type: "PUSH",
+            payload: {
+              rows: prev.present.rows,
+              columns: prev.present.columns,
+              cellMeta: nextCellMeta,
+              rowMeta: prev.present.rowMeta,
+            },
           },
-        }, {
-          historyLimit,
-          preserveRowReferences,
-        })
+          {
+            historyLimit,
+            preserveRowReferences,
+          }
+        )
       );
 
       focusViewport();
@@ -124,13 +128,7 @@ export function useCellFormatting<T extends GridRow = GridRow>({
         )
       );
     },
-    [
-      bounds,
-      displayRowIndexes,
-      history.present.cellMeta,
-      pushCellMetaHistory,
-      visibleColumns,
-    ]
+    [bounds, displayRowIndexes, history.present.cellMeta, pushCellMetaHistory, visibleColumns]
   );
 
   const applyMetaPatch = useCallback(
@@ -147,13 +145,7 @@ export function useCellFormatting<T extends GridRow = GridRow>({
         )
       );
     },
-    [
-      bounds,
-      displayRowIndexes,
-      history.present.cellMeta,
-      pushCellMetaHistory,
-      visibleColumns,
-    ]
+    [bounds, displayRowIndexes, history.present.cellMeta, pushCellMetaHistory, visibleColumns]
   );
 
   const applyMetaTransform = useCallback(
@@ -170,13 +162,7 @@ export function useCellFormatting<T extends GridRow = GridRow>({
         )
       );
     },
-    [
-      bounds,
-      displayRowIndexes,
-      history.present.cellMeta,
-      pushCellMetaHistory,
-      visibleColumns,
-    ]
+    [bounds, displayRowIndexes, history.present.cellMeta, pushCellMetaHistory, visibleColumns]
   );
 
   const wrapEnabled = summary.wrapText === true;

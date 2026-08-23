@@ -123,8 +123,7 @@ export function applyFormatPainterToBounds<T extends GridRow>(
       const patternRow = (displayRow - targetBounds.startRow) % Math.max(painter.rows, 1);
       const patternCol = (colIndex - targetBounds.startCol) % Math.max(painter.cols, 1);
       const formatMeta =
-        painter.meta[createCellMetaKey(patternRow, String(patternCol))] ??
-        normalizeFormatMeta();
+        painter.meta[createCellMetaKey(patternRow, String(patternCol))] ?? normalizeFormatMeta();
       const targetKey = createCellMetaKey(sourceRowIndex, column.key);
       const currentMeta = nextMetaMap[targetKey] ?? {};
 

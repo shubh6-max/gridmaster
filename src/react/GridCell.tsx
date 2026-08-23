@@ -25,7 +25,9 @@ type GridCellProps<T extends GridRow = GridRow> = {
   baseMeta?: GridCellMeta;
 };
 
-function getVerticalJustify(verticalAlign: "top" | "middle" | "bottom"): React.CSSProperties["justifyContent"] {
+function getVerticalJustify(
+  verticalAlign: "top" | "middle" | "bottom"
+): React.CSSProperties["justifyContent"] {
   switch (verticalAlign) {
     case "top":
       return "flex-start";
@@ -202,12 +204,12 @@ export function GridCell<T extends GridRow = GridRow>({
     };
 
     return (
-      <div
-        className={wrapperClassName}
-        style={wrapperStyle}
-        title={cellError ?? undefined}
-      >
-        {column.renderEditor ? <>{column.renderEditor(editorProps)}</> : <DefaultEditor {...editorProps} />}
+      <div className={wrapperClassName} style={wrapperStyle} title={cellError ?? undefined}>
+        {column.renderEditor ? (
+          <>{column.renderEditor(editorProps)}</>
+        ) : (
+          <DefaultEditor {...editorProps} />
+        )}
         {cellError ? <span className="gm-cell-error-indicator" aria-label={cellError} /> : null}
       </div>
     );
@@ -247,7 +249,11 @@ export function GridCell<T extends GridRow = GridRow>({
           .join(" ")}
         style={contentStyle}
       >
-        {column.renderCell ? <>{column.renderCell(rendererProps)}</> : <DefaultRenderer {...rendererProps} />}
+        {column.renderCell ? (
+          <>{column.renderCell(rendererProps)}</>
+        ) : (
+          <DefaultRenderer {...rendererProps} />
+        )}
       </div>
       {cellError ? <span className="gm-cell-error-indicator" aria-label={cellError} /> : null}
     </div>

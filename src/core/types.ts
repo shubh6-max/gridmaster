@@ -14,14 +14,7 @@ export type GridPrimitive = string | number | boolean | null | undefined | Date;
 
 export type GridCellValue = GridPrimitive | Record<string, any> | any[];
 
-export type GridColumnType =
-  | "text"
-  | "number"
-  | "select"
-  | "checkbox"
-  | "link"
-  | "date"
-  | "custom";
+export type GridColumnType = "text" | "number" | "select" | "checkbox" | "link" | "date" | "custom";
 
 export type GridMode = "editable" | "readonly";
 
@@ -325,15 +318,9 @@ export type GridValueFormatter<T extends GridRow = GridRow> = (value: any, row: 
 
 export type GridValueParser<T extends GridRow = GridRow> = (value: any, row: T) => any;
 
-export type GridCellValidator<T extends GridRow = GridRow> = (
-  value: any,
-  row: T
-) => string | null;
+export type GridCellValidator<T extends GridRow = GridRow> = (value: any, row: T) => string | null;
 
-export type GridRowIdGetter<T extends GridRow = GridRow> = (
-  row: T,
-  index: number
-) => string;
+export type GridRowIdGetter<T extends GridRow = GridRow> = (row: T, index: number) => string;
 
 export type GridRowMetaGetter<T extends GridRow = GridRow> = (
   row: T,
@@ -609,8 +596,14 @@ export type GridCreateColumnOptions<T extends GridRow = GridRow> = Omit<
 >;
 
 export type GridColumnFactory<T extends GridRow = GridRow> = {
-  text: (key: string, options?: GridCreateColumnOptions<T> & { title?: string }) => GridColumnDef<T>;
-  number: (key: string, options?: GridCreateColumnOptions<T> & { title?: string }) => GridColumnDef<T>;
+  text: (
+    key: string,
+    options?: GridCreateColumnOptions<T> & { title?: string }
+  ) => GridColumnDef<T>;
+  number: (
+    key: string,
+    options?: GridCreateColumnOptions<T> & { title?: string }
+  ) => GridColumnDef<T>;
   select: (
     key: string,
     options?: GridCreateColumnOptions<T> & {
@@ -623,8 +616,14 @@ export type GridColumnFactory<T extends GridRow = GridRow> = {
     key: string,
     options?: GridCreateColumnOptions<T> & { title?: string }
   ) => GridColumnDef<T>;
-  link: (key: string, options?: GridCreateColumnOptions<T> & { title?: string }) => GridColumnDef<T>;
-  date: (key: string, options?: GridCreateColumnOptions<T> & { title?: string }) => GridColumnDef<T>;
+  link: (
+    key: string,
+    options?: GridCreateColumnOptions<T> & { title?: string }
+  ) => GridColumnDef<T>;
+  date: (
+    key: string,
+    options?: GridCreateColumnOptions<T> & { title?: string }
+  ) => GridColumnDef<T>;
   custom: (
     key: string,
     options?: GridCreateColumnOptions<T> & { title?: string }
