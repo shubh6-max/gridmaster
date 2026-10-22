@@ -7103,5 +7103,5273 @@
   "formula": "=DOLLAR(1,2,3)",
   "expected": "#VALUE!",
   "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-true-call",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUE()",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-false-call",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FALSE()",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-true-bare-name-still-works",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUE",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-false-bare-name-still-works",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FALSE",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-true-in-if",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=IF(TRUE(),\"y\",\"n\")",
+  "expected": "y",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-false-in-and",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=AND(TRUE(),FALSE())",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-true-plus-one",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUE()+1",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-false-times-five",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FALSE()*5",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-false-under-not",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NOT(FALSE())",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-true-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUE(1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-false-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FALSE(1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-xor-doc-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(3>0,2<9)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-xor-doc-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(3>12,4>6)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-xor-doc-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(3>12,4<6)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-xor-one-true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(TRUE)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-one-false",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(FALSE)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-three-true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(TRUE,TRUE,TRUE)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-four-true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(TRUE,TRUE,TRUE,TRUE)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-numbers-one-nonzero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(1,0)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-numbers-all-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(0,0)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-numbers-two-nonzero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(2,3)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-negative-is-true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(-1,0)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-range-odd",
+  "auditId": null,
+  "grid": [
+   [
+    true
+   ],
+   [
+    false
+   ],
+   [
+    true
+   ],
+   [
+    true
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1:A4)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-range-even",
+  "auditId": null,
+  "grid": [
+   [
+    true
+   ],
+   [
+    true
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1:A2)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-range-skips-text-and-blanks",
+  "auditId": null,
+  "grid": [
+   [
+    true
+   ],
+   [
+    "x"
+   ],
+   [
+    null
+   ],
+   [
+    false
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1:A4)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-range-no-logical-values",
+  "auditId": null,
+  "grid": [
+   [
+    "x"
+   ],
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-range-2d-numbers",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    0
+   ],
+   [
+    0,
+    0
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1:B2)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-range-2d-two",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    0
+   ],
+   [
+    2,
+    0
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1:B2)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-range-and-scalar",
+  "auditId": null,
+  "grid": [
+   [
+    true
+   ],
+   [
+    false
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1:A2,TRUE)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-cell-text-skipped",
+  "auditId": null,
+  "grid": [
+   [
+    "abc",
+    true
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1,B1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-cell-blank",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XOR(A1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(1/0,TRUE)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-typed-text-true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(\"TRUE\",FALSE)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (least certain: implementation choice, not checked against Excel)"
+ },
+ {
+  "id": "gc1e-xor-typed-text-false-any-case",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(\"false\",TRUE)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (least certain: implementation choice, not checked against Excel)"
+ },
+ {
+  "id": "gc1e-xor-typed-text-other",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-typed-empty-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR(\"\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-xor-no-arguments",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XOR()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-doc-dd-mon-yyyy",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"22-MAY-2011\")=DATE(2011,5,22)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-datevalue-doc-us-slash",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"8/22/2011\")=DATE(2011,8,22)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-datevalue-doc-year-first-slash",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2011/02/23\")=DATE(2011,2,23)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-datevalue-iso",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2024-01-15\")=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-iso-single-digits",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2024-1-5\")=DATE(2024,1,5)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-iso-with-time-dropped",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2024-01-15 14:30\")=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-iso-t-time-dropped",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2024-01-15T08:15:30\")=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-us-with-time-dropped",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"1/15/2024 2:30 PM\")=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-month-name-first",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"Jan 15, 2024\")=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-month-name-first-full",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"January 15 2024\")=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-day-first-spaces",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"15 January 2024\")=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-day-first-short-month",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"5 Sep 2024\")=DATE(2024,9,5)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-sept-spelling",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"5 Sept 2024\")=DATE(2024,9,5)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-leap-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2024-02-29\")=DATE(2024,2,29)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-us-first-is-month",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"3/4/2024\")=DATE(2024,3,4)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (least certain: implementation choice, not checked against Excel)"
+ },
+ {
+  "id": "gc1e-datevalue-leap-day-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAY(DATEVALUE(\"2024-02-29\"))",
+  "expected": 29,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-from-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-03-10"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=DAY(DATEVALUE(A1))",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-not-a-day-in-feb",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2024-02-30\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-not-a-leap-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2023-02-29\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-month-13",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"13/45/2024\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-month-13-iso",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2024-13-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"hello\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-loose-number-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"1\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-loose-word-and-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"abc 1\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-time-only",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"14:30\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-unknown-month-name",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"Foo 15, 2024\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-two-letter-month-name",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"Ma 15, 2024\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(45000)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-date-value-not-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(DATE(2024,1,15))",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-datevalue-blank-cell",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=DATEVALUE(A1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-15"
+   ],
+   [
+    "2024-01-16"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=DATEVALUE(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-datevalue-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-datevalue-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(\"2024-01-15\",1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-datevalue-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEVALUE(1/0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-datevalue-result-is-local-midnight",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(DATEVALUE(\"2024-01-15\"))",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-timevalue-doc-2-24-am",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"2:24 AM\")",
+  "expected": 8640000,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-timevalue-doc-with-date",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"22-Aug-2011 6:35 AM\")",
+  "expected": 23700000,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-timevalue-noon-24h",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"12:00\")",
+  "expected": 43200000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-midnight-am",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"12:00 AM\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-noon-pm",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"12:00 PM\")",
+  "expected": 43200000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-one-pm",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"1:00 PM\")",
+  "expected": 46800000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-last-second-12h",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"11:59:59 PM\")",
+  "expected": 86399000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-last-second-24h",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"23:59:59\")",
+  "expected": 86399000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-seconds",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"9:05:07\")",
+  "expected": 32707000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-lowercase-meridiem",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"9:05 pm\")",
+  "expected": 75900000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-space-before-meridiem-optional",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"9:05PM\")",
+  "expected": 75900000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-hour-only-with-meridiem",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"2 PM\")",
+  "expected": 50400000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-padded",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"  9:05  \")",
+  "expected": 32700000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-iso-date-time",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"2024-01-15 14:30\")",
+  "expected": 52200000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-iso-t-separator",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"2024-01-15T08:15:30\")",
+  "expected": 29730000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-us-date-time",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"1/15/2024 2:30 PM\")",
+  "expected": 52200000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-fractional-seconds-dropped",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"9:05:07.9\")",
+  "expected": 32707000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-date-only-is-midnight",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"2024-01-15\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-hour-13-with-pm",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"13:00 PM\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-hour-0-with-am",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"0:30 AM\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-hour-24",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"24:00\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-minute-60",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"12:60\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-second-60",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"12:30:60\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-bad-date-prefix",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"2024-02-30 10:00\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-bare-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"5\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(\"\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE(0.5)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-from-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "6:45 PM"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TIMEVALUE(A1)",
+  "expected": 67500000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-timevalue-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIMEVALUE()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-timevalue-range",
+  "auditId": null,
+  "grid": [
+   [
+    "6:45 PM"
+   ],
+   [
+    "7:00 PM"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TIMEVALUE(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-timevalue-into-hour",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(TIMEVALUE(\"6:45 PM\"))",
+  "expected": 18,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-time-doc-noon",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(12,0,0)",
+  "expected": 43200000,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-time-doc-16-48-10",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(16,48,10)",
+  "expected": 60490000,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-time-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(0,0,0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-last-second",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(23,59,59)",
+  "expected": 86399000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-hours-wrap",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(27,0,0)",
+  "expected": 10800000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-hours-24",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(24,0,0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-minutes-carry",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(0,750,0)",
+  "expected": 45000000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-seconds-carry",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(0,0,2000)",
+  "expected": 2000000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-mixed-carry",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(1,70,130)",
+  "expected": 7930000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-decimals-cut",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(1.9,0,0)",
+  "expected": 3600000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-decimal-minutes-cut",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(0,30.9,0)",
+  "expected": 1800000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-max-hours",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(32767,0,0)",
+  "expected": 25200000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-numeric-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(\"9\",30,0)",
+  "expected": 34200000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-boolean-true-is-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(TRUE,0,0)",
+  "expected": 3600000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-negative-hour",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(-1,0,0)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-negative-minute",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(0,-1,0)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-negative-second",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(0,0,-1)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-hour-too-big",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(32768,0,0)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-text-hour",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(\"a\",0,0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(1/0,0,0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-from-cells",
+  "auditId": null,
+  "grid": [
+   [
+    9,
+    30,
+    15
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TIME(A1,B1,C1)",
+  "expected": 34215000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-blank-cell-is-0",
+  "auditId": null,
+  "grid": [
+   [
+    null,
+    5
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TIME(A1,B1,0)",
+  "expected": 300000,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-time-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-time-four-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TIME(1,2,3,4)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-time-range",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TIME(A1:A2,0,0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-time-added-to-date-reads-back-hour",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(DATE(2024,1,15)+TIME(9,30,0))",
+  "expected": 9,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-time-added-to-date-reads-back-minute",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(DATE(2024,1,15)+TIME(9,30,0))",
+  "expected": 30,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-time-added-to-date-keeps-the-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(DATE(2024,1,15)+TIME(23,59,59),DATE(2024,1,15))",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-doc-am",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"3:30:30 AM\")",
+  "expected": 3,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-hour-doc-pm",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"3:30:30 PM\")",
+  "expected": 15,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-hour-doc-4-48-18-pm",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"4:48:18 PM\")",
+  "expected": 16,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-minute-doc-4-48-18-pm",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(\"4:48:18 PM\")",
+  "expected": 48,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-second-doc-4-48-18-pm",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND(\"4:48:18 PM\")",
+  "expected": 18,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-hour-midnight-12am",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"12:00 AM\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-noon-12pm",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"12:00 PM\")",
+  "expected": 12,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-last-second",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"23:59:59\")",
+  "expected": 23,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-minute-last-second",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(\"23:59:59\")",
+  "expected": 59,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-second-last-second",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND(\"23:59:59\")",
+  "expected": 59,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-date-alone-is-midnight",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"2024-01-15\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-minute-date-alone-is-midnight",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(\"2024-01-15\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-date-and-time",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"2024-01-15 14:30:15\")",
+  "expected": 14,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-minute-date-and-time",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(\"2024-01-15 14:30:15\")",
+  "expected": 30,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-second-date-and-time",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND(\"2024-01-15 14:30:15\")",
+  "expected": 15,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-second-iso-t",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND(\"2024-01-15T14:30:15\")",
+  "expected": 15,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-time-of-day-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(43200000)",
+  "expected": 12,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-minute-time-of-day-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(45000000)",
+  "expected": 30,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-second-time-of-day-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND(86399000)",
+  "expected": 59,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-just-under-a-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(86399999)",
+  "expected": 23,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-five-and-a-half-hours",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(19800000)",
+  "expected": 5,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-minute-five-and-a-half-hours",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(19800000)",
+  "expected": 30,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-minute-twenty-five-minutes",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(1500000)",
+  "expected": 25,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-from-time-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(TIME(14,30,15))",
+  "expected": 14,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-minute-from-time-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(TIME(14,30,15))",
+  "expected": 30,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-second-from-time-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND(TIME(14,30,15))",
+  "expected": 15,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-timestamp",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(DATE(2024,1,15)+TIME(9,30,45))",
+  "expected": 9,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-minute-timestamp",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(DATE(2024,1,15)+TIME(9,30,45))",
+  "expected": 30,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-second-timestamp",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND(DATE(2024,1,15)+TIME(9,30,45))",
+  "expected": 45,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-date-is-midnight",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(DATE(2024,1,15))",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-numeric-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"43200000\")",
+  "expected": 12,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-true-is-one-ms",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(TRUE)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-hour-bad-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-empty-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(\"\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-minute-bad-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(\"25:99\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-second-bad-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND(\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(1/0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-blank-cell",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HOUR(A1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-minute-blank-cell",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MINUTE(A1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-second-blank-cell",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SECOND(A1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-from-cell-text",
+  "auditId": null,
+  "grid": [
+   [
+    "8:15 PM"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HOUR(A1)",
+  "expected": 20,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-hour-range",
+  "auditId": null,
+  "grid": [
+   [
+    "8:15 PM"
+   ],
+   [
+    "9:00 PM"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HOUR(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-hour-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-minute-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MINUTE(1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-second-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SECOND()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-days-feb-to-mar",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2021-03-15\",\"2021-02-15\")",
+  "expected": 28,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-days-full-year-less-a-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2021-12-31\",\"2021-01-01\")",
+  "expected": 364,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-days-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2021-02-15\",\"2021-03-15\")",
+  "expected": -28,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-leap-february",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-03-01\",\"2024-02-01\")",
+  "expected": 29,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-same-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-01-01\",\"2024-01-01\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-across-new-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2025-01-01\",\"2024-12-31\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-leap-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2025-01-01\",\"2024-01-01\")",
+  "expected": 366,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-hundred-years",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2100-01-01\",\"2000-01-01\")",
+  "expected": 36525,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-time-of-day-ignored",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-01-15 23:00\",\"2024-01-14 01:00\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-later-time-same-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-01-15 23:59\",\"2024-01-15 00:01\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-across-us-dst-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-03-11\",\"2024-03-09\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-across-us-dst-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-11-04\",\"2024-11-02\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-across-eu-dst-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-03-31\",\"2024-03-30\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-date-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(DATE(2024,3,11),DATE(2024,3,9))",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-from-cells",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-01",
+    "2024-02-01"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=DAYS(B1,A1)",
+  "expected": 31,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-date-and-text-mix",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(DATE(2024,1,31),\"2024-01-01\")",
+  "expected": 30,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days-bad-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"abc\",\"2024-01-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-days-bad-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-01-01\",\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-days-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-01-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-days-three-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(\"2024-01-01\",\"2024-01-01\",1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-days-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-02"
+   ],
+   [
+    "2024-01-03"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=DAYS(A1:A2,\"2024-01-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-days-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS(1/0,\"2024-01-01\")",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-weeknum-doc-default",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\")",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-weeknum-doc-monday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",2)",
+  "expected": 11,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-weeknum-jan-1-sunday-start-week-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2012-01-01\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-jan-7-still-week-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2012-01-07\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-jan-8-week-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2012-01-08\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-jan-1-on-sunday-monday-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2012-01-01\",2)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-jan-2-monday-starts-week-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2012-01-02\",2)",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-jan-1-friday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2021-01-01\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-jan-2-saturday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2021-01-02\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-jan-3-sunday-starts-week-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2021-01-03\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-dec-31-is-week-53",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2021-12-31\")",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-dec-31-2024",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2024-12-31\")",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-11",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",11)",
+  "expected": 11,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-12-tuesday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",12)",
+  "expected": 11,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-13-wednesday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",13)",
+  "expected": 11,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-14-thursday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",14)",
+  "expected": 11,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-15-friday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",15)",
+  "expected": 11,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-16-saturday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",16)",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-17-sunday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",17)",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-1-explicit",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",1)",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-21-iso",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",21)",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-21-iso-year-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2012-01-01\",21)",
+  "expected": 52,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-21-iso-week-53",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2021-01-03\",21)",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-21-iso-week-1-of-next-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2024-12-30\",21)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-weeknum-type-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",0)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-weeknum-type-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",3)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-weeknum-type-18",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",18)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-weeknum-type-22",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",22)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-weeknum-type-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",-1)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-weeknum-type-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"3/9/2012\",\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-weeknum-bad-date",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"nope\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-weeknum-date-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(DATE(2012,3,9))",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-weeknum-timestamp-time-ignored",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(DATE(2012,3,9)+TIME(23,59,59))",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-weeknum-from-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "2012-03-09"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WEEKNUM(A1,2)",
+  "expected": 11,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-weeknum-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-weeknum-three-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WEEKNUM(\"2012-03-09\",1,1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-weeknum-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2012-03-09"
+   ],
+   [
+    "2012-03-10"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WEEKNUM(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-isoweeknum-doc",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"3/9/2012\")",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-isoweeknum-sunday-belongs-to-last-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2012-01-01\")",
+  "expected": 52,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-monday-starts-week-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2012-01-02\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-week-53-sunday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2021-01-03\")",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-week-1-monday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2021-01-04\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-dec-30-2024-is-week-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2024-12-30\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-dec-29-2024-is-week-52",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2024-12-29\")",
+  "expected": 52,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-dec-31-2026-thursday-week-53",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2026-12-31\")",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-dec-31-2015-thursday-week-53",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2015-12-31\")",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-jan-3-2016-sunday-week-53",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2016-01-03\")",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-dec-31-2020",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2020-12-31\")",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-dec-30-2019-is-week-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2019-12-30\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-jan-1-2023-sunday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2023-01-01\")",
+  "expected": 52,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-jan-2-2023-monday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2023-01-02\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-leap-day-2024",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2024-02-29\")",
+  "expected": 9,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-mid-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2024-07-04\")",
+  "expected": 27,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-date-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(DATE(2021,1,3))",
+  "expected": 53,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-isoweeknum-bad-date",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"nope\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isoweeknum-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-isoweeknum-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(\"2012-03-09\",2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-isoweeknum-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2012-03-09"
+   ],
+   [
+    "2012-03-10"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISOWEEKNUM(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-networkdays-one-weekday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-15\",\"2024-01-15\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-one-saturday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-13\",\"2024-01-13\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-weekend-only",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-06\",\"2024-01-07\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-january-2024",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\")",
+  "expected": 23,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-one-week",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-07\")",
+  "expected": 5,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-two-weeks",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-14\")",
+  "expected": 10,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-friday-to-monday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-05\",\"2024-01-08\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-monday-to-monday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-02-26\",\"2024-03-04\")",
+  "expected": 6,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-start-on-weekend",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-13\",\"2024-01-19\")",
+  "expected": 5,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-end-on-weekend",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-15\",\"2024-01-20\")",
+  "expected": 5,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-reversed-dates-are-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-31\",\"2024-01-01\")",
+  "expected": -23,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-reversed-one-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-16\",\"2024-01-15\")",
+  "expected": -2,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-long-span",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2000-01-01\",\"2100-01-01\")",
+  "expected": 26090,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-long-span-odd-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2001-03-07\",\"2099-11-20\")",
+  "expected": 25753,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-doc-dates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2012-10-01\",\"2013-03-01\")",
+  "expected": 110,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holiday-on-weekday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",\"2024-01-15\")",
+  "expected": 22,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holiday-on-weekend-ignored",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",\"2024-01-13\")",
+  "expected": 23,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holiday-outside-range-ignored",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",\"2024-02-14\")",
+  "expected": 23,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holiday-on-first-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",\"2024-01-01\")",
+  "expected": 22,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holiday-on-last-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",\"2024-01-31\")",
+  "expected": 22,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-same-holiday-twice-counts-once",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-15"
+   ],
+   [
+    "2024-01-15"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",A1:A2)",
+  "expected": 22,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holidays-in-reversed-range",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-31\",\"2024-01-01\",\"2024-01-15\")",
+  "expected": -22,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-doc-first-holiday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2012-10-01\",\"2013-03-01\",\"2012-11-22\")",
+  "expected": 109,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holiday-with-time-of-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",\"2024-01-15 18:00\")",
+  "expected": 22,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-doc-three-holidays-in-a-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2012-10-01",
+    "2013-03-01",
+    "2012-11-22",
+    "2012-12-04",
+    "2013-01-21"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(A1,B1,C1:E1)",
+  "expected": 107,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holiday-range-skips-blanks",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-01",
+    "2024-01-31",
+    null,
+    "2024-01-15",
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(A1,B1,C1:E1)",
+  "expected": 22,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-holiday-range-column",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-15"
+   ],
+   [
+    "2024-01-16"
+   ],
+   [
+    "2024-01-17"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",A1:A3)",
+  "expected": 20,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-single-holiday-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-15"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",A1)",
+  "expected": 22,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-dates-from-date-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(DATE(2024,1,1),DATE(2024,1,31))",
+  "expected": 23,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-networkdays-bad-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"abc\",\"2024-01-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-networkdays-bad-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-networkdays-bad-holiday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-networkdays-bad-holiday-in-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-15"
+   ],
+   [
+    "abc"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-networkdays-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-networkdays-four-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-01\",\"2024-01-31\",\"2024-01-15\",1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-networkdays-range-as-start",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-01"
+   ],
+   [
+    "2024-01-02"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(A1:A2,\"2024-01-31\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-networkdays-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(1/0,\"2024-01-31\")",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-workday-friday-plus-one",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-12\",1)=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-monday-minus-one",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-15\",-1)=DATE(2024,1,12)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-saturday-plus-zero-stays",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-13\",0)=DATE(2024,1,13)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-weekday-plus-zero-stays",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-15\",0)=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-saturday-plus-one",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-13\",1)=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-saturday-minus-one",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-13\",-1)=DATE(2024,1,12)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-sunday-plus-five",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-14\",5)=DATE(2024,1,19)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-sunday-minus-five",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-14\",-5)=DATE(2024,1,8)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-monday-plus-five",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-15\",5)=DATE(2024,1,22)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-monday-plus-ten",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-15\",10)=DATE(2024,1,29)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-friday-minus-five",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-19\",-5)=DATE(2024,1,12)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-month-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-31\",1)=DATE(2024,2,1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-year-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-12-31\",1)=DATE(2025,1,1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-leap-day-reached",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-02-28\",1)=DATE(2024,2,29)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-leap-day-passed",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-02-29\",1)=DATE(2024,3,1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-doc-151-days",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2008-10-01\",151)=DATE(2009,4,30)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-workday-doc-151-days-three-holidays",
+  "auditId": null,
+  "grid": [
+   [
+    "2008-11-26"
+   ],
+   [
+    "2008-12-04"
+   ],
+   [
+    "2009-01-21"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2008-10-01\",151,A1:A3)=DATE(2009,5,5)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-workday-holiday-the-next-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-12\",1,\"2024-01-15\")=DATE(2024,1,16)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-holiday-on-weekend-ignored",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-12\",1,\"2024-01-13\")=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-holiday-going-back",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-16\",-1,\"2024-01-15\")=DATE(2024,1,12)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-holiday-before-start-ignored",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-16\",1,\"2024-01-10\")=DATE(2024,1,17)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-two-holidays-in-a-row",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-15"
+   ],
+   [
+    "2024-01-16"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-12\",1,A1:A2)=DATE(2024,1,17)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-same-holiday-twice-counts-once",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-15"
+   ],
+   [
+    "2024-01-15"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-12\",1,A1:A2)=DATE(2024,1,16)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-fraction-cut-forward",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-12\",1.9)=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-fraction-cut-backward",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-15\",-1.9)=DATE(2024,1,12)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-time-of-day-dropped",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-15 14:30\",1)=DATE(2024,1,16)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-long-offset",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-01\",260)=DATE(2024,12,30)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-long-offset-back",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-12-30\",-260)=DATE(2024,1,1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-result-is-local-midnight",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=HOUR(WORKDAY(\"2024-01-15 14:30\",1))",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-workday-round-trip-with-networkdays",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-15\",WORKDAY(\"2024-01-15\",20))",
+  "expected": 21,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-round-trip-backwards",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NETWORKDAYS(\"2024-01-15\",WORKDAY(\"2024-01-15\",-20))",
+  "expected": -21,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-holiday-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2008-11-26"
+   ],
+   [
+    "2008-12-04"
+   ],
+   [
+    "2009-01-21"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2008-10-01\",151,A1:A3)=DATE(2009,5,5)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-workday-holiday-range-skips-blanks",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ],
+   [
+    "2024-01-15"
+   ],
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-12\",1,A1:A3)=DATE(2024,1,16)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-from-date-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(DATE(2024,1,12),1)=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-offset-from-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-12",
+    1
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WORKDAY(A1,B1)=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-workday-offset-too-large",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-01\",3000001)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (least certain: implementation choice, not checked against Excel)"
+ },
+ {
+  "id": "gc1e-workday-offset-too-small",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-01\",-3000001)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (least certain: implementation choice, not checked against Excel)"
+ },
+ {
+  "id": "gc1e-workday-bad-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"abc\",1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-workday-bad-offset",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-01\",\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-workday-bad-holiday",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-01\",1,\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-workday-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-workday-four-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-01\",1,\"2024-01-15\",1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-workday-range-as-start",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-01"
+   ],
+   [
+    "2024-01-02"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WORKDAY(A1:A2,1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-workday-range-as-offset",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=WORKDAY(\"2024-01-01\",A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-workday-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=WORKDAY(1/0,1)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-days360-doc-short",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"1/30/2008\",\"2/1/2008\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-days360-doc-full-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"1/1/2008\",\"12/31/2008\")",
+  "expected": 360,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-days360-jan-30-to-feb-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-30\",\"2024-02-01\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-both-31st-us",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-31\",\"2024-03-31\")",
+  "expected": 60,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-end-31st-start-before-30th-us",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-15\",\"2024-03-31\")",
+  "expected": 76,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-start-30th-end-31st-us",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-30\",\"2024-03-31\")",
+  "expected": 60,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-european-both-31st",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-31\",\"2024-03-31\",TRUE)",
+  "expected": 60,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-european-end-31st",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-15\",\"2024-03-31\",TRUE)",
+  "expected": 75,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-us-explicit-false",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-15\",\"2024-03-31\",FALSE)",
+  "expected": 76,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-method-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-15\",\"2024-03-31\",0)",
+  "expected": 76,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-method-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-15\",\"2024-03-31\",1)",
+  "expected": 75,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-negative-when-reversed",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-03-31\",\"2024-01-15\")",
+  "expected": -75,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-same-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-05-17\",\"2024-05-17\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-whole-leap-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-01\",\"2024-12-31\")",
+  "expected": 360,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-year-end-to-year-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2023-12-31\",\"2024-12-31\")",
+  "expected": 360,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-february-month-end-start-us",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-02-29\",\"2024-03-31\")",
+  "expected": 30,
+  "note": "GridCraft port batch 1E (least certain: implementation choice, not checked against Excel)"
+ },
+ {
+  "id": "gc1e-days360-february-month-end-start-european",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-02-29\",\"2024-03-31\",TRUE)",
+  "expected": 31,
+  "note": "GridCraft port batch 1E (least certain: implementation choice, not checked against Excel)"
+ },
+ {
+  "id": "gc1e-days360-with-times-of-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-15 10:00\",\"2024-03-15 22:00\")",
+  "expected": 60,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-days360-bad-method",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-15\",\"2024-03-31\",\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-days360-bad-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"nope\",\"2024-03-31\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-days360-date-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(DATE(2008,1,30),DATE(2008,2,1))",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-days360-from-cells",
+  "auditId": null,
+  "grid": [
+   [
+    "2008-01-01",
+    "2008-12-31"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=DAYS360(A1,B1)",
+  "expected": 360,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-days360-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-days360-four-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAYS360(\"2024-01-01\",\"2024-02-01\",TRUE,1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-days360-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2024-01-01"
+   ],
+   [
+    "2024-01-02"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=DAYS360(A1:A2,\"2024-02-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-yearfrac-doc-default",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\")",
+  "expected": 0.5805555555555556,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-yearfrac-doc-basis-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",0)",
+  "expected": 0.5805555555555556,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-yearfrac-doc-basis-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",3)",
+  "expected": 0.5780821917808219,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-1-leap-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",1)",
+  "expected": 0.5765027322404371,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",2)",
+  "expected": 0.5861111111111111,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-4",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",4)",
+  "expected": 0.5805555555555556,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-reversed-order-same-result",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-07-30\",\"2012-01-01\")",
+  "expected": 0.5805555555555556,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-yearfrac-reversed-basis-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-07-30\",\"2012-01-01\",3)",
+  "expected": 0.5780821917808219,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-same-day-basis-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-05-17\",\"2024-05-17\",0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-same-day-basis-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-05-17\",\"2024-05-17\",1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-same-day-basis-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-05-17\",\"2024-05-17\",2)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-one-year-basis-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2023-01-01\",\"2024-01-01\",0)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-one-year-basis-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2023-01-01\",\"2024-01-01\",1)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-one-year-basis-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2023-01-01\",\"2024-01-01\",2)",
+  "expected": 1.0138888888888888,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-one-year-basis-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2023-01-01\",\"2024-01-01\",3)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-one-leap-year-basis-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-01-01\",\"2025-01-01\",1)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-one-leap-year-basis-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-01-01\",\"2025-01-01\",3)",
+  "expected": 1.0027397260273974,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-1-same-non-leap-year",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2023-06-01\",\"2023-12-31\",1)",
+  "expected": 0.5835616438356165,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-1-across-new-year-leap-day-after",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2023-11-01\",\"2024-03-01\",1)",
+  "expected": 0.33060109289617484,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-1-across-new-year-leap-day-before",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-03-01\",\"2025-02-01\",1)",
+  "expected": 0.9232876712328767,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-1-two-years",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2000-01-01\",\"2002-01-01\",1)",
+  "expected": 2.0009124087591244,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-1-several-years",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2020-03-15\",\"2023-09-20\",1)",
+  "expected": 3.515400410677618,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-1-decades",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"1990-05-10\",\"2024-08-21\",1)",
+  "expected": 34.28269712140175,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-0-start-31st",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-01-31\",\"2024-03-15\",0)",
+  "expected": 0.125,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-0-both-31st",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-01-31\",\"2024-03-31\",0)",
+  "expected": 0.16666666666666666,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-4-both-31st",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-01-31\",\"2024-03-31\",4)",
+  "expected": 0.16666666666666666,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-4-end-31st-start-before-30th",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-01-15\",\"2024-03-31\",4)",
+  "expected": 0.20833333333333334,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-0-end-31st-start-before-30th",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2024-01-15\",\"2024-03-31\",0)",
+  "expected": 0.2111111111111111,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-3-long",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2000-01-01\",\"2100-01-01\",3)",
+  "expected": 100.06849315068493,
+  "note": "GridCraft port batch 1E (expected = calendar arithmetic)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",5)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",-1)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-yearfrac-basis-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-yearfrac-bad-date",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"nope\",\"2012-07-30\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-yearfrac-date-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(DATE(2012,1,1),DATE(2012,7,30),3)",
+  "expected": 0.5780821917808219,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-yearfrac-from-cells",
+  "auditId": null,
+  "grid": [
+   [
+    "2012-01-01",
+    "2012-07-30"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=YEARFRAC(A1,B1)",
+  "expected": 0.5805555555555556,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-yearfrac-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-yearfrac-four-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEARFRAC(\"2012-01-01\",\"2012-07-30\",0,1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-yearfrac-range",
+  "auditId": null,
+  "grid": [
+   [
+    "2012-01-01"
+   ],
+   [
+    "2012-01-02"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=YEARFRAC(A1:A2,\"2012-07-30\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-iseven-doc-minus-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(-1)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-iseven-doc-2-5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(2.5)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-iseven-doc-5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(5)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-isodd-doc-minus-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(-1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-isodd-doc-5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(5)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-isodd-doc-2-5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(2.5)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-iseven-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(0)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(0)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-negative-even",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(-2)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-negative-odd",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(-3)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-negative-fraction-cut-to-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(-0.5)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-fraction-cut",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(1.9)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-negative-fraction-cut",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(-1.9)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-large-even",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(1E15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-large-odd",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(1E15+1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-numeric-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(\"4\")",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-numeric-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(\"7\")",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-empty-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(\"\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-boolean",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(TRUE)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-boolean",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(FALSE)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN(1/0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-formula-argument",
+  "auditId": null,
+  "grid": [
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISODD(A1+1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-blank-cell-is-zero",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISEVEN(A1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isodd-blank-cell-is-zero",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISODD(A1)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-iseven-range",
+  "auditId": null,
+  "grid": [
+   [
+    2
+   ],
+   [
+    4
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISEVEN(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-isodd-range",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    3
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISODD(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-iseven-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISEVEN()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-isodd-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISODD(1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-iseven-in-if",
+  "auditId": null,
+  "grid": [
+   [
+    7
+   ]
+  ],
+  "at": "H1",
+  "formula": "=IF(ISEVEN(A1),\"even\",\"odd\")",
+  "expected": "odd",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-doc-true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(TRUE)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-islogical-doc-text-true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(\"TRUE\")",
+  "expected": false,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-islogical-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(1)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-comparison",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(1=1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-and-result",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(AND(TRUE,FALSE))",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-true-call",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(TRUE())",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-cell-boolean",
+  "auditId": null,
+  "grid": [
+   [
+    true
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISLOGICAL(A1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-cell-number",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISLOGICAL(A1)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-cell-text",
+  "auditId": null,
+  "grid": [
+   [
+    "TRUE"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISLOGICAL(A1)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-blank-cell",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISLOGICAL(A1)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-error-is-not-logical",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(1/0)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-na-is-not-logical",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(NA())",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-cell-with-error",
+  "auditId": null,
+  "grid": [
+   [
+    "=1/0"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISLOGICAL(A1)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-islogical-range",
+  "auditId": null,
+  "grid": [
+   [
+    true
+   ],
+   [
+    false
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISLOGICAL(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-islogical-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-islogical-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISLOGICAL(TRUE,FALSE)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-isnontext-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(\"x\")",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-empty-string-is-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(\"\")",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-number-as-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(\"1\")",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-boolean",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(TRUE)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-error",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(1/0)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-na",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(NA())",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-blank-cell",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISNONTEXT(A1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-cell-text",
+  "auditId": null,
+  "grid": [
+   [
+    "hello"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISNONTEXT(A1)",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-cell-number",
+  "auditId": null,
+  "grid": [
+   [
+    5
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISNONTEXT(A1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-cell-with-error",
+  "auditId": null,
+  "grid": [
+   [
+    "=1/0"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISNONTEXT(A1)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-concatenation-is-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(1&\"\")",
+  "expected": false,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-isnontext-date-is-a-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(DATE(2024,1,15))",
+  "expected": true,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-isnontext-range",
+  "auditId": null,
+  "grid": [
+   [
+    "a"
+   ],
+   [
+    1
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ISNONTEXT(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-isnontext-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-isnontext-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNONTEXT(1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-n-doc-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(7)",
+  "expected": 7,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-n-doc-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(\"Even\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-n-doc-true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(TRUE)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-n-doc-false",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(FALSE)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-n-negative-fraction",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(-3.5)",
+  "expected": -3.5,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-numeric-text-is-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(\"7\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-empty-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(\"\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-cell-number",
+  "auditId": null,
+  "grid": [
+   [
+    5
+   ]
+  ],
+  "at": "H1",
+  "formula": "=N(A1)",
+  "expected": 5,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-cell-text",
+  "auditId": null,
+  "grid": [
+   [
+    "abc"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=N(A1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-cell-boolean",
+  "auditId": null,
+  "grid": [
+   [
+    true
+   ]
+  ],
+  "at": "H1",
+  "formula": "=N(A1)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-cell-blank",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=N(A1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-formula-result",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(1+2)",
+  "expected": 3,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-comparison-result",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(2>1)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-date-is-its-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(DATE(2024,1,15))=DATE(2024,1,15)",
+  "expected": true,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-n-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(1/0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-cell-with-error",
+  "auditId": null,
+  "grid": [
+   [
+    "=1/0"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=N(A1)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-n-range",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=N(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (a range argument is #VALUE!: no implicit intersection or spill yet)"
+ },
+ {
+  "id": "gc1e-n-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-n-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=N(1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-type-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(1)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-type-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(\"x\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-type-logical",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(TRUE)",
+  "expected": 4,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-type-error-na",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(NA())",
+  "expected": 16,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-type-error-div0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(1/0)",
+  "expected": 16,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-array-range",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(A1:A2)",
+  "expected": 64,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-type-array-range-holding-an-error",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    "=1/0"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(A1:A2)",
+  "expected": 64,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-array-range-of-text",
+  "auditId": null,
+  "grid": [
+   [
+    "a",
+    "b"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(A1:B1)",
+  "expected": 64,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-empty-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(\"\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-formula-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(1+2)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-function-number",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(SUM(A1:A2))",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-function-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(UPPER(\"a\"))",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-comparison",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(1=1)",
+  "expected": 4,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-date-is-a-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(DATE(2024,1,15))",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (this evaluator's date model: dates are epoch ms, a time of day is ms since midnight)"
+ },
+ {
+  "id": "gc1e-type-cell-number",
+  "auditId": null,
+  "grid": [
+   [
+    5
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(A1)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-cell-text",
+  "auditId": null,
+  "grid": [
+   [
+    "abc"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(A1)",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-cell-boolean",
+  "auditId": null,
+  "grid": [
+   [
+    true
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(A1)",
+  "expected": 4,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-cell-blank",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(A1)",
+  "expected": 1,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-cell-with-error",
+  "auditId": null,
+  "grid": [
+   [
+    "=NA()"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TYPE(A1)",
+  "expected": 16,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-unknown-function-is-an-error",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(FOO(1))",
+  "expected": 16,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-in-if",
+  "auditId": null,
+  "grid": [
+   [
+    "abc"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=IF(TYPE(A1)=2,\"text\",\"other\")",
+  "expected": "text",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-type-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-type-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TYPE(1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-error-type-div-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(1/0)",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-error-type-value",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(\"a\"+1)",
+  "expected": 3,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-error-type-ref",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(INDEX(A1:A2,5))",
+  "expected": 4,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-error-type-name",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(FOO(1))",
+  "expected": 5,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-error-type-num",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(SQRT(-1))",
+  "expected": 6,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-error-type-na",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(NA())",
+  "expected": 7,
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-error-type-mod-by-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(MOD(1,0))",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-ln-of-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(LN(0))",
+  "expected": 6,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-cell-with-error",
+  "auditId": null,
+  "grid": [
+   [
+    "=1/0"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(A1)",
+  "expected": 2,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-cell-with-na",
+  "auditId": null,
+  "grid": [
+   [
+    "=NA()"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(A1)",
+  "expected": 7,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-no-error-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(5)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1E (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1e-error-type-no-error-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(\"text\")",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-no-error-text-that-looks-like-one",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(\"#N/A\")",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-no-error-blank",
+  "auditId": null,
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(A1)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-no-error-after-iferror",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(IFERROR(1/0,0))",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-no-error-boolean",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(TRUE)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-in-arithmetic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(NA())+1",
+  "expected": 8,
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-in-isna",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=IF(ISNA(ERROR.TYPE(5)),\"no error\",\"error\")",
+  "expected": "no error",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-in-choose",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHOOSE(ERROR.TYPE(1/0),\"a\",\"b\",\"c\")",
+  "expected": "b",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-in-iferror",
+  "auditId": null,
+  "grid": [
+   [
+    5
+   ]
+  ],
+  "at": "H1",
+  "formula": "=IFERROR(ERROR.TYPE(A1),\"none\")",
+  "expected": "none",
+  "note": "GridCraft port batch 1E (known Excel behaviour)"
+ },
+ {
+  "id": "gc1e-error-type-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1e-error-type-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ERROR.TYPE(1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
  }
 ]

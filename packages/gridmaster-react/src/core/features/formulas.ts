@@ -1113,10 +1113,11 @@ function textResult(value: string): GridFormulaScalarResult {
 }
 
 /**
- * [min, max] argument counts of the single-value text functions. A wrong count or a range argument
- * (there is no implicit intersection or spill yet) is #VALUE!. TEXTJOIN takes ranges, so it checks itself.
+ * [min, max] argument counts of the single-value functions (text from batch 1D, logical/date/info from 1E).
+ * A wrong count or a range argument (there is no implicit intersection or spill yet) is #VALUE!. TEXTJOIN,
+ * XOR, NETWORKDAYS and WORKDAY take ranges, so they check themselves.
  */
-const SCALAR_TEXT_ARITY = new Map<string, [min: number, max: number]>([
+const SCALAR_ARITY = new Map<string, [min: number, max: number]>([
   ["CONCATENATE", [1, 255]],
   ["SEARCH", [2, 3]],
   ["REPLACE", [4, 4]],
@@ -1135,6 +1136,22 @@ const SCALAR_TEXT_ARITY = new Map<string, [min: number, max: number]>([
   ["NUMBERVALUE", [1, 3]],
   ["FIXED", [1, 3]],
   ["DOLLAR", [1, 2]],
+  ["TRUE", [0, 0]],
+  ["FALSE", [0, 0]],
+  ["DATEVALUE", [1, 1]],
+  ["DAYS", [2, 2]],
+  ["HOUR", [1, 1]],
+  ["MINUTE", [1, 1]],
+  ["SECOND", [1, 1]],
+  ["TIME", [3, 3]],
+  ["TIMEVALUE", [1, 1]],
+  ["WEEKNUM", [1, 2]],
+  ["ISOWEEKNUM", [1, 1]],
+  ["YEARFRAC", [2, 3]],
+  ["DAYS360", [2, 3]],
+  ["ISEVEN", [1, 1]],
+  ["ISODD", [1, 1]],
+  ["N", [1, 1]],
 ]);
 
 /** Windows-1252 characters for codes 128-159 (CHAR / CODE use the ANSI code page); unassigned codes stay C1 controls. */
@@ -1336,6 +1353,254 @@ function datedif(start: Date, end: Date, unit: string): number | null {
     default:
       return null;
   }
+}
+
+// ── Date / time helpers (GridCraft port batch 1E) ───────────────────────────────────────────────
+// A date is an epoch-millisecond timestamp (DATE, TODAY, NOW) and a time of day is the milliseconds since
+// midnight, so DATE(...) + TIME(...) is a real timestamp. Excel's day-fraction times (TIME(12,0,0) = 0.5)
+// need serial dates, which the evaluator does not have yet (audit A-043).
+
+const MS_PER_DAY = 86400000;
+
+/** ERROR.TYPE codes. Errors with no Excel number (#ERROR!, #CYCLE!) are not listed, so they give #N/A. */
+const ERROR_TYPE_CODES = new Map<string, number>([
+  [GRID_FORMULA_DIV_ZERO, 2],
+  [GRID_FORMULA_VALUE, 3],
+  [GRID_FORMULA_REF, 4],
+  [GRID_FORMULA_NAME, 5],
+  [GRID_FORMULA_NUM, 6],
+  [GRID_FORMULA_NA, 7],
+]);
+
+const MONTH_NAMES = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+];
+
+/** Whole days since 1970-01-01 of a calendar day (`month` is 0-11). Built in UTC, so DST never shifts it. */
+function dayNumberOf(year: number, month: number, day: number): number {
+  const utc = new Date(0);
+  utc.setUTCFullYear(year, month, day);
+  return utc.getTime() / MS_PER_DAY;
+}
+
+/** The calendar day of a local date, as a day number: the time of day is dropped (Excel's INT of a serial). */
+function dayNumber(date: Date): number {
+  return dayNumberOf(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+/** Local midnight of a day number (the inverse of `dayNumber`). */
+function dateFromDayNumber(day: number): Date {
+  const utc = new Date(day * MS_PER_DAY);
+  const local = new Date(0);
+  local.setFullYear(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
+  local.setHours(0, 0, 0, 0);
+  return local;
+}
+
+/** 0 = Sunday ... 6 = Saturday; 1970-01-01 (day 0) was a Thursday. */
+function weekdayOfDay(day: number): number {
+  return (((day + 4) % 7) + 7) % 7;
+}
+
+function isWorkday(day: number): boolean {
+  const weekday = weekdayOfDay(day);
+  return weekday !== 0 && weekday !== 6;
+}
+
+function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+/** Local midnight of a real calendar date (`month` is 1-12), or null when the month has no such day. */
+function calendarDate(year: number, month: number, day: number): Date | null {
+  const date = new Date(2000, 0, 1);
+  date.setFullYear(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day ? date : null;
+}
+
+/**
+ * A date written as text, or null. Year first (`2024-01-15`, `2024/1/5`), US order (`1/15/2024`, day and month
+ * are not swapped), `22-May-2011`, `15 January 2024` and `Jan 15, 2024`. Unlike `new Date(text)` it rejects a
+ * day the month doesn't have (2024-02-30) and loose text ("1", "abc 1").
+ */
+function parseDateText(text: string): Date | null {
+  const input = text.trim();
+  const monthOf = (name: string): number => {
+    const lower = name.toLowerCase();
+    return lower.length < 3 ? 0 : MONTH_NAMES.findIndex((full) => full.startsWith(lower)) + 1;
+  };
+  let match = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/.exec(input);
+  if (match) return calendarDate(Number(match[1]), Number(match[2]), Number(match[3]));
+  match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(input);
+  if (match) return calendarDate(Number(match[3]), Number(match[1]), Number(match[2]));
+  match = /^(\d{1,2})[-\s]([A-Za-z]{3,9})[-\s,]+(\d{4})$/.exec(input);
+  if (match) return calendarDate(Number(match[3]), monthOf(match[2]), Number(match[1]));
+  match = /^([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})$/.exec(input);
+  if (match) return calendarDate(Number(match[3]), monthOf(match[1]), Number(match[2]));
+  return null;
+}
+
+/**
+ * Text holding a date, a time or both: a date alone, `14:30`, `2:30:15 PM`, `2 pm`, or a date then a time
+ * (`2024-01-15 14:30`, `2024-01-15T14:30:15`). `time` is milliseconds since midnight. Time zones are not read.
+ */
+function parseDateTimeText(text: string): { date: Date | null; time: number | null } | null {
+  const input = text.trim();
+  const dateOnly = parseDateText(input);
+  if (dateOnly) return { date: dateOnly, time: null };
+  const match = /^(?:(.+?)[\sT])?(\d{1,2})(?::(\d{2})(?::(\d{2})(?:\.\d+)?)?)?\s*([ap]m)?$/i.exec(input);
+  if (!match) return null;
+  const [, datePart, hourText, minuteText, secondText, meridiem] = match;
+  if (minuteText === undefined && meridiem === undefined) return null; // a bare number is not a time
+  const date = datePart === undefined ? null : parseDateText(datePart);
+  if (datePart !== undefined && !date) return null;
+  let hour = Number(hourText);
+  const minute = Number(minuteText ?? 0);
+  const second = Number(secondText ?? 0);
+  if (meridiem !== undefined) {
+    if (hour < 1 || hour > 12) return null;
+    hour = (hour % 12) + (meridiem.toLowerCase() === "pm" ? 12 : 0);
+  }
+  if (hour > 23 || minute > 59 || second > 59) return null;
+  return { date, time: ((hour * 60 + minute) * 60 + second) * 1000 };
+}
+
+/**
+ * Milliseconds since midnight for HOUR / MINUTE / SECOND. Text is read as a date and/or time; a number in
+ * [0, 86400000) is already a time of day (TIME's result); any other number or a Date is a timestamp, read in
+ * local time. (A timestamp inside the first UTC day of 1970 therefore reads as a time of day.)
+ */
+function timeOfDayMs(value: unknown): number | null {
+  if (typeof value === "string") {
+    const parsed = parseDateTimeText(value);
+    if (parsed) return parsed.time ?? 0;
+  }
+  const number = scalarToNumber(value);
+  if (number === null) return null;
+  if (number >= 0 && number < MS_PER_DAY) return Math.floor(number);
+  const date = new Date(number);
+  if (Number.isNaN(date.getTime())) return null;
+  return ((date.getHours() * 60 + date.getMinutes()) * 60 + date.getSeconds()) * 1000 + date.getMilliseconds();
+}
+
+/** WEEKNUM return_type -> the weekday a week starts on (0 = Sunday). 21 is the ISO system, handled apart. */
+const WEEK_START_DAY = new Map<number, number>([
+  [1, 0],
+  [2, 1],
+  [11, 1],
+  [12, 2],
+  [13, 3],
+  [14, 4],
+  [15, 5],
+  [16, 6],
+  [17, 0],
+]);
+
+/** Week 1 is the week holding 1 January; weeks start on `startDay`. */
+function weekNumber(date: Date, startDay: number): number {
+  const year = date.getFullYear();
+  const yearStart = dayNumberOf(year, 0, 1);
+  const lead = (weekdayOfDay(yearStart) - startDay + 7) % 7; // days of week 1 that fall before 1 January
+  return Math.floor((dayNumber(date) - yearStart + lead) / 7) + 1;
+}
+
+/** ISO 8601 week: weeks start on Monday and week 1 holds the year's first Thursday. */
+function isoWeekNumber(date: Date): number {
+  const day = dayNumber(date);
+  const thursday = day - ((weekdayOfDay(day) + 6) % 7) + 3; // the Thursday of this ISO week fixes its year
+  const year = new Date(thursday * MS_PER_DAY).getUTCFullYear();
+  return Math.floor((thursday - dayNumberOf(year, 0, 1)) / 7) + 1;
+}
+
+/**
+ * Day numbers of a holiday list (a range or one date), or null when an item isn't a date. Blank items are
+ * skipped. `undefined` (no argument) is an empty list.
+ */
+function holidayDays(value: unknown): Set<number> | null {
+  const days = new Set<number>();
+  if (value === undefined) return days;
+  for (const item of flattenFormulaValues([value])) {
+    if (item === null || item === undefined || item === "") continue;
+    const date = parseLocalDate(item);
+    if (!date) return null;
+    days.add(dayNumber(date));
+  }
+  return days;
+}
+
+/** Monday-Friday days in [first, last] (day numbers, first <= last) that are not holidays. Whole weeks count at once. */
+function countWorkdays(first: number, last: number, holidays: Set<number>): number {
+  const weeks = Math.floor((last - first + 1) / 7);
+  let count = weeks * 5;
+  for (let day = first + weeks * 7; day <= last; day++) if (isWorkday(day)) count++;
+  for (const holiday of holidays) if (holiday >= first && holiday <= last && isWorkday(holiday)) count--;
+  return count;
+}
+
+const isLastDayOfFebruary = (date: Date): boolean =>
+  date.getMonth() === 1 && date.getDate() === (isLeapYear(date.getFullYear()) ? 29 : 28);
+
+/**
+ * Days between two dates on a 360-day year (twelve 30-day months). "us" is DAYS360's default (a start on the last
+ * day of February counts as the 30th); "yearfrac" is the US rule YEARFRAC basis 0 uses, which only moves a
+ * February start when the end is also the last day of February; "european" caps day 31 at 30 on both dates.
+ * Negative when `start` is after `end`.
+ */
+function days360(start: Date, end: Date, rule: "us" | "yearfrac" | "european"): number {
+  let startDay = start.getDate();
+  let endDay = end.getDate();
+  if (rule === "european") {
+    startDay = Math.min(startDay, 30);
+    endDay = Math.min(endDay, 30);
+  } else {
+    if (rule === "yearfrac" && isLastDayOfFebruary(start) && isLastDayOfFebruary(end)) {
+      startDay = 30;
+      endDay = 30;
+    }
+    if (startDay === 31 || (rule === "us" && isLastDayOfFebruary(start))) startDay = 30;
+    if (endDay === 31 && startDay === 30) endDay = 30;
+  }
+  return (
+    (end.getFullYear() - start.getFullYear()) * 360 + (end.getMonth() - start.getMonth()) * 30 + (endDay - startDay)
+  );
+}
+
+/** YEARFRAC for `first` <= `last` and basis 0-4 (30/360 US, actual/actual, actual/360, actual/365, 30/360 European). */
+function yearFraction(first: Date, last: Date, basis: number): number {
+  const days = dayNumber(last) - dayNumber(first);
+  if (basis === 0) return days360(first, last, "yearfrac") / 360;
+  if (basis === 2) return days / 360;
+  if (basis === 3) return days / 365;
+  if (basis === 4) return days360(first, last, "european") / 360;
+  // Actual/actual: within one year of the start, the length of the year(s) touched by 29 February; beyond
+  // that, the average year length from the first year through the last.
+  const firstYear = first.getFullYear();
+  const lastYear = last.getFullYear();
+  const withinOneYear =
+    firstYear === lastYear ||
+    (lastYear === firstYear + 1 &&
+      (last.getMonth() < first.getMonth() ||
+        (last.getMonth() === first.getMonth() && last.getDate() <= first.getDate())));
+  if (!withinOneYear) {
+    return days / ((dayNumberOf(lastYear + 1, 0, 1) - dayNumberOf(firstYear, 0, 1)) / (lastYear - firstYear + 1));
+  }
+  const countsLeapDay =
+    firstYear === lastYear
+      ? isLeapYear(firstYear)
+      : (isLeapYear(firstYear) && dayNumber(first) <= dayNumberOf(firstYear, 1, 29)) ||
+        (isLeapYear(lastYear) && dayNumber(last) >= dayNumberOf(lastYear, 1, 29));
+  return days / (countsLeapDay ? 366 : 365);
 }
 
 // Above this area a range is assumed to be bulk literal data and is not pre-warmed (A-039).
@@ -1657,6 +1922,32 @@ export function createFormulaEvaluator<T extends object = GridRow>(
           }
           case "NA":
             return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
+          // Info functions (batch 1E). Lazy like ISERROR: an error in the argument is an answer, not a failure.
+          case "ISLOGICAL":
+          case "ISNONTEXT":
+          case "TYPE":
+          case "ERROR.TYPE": {
+            if (args.length !== 1) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            // A range reference is an array whatever its cells hold.
+            if (callee === "TYPE" && args[0].type === "RangeRef") return { value: 64, error: null };
+            const inner = evaluateNode(args[0], stack);
+            if (callee === "ERROR.TYPE") {
+              const code = inner.error === null ? undefined : ERROR_TYPE_CODES.get(inner.error);
+              return code === undefined
+                ? { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA }
+                : { value: code, error: null };
+            }
+            if (callee === "TYPE") {
+              if (inner.error !== null) return { value: 16, error: null };
+              if (isFormulaRangeValue(inner.value)) return { value: 64, error: null };
+              const kind = typeof inner.value;
+              return { value: kind === "string" ? 2 : kind === "boolean" ? 4 : 1, error: null };
+            }
+            if (isFormulaRangeValue(inner.value)) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            const isText = inner.error === null && typeof inner.value === "string";
+            const isLogical = inner.error === null && typeof inner.value === "boolean";
+            return { value: callee === "ISLOGICAL" ? isLogical : !isText, error: null };
+          }
         }
 
         // ── Eager argument evaluation (errors propagate) ──
@@ -1683,11 +1974,11 @@ export function createFormulaEvaluator<T extends object = GridRow>(
           return nums;
         };
 
-        const textArity = SCALAR_TEXT_ARITY.get(callee);
+        const scalarArity = SCALAR_ARITY.get(callee);
         if (
-          textArity &&
-          (evaluatedArgs.length < textArity[0] ||
-            evaluatedArgs.length > textArity[1] ||
+          scalarArity &&
+          (evaluatedArgs.length < scalarArity[0] ||
+            evaluatedArgs.length > scalarArity[1] ||
             argResults.some((entry) => entry.isRange))
         ) {
           return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
@@ -2400,7 +2691,8 @@ export function createFormulaEvaluator<T extends object = GridRow>(
             if (typeof input === "number") return { value: input, error: null };
             if (input === null || input === undefined) return { value: 0, error: null }; // blank cell
             if (typeof input !== "string") return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
-            // Numbers only: one leading `$` and `(1,000)` negatives are accepted; dates and times wait for 1E.
+            // Numbers only: one leading `$` and `(1,000)` negatives are accepted; dates and times are #VALUE!
+            // here (DATEVALUE / TIMEVALUE read them).
             const trimmed = input.trim();
             const negative = /^\(.*\)$/.test(trimmed);
             const unwrapped = (negative ? trimmed.slice(1, -1) : trimmed).replace(/^([+-]?)\$/, "$1");
@@ -2520,6 +2812,175 @@ export function createFormulaEvaluator<T extends object = GridRow>(
             );
             if (callee === "FIXED") return { value: `${rounded < 0 ? "-" : ""}${body}`, error: null };
             return { value: rounded < 0 ? `($${body})` : `$${body}`, error: null };
+          }
+
+          // ── Logical, date, info (GridCraft port batch 1E) ─────────────
+          case "TRUE":
+            return { value: true, error: null };
+
+          case "FALSE":
+            return { value: false, error: null };
+
+          case "XOR": {
+            // TRUE when an odd number of the arguments are TRUE. A reference skips text and blanks; typed-in text
+            // other than "TRUE" / "FALSE" is #VALUE!, and so is having no logical value at all.
+            let seen = 0;
+            let trues = 0;
+            for (let i = 0; i < evaluatedArgs.length; i++) {
+              const fromReference = argResults[i].isRange || args[i].type === "CellRef";
+              const items = argResults[i].isRange ? flattenFormulaValues([evaluatedArgs[i]]) : [evaluatedArgs[i]];
+              for (const item of items) {
+                let flag: boolean | null = null;
+                if (typeof item === "boolean") flag = item;
+                else if (typeof item === "number") flag = item !== 0;
+                else if (typeof item === "string" && !fromReference) {
+                  const word = item.trim().toUpperCase();
+                  if (word !== "TRUE" && word !== "FALSE") return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+                  flag = word === "TRUE";
+                }
+                if (flag === null) continue;
+                seen += 1;
+                if (flag) trues += 1;
+              }
+            }
+            if (seen === 0) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: trues % 2 === 1, error: null };
+          }
+
+          case "DATEVALUE": {
+            // Text only, as in Excel; any time in the text is dropped. See `parseDateText` for the formats.
+            const parsed = typeof evaluatedArgs[0] === "string" ? parseDateTimeText(evaluatedArgs[0]) : null;
+            if (!parsed?.date) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: parsed.date.getTime(), error: null };
+          }
+
+          case "TIMEVALUE": {
+            // Text only; any date in the text is dropped. The result is milliseconds since midnight.
+            const parsed = typeof evaluatedArgs[0] === "string" ? parseDateTimeText(evaluatedArgs[0]) : null;
+            if (!parsed) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: parsed.time ?? 0, error: null };
+          }
+
+          case "DAYS": {
+            // DAYS(end_date, start_date): calendar days, so the time of day never counts.
+            const end = parseLocalDate(evaluatedArgs[0]);
+            const start = parseLocalDate(evaluatedArgs[1]);
+            if (!end || !start) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: dayNumber(end) - dayNumber(start), error: null };
+          }
+
+          case "HOUR":
+          case "MINUTE":
+          case "SECOND": {
+            const time = timeOfDayMs(evaluatedArgs[0]);
+            if (time === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            if (callee === "HOUR") return { value: Math.floor(time / 3600000), error: null };
+            if (callee === "MINUTE") return { value: Math.floor(time / 60000) % 60, error: null };
+            return { value: Math.floor(time / 1000) % 60, error: null };
+          }
+
+          case "TIME": {
+            // TIME(hour, minute, second) as milliseconds since midnight. Each part is cut to a whole number in
+            // 0-32767 and the total wraps past 24 hours (TIME(27,0,0) is 3:00).
+            const hour = scalarToNumber(evaluatedArgs[0]);
+            const minute = scalarToNumber(evaluatedArgs[1]);
+            const second = scalarToNumber(evaluatedArgs[2]);
+            if (hour === null || minute === null || second === null) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const h = Math.trunc(hour);
+            const m = Math.trunc(minute);
+            const s = Math.trunc(second);
+            if ([h, m, s].some((part) => part < 0 || part > 32767)) {
+              return { value: GRID_FORMULA_NUM, error: GRID_FORMULA_NUM };
+            }
+            return { value: ((h * 3600 + m * 60 + s) % 86400) * 1000, error: null };
+          }
+
+          case "WEEKNUM": {
+            // WEEKNUM(date, [return_type=1]): 1/17 Sunday start, 2/11 Monday ... 16 Saturday, 21 is ISO.
+            const date = parseLocalDate(evaluatedArgs[0]);
+            const type = evaluatedArgs[1] === undefined ? 1 : scalarToNumber(evaluatedArgs[1]);
+            if (!date || type === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            const returnType = Math.trunc(type);
+            if (returnType === 21) return { value: isoWeekNumber(date), error: null };
+            const startDay = WEEK_START_DAY.get(returnType);
+            if (startDay === undefined) return { value: GRID_FORMULA_NUM, error: GRID_FORMULA_NUM };
+            return { value: weekNumber(date, startDay), error: null };
+          }
+
+          case "ISOWEEKNUM": {
+            const date = parseLocalDate(evaluatedArgs[0]);
+            if (!date) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: isoWeekNumber(date), error: null };
+          }
+
+          case "NETWORKDAYS":
+          case "WORKDAY": {
+            // (start_date, end_date | days, [holidays]); Saturday and Sunday never count and the holidays may be a range.
+            const start = parseLocalDate(evaluatedArgs[0]);
+            const holidays = holidayDays(evaluatedArgs[2]);
+            if (evaluatedArgs.length < 2 || evaluatedArgs.length > 3 || !start || !holidays) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const first = dayNumber(start);
+            if (callee === "NETWORKDAYS") {
+              const end = parseLocalDate(evaluatedArgs[1]);
+              if (!end) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+              const last = dayNumber(end);
+              // Negative when the start is after the end; `|| 0` avoids -0.
+              const count = first <= last ? countWorkdays(first, last, holidays) : -countWorkdays(last, first, holidays);
+              return { value: count || 0, error: null };
+            }
+            const offset = scalarToNumber(evaluatedArgs[1]);
+            if (offset === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            // ponytail: steps one day at a time; the cap bounds the loop (Excel's dates hold about 2.1 million workdays).
+            const steps = Math.trunc(offset);
+            if (Math.abs(steps) > 3000000) return { value: GRID_FORMULA_NUM, error: GRID_FORMULA_NUM };
+            let day = first;
+            for (let left = Math.abs(steps); left > 0; ) {
+              day += steps < 0 ? -1 : 1;
+              if (isWorkday(day) && !holidays.has(day)) left -= 1;
+            }
+            const result = dateFromDayNumber(day).getTime();
+            if (!Number.isFinite(result)) return { value: GRID_FORMULA_NUM, error: GRID_FORMULA_NUM };
+            return { value: result, error: null };
+          }
+
+          case "DAYS360": {
+            // DAYS360(start, end, [european=FALSE]); negative when start is after end.
+            const start = parseLocalDate(evaluatedArgs[0]);
+            const end = parseLocalDate(evaluatedArgs[1]);
+            const european = evaluatedArgs[2] === undefined ? 0 : scalarToNumber(evaluatedArgs[2]);
+            if (!start || !end || european === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: days360(start, end, european !== 0 ? "european" : "us"), error: null };
+          }
+
+          case "YEARFRAC": {
+            // YEARFRAC(start, end, [basis=0]); the order of the dates does not matter.
+            const start = parseLocalDate(evaluatedArgs[0]);
+            const end = parseLocalDate(evaluatedArgs[1]);
+            const basis = evaluatedArgs[2] === undefined ? 0 : scalarToNumber(evaluatedArgs[2]);
+            if (!start || !end || basis === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            const kind = Math.trunc(basis);
+            if (kind < 0 || kind > 4) return { value: GRID_FORMULA_NUM, error: GRID_FORMULA_NUM };
+            const [first, last] = dayNumber(start) <= dayNumber(end) ? [start, end] : [end, start];
+            return { value: yearFraction(first, last, kind), error: null };
+          }
+
+          case "ISEVEN":
+          case "ISODD": {
+            // A number cut toward zero; text that isn't numeric and booleans are #VALUE!.
+            const number = typeof evaluatedArgs[0] === "boolean" ? null : scalarToNumber(evaluatedArgs[0]);
+            if (number === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            const odd = Math.trunc(number) % 2 !== 0;
+            return { value: callee === "ISODD" ? odd : !odd, error: null };
+          }
+
+          case "N": {
+            // Numbers pass through, TRUE/FALSE are 1/0, text (even "5") and blanks are 0.
+            const value = evaluatedArgs[0];
+            return { value: typeof value === "string" ? 0 : (scalarToNumber(value) ?? 0), error: null };
           }
 
           default:

@@ -59,9 +59,14 @@ function matches(actual: unknown, expected: CorpusCase["expected"]): boolean {
 const PORT_CASES = (corpusJson as CorpusCase[]).filter((c) => batchOf(c.id) !== null);
 const BATCHES = ["All", ...Array.from(new Set(PORT_CASES.map((c) => batchOf(c.id) as string)))];
 
+// The table shows this many rows until "Show all" is pressed: every row is DOM, and the corpus grows with
+// each batch (about 1,000 rows made one mount take seconds). The pass/fail count always covers every case.
+const ROW_LIMIT = 100;
+
 function Results() {
   const [batch, setBatch] = useState("All");
   const [failingOnly, setFailingOnly] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   // Evaluated once per mount; the corpus is static data.
   const results = useMemo(
     () =>
@@ -74,6 +79,7 @@ function Results() {
   const scoped = results.filter((r) => batch === "All" || batchOf(r.c.id) === batch);
   const passing = scoped.filter((r) => r.ok).length;
   const shown = failingOnly ? scoped.filter((r) => !r.ok) : scoped;
+  const visible = showAll || failingOnly ? shown : shown.slice(0, ROW_LIMIT);
 
   return (
     <section data-testid="port-results">
@@ -100,7 +106,7 @@ function Results() {
             </tr>
           </thead>
           <tbody>
-            {shown.map(({ c, actual, ok }) => (
+            {visible.map(({ c, actual, ok }) => (
               <tr key={c.id} className={ok ? undefined : "lab-fail-row"}>
                 <td>{batchOf(c.id)}</td>
                 <td>
@@ -115,6 +121,14 @@ function Results() {
           </tbody>
         </table>
       </div>
+      {visible.length < shown.length ? (
+        <p className="lab-muted">
+          Showing the first {visible.length} of {shown.length} rows.{" "}
+          <button type="button" onClick={() => setShowAll(true)}>
+            Show all {shown.length}
+          </button>
+        </p>
+      ) : null}
     </section>
   );
 }
@@ -136,9 +150,9 @@ function TryIt() {
   );
 }
 
-// Live sheet. Data in A1:B6 (numbers) and G1:I6 (a small sales table: region, product, qty; I6 is text
-// on purpose); each formula (E) sits beside its expected result (F). Add one line per function when a
-// new batch lands.
+// Live sheet. Data in A1:B6 (numbers), G1:I6 (a small sales table: region, product, qty; I6 is text
+// on purpose) and J1:J3 (holiday dates); each formula (E) sits beside its expected result (F). Add one
+// line per function when a new batch lands.
 const DATA_A: Cell[] = [2, 3, 4, 8.9, -8.9, 0];
 const DATA_B: Cell[] = [24, 36, 5];
 const SALES: [region: Cell, product: Cell, qty: Cell][] = [
@@ -263,7 +277,68 @@ export const SHEET: [label: string, formula: string, expected: string][] = [
   ["FIXED without commas", "=FIXED(1234.567,1,TRUE)", "1234.6"],
   ["DOLLAR", "=DOLLAR(1234.567,2)", "$1,234.57"],
   ["DOLLAR, negative in parentheses", "=DOLLAR(-1234.567,-2)", "($1,200)"],
+  // Batch 1E: logical, date, info. Dates in this grid are epoch milliseconds and a time of day is the
+  // milliseconds since midnight (Excel shows 0.5 for noon; here TIME(12,0,0) is 43200000). Date results are
+  // checked by comparing with DATE(). Holidays are in J1:J3 (the 27th is a Saturday, so it never counts).
+  ["TRUE()", "=TRUE()", "TRUE"],
+  ["FALSE()", "=FALSE()", "FALSE"],
+  ["XOR: exactly one is true", "=XOR(3>12,4<6)", "TRUE"],
+  ["XOR: two true is FALSE", "=XOR(TRUE,TRUE)", "FALSE"],
+  ["XOR over a range (A1:A3 are all non-zero)", "=XOR(A1:A3)", "TRUE"],
+  ["XOR, a range with no logical value (G1:G3 is text)", "=XOR(G1:G3)", "#VALUE!"],
+  ["DATEVALUE reads text as a date", '=DATEVALUE("22-MAY-2011")=DATE(2011,5,22)', "TRUE"],
+  ["DATEVALUE, 30 February", '=DATEVALUE("2024-02-30")', "#VALUE!"],
+  ["TIMEVALUE (ms since midnight; Excel shows 0.1)", '=TIMEVALUE("2:24 AM")', "8640000"],
+  ["TIME (ms since midnight; Excel shows 0.5)", "=TIME(12,0,0)", "43200000"],
+  ["TIME wraps past 24 hours (27:00 is 3:00)", "=TIME(27,0,0)", "10800000"],
+  ["HOUR of a time text", '=HOUR("4:48:18 PM")', "16"],
+  ["MINUTE of a time text", '=MINUTE("4:48:18 PM")', "48"],
+  ["SECOND of a time text", '=SECOND("4:48:18 PM")', "18"],
+  ["HOUR of a DATE plus a TIME", "=HOUR(DATE(2024,1,15)+TIME(9,30,0))", "9"],
+  ["HOUR, text that is not a time", '=HOUR("abc")', "#VALUE!"],
+  ["DAYS(end, start)", '=DAYS("2021-03-15","2021-02-15")', "28"],
+  ["DAYS, negative", '=DAYS("2021-02-15","2021-03-15")', "-28"],
+  ["DAYS across a daylight-saving change", '=DAYS("2024-03-11","2024-03-09")', "2"],
+  ["WEEKNUM, weeks start on Sunday", '=WEEKNUM("2012-03-09")', "10"],
+  ["WEEKNUM, weeks start on Monday", '=WEEKNUM("2012-03-09",2)', "11"],
+  ["WEEKNUM, ISO system (21)", '=WEEKNUM("2012-03-09",21)', "10"],
+  ["WEEKNUM, return type 3 does not exist", '=WEEKNUM("2012-03-09",3)', "#NUM!"],
+  ["ISOWEEKNUM: 1 Jan 2012 is in week 52 of 2011", '=ISOWEEKNUM("2012-01-01")', "52"],
+  ["ISOWEEKNUM: 3 Jan 2021 is in week 53", '=ISOWEEKNUM("2021-01-03")', "53"],
+  ["NETWORKDAYS over January 2024", '=NETWORKDAYS("2024-01-01","2024-01-31")', "23"],
+  ["NETWORKDAYS with holidays J1:J3", '=NETWORKDAYS("2024-01-01","2024-01-31",J1:J3)', "21"],
+  ["NETWORKDAYS, start after end is negative", '=NETWORKDAYS("2024-01-31","2024-01-01")', "-23"],
+  ["WORKDAY skips the weekend (Fri 12 Jan + 1 = Mon 15 Jan)", '=WORKDAY("2024-01-12",1)=DATE(2024,1,15)', "TRUE"],
+  ["WORKDAY backwards (Mon 15 Jan - 1 = Fri 12 Jan)", '=WORKDAY("2024-01-15",-1)=DATE(2024,1,12)', "TRUE"],
+  ["WORKDAY with holidays (15 Jan is one, so Tue 16 Jan)", '=WORKDAY("2024-01-12",1,J1:J3)=DATE(2024,1,16)', "TRUE"],
+  ["DAYS360, US method", '=DAYS360("2024-01-15","2024-03-31")', "76"],
+  ["DAYS360, European method", '=DAYS360("2024-01-15","2024-03-31",TRUE)', "75"],
+  ["YEARFRAC, 30/360 (Excel shows 0.58055556)", '=YEARFRAC("2012-01-01","2012-07-30")', "0.580555555555556"],
+  ["YEARFRAC, actual/365", '=YEARFRAC("2012-01-01","2012-07-30",3)', "0.578082191780822"],
+  ["YEARFRAC, actual/actual", '=YEARFRAC("2012-01-01","2012-07-30",1)', "0.576502732240437"],
+  ["YEARFRAC, basis 5 does not exist", '=YEARFRAC("2012-01-01","2012-07-30",5)', "#NUM!"],
+  ["ISEVEN(2.5) cuts to 2", "=ISEVEN(2.5)", "TRUE"],
+  ["ISODD(-1)", "=ISODD(-1)", "TRUE"],
+  ["ISEVEN of text (G1 = East)", "=ISEVEN(G1)", "#VALUE!"],
+  ["ISLOGICAL(TRUE)", "=ISLOGICAL(TRUE)", "TRUE"],
+  ['ISLOGICAL of the text "TRUE"', '=ISLOGICAL("TRUE")', "FALSE"],
+  ["ISNONTEXT of a number (I1 = 5)", "=ISNONTEXT(I1)", "TRUE"],
+  ["ISNONTEXT of text (G1 = East)", "=ISNONTEXT(G1)", "FALSE"],
+  ["ISNONTEXT of an empty cell (C1)", "=ISNONTEXT(C1)", "TRUE"],
+  ["N of a number (I1 = 5)", "=N(I1)", "5"],
+  ["N of text is 0 (G1 = East)", "=N(G1)", "0"],
+  ["N(TRUE)", "=N(TRUE)", "1"],
+  ["TYPE of a number (I1)", "=TYPE(I1)", "1"],
+  ["TYPE of text (G1)", "=TYPE(G1)", "2"],
+  ["TYPE of a range", "=TYPE(A1:A3)", "64"],
+  ["TYPE of an error", "=TYPE(1/0)", "16"],
+  ["ERROR.TYPE of #DIV/0!", "=ERROR.TYPE(1/0)", "2"],
+  ["ERROR.TYPE of #N/A", "=ERROR.TYPE(NA())", "7"],
+  ["ERROR.TYPE of a value that is not an error", "=ERROR.TYPE(5)", "#N/A"],
 ];
+
+// Holidays for the NETWORKDAYS / WORKDAY rows, in J1:J3.
+const HOLIDAYS: Cell[] = ["2024-01-01", "2024-01-15", "2024-01-27"];
 
 export function buildSheet(): GridRow[] {
   return SHEET.map(([d, e, f], i) => ({
@@ -276,6 +351,7 @@ export function buildSheet(): GridRow[] {
     g: SALES[i]?.[0] ?? null,
     h: SALES[i]?.[1] ?? null,
     i: SALES[i]?.[2] ?? null,
+    j: HOLIDAYS[i] ?? null,
   }));
 }
 
@@ -290,6 +366,7 @@ export function sheetColumns() {
     g.text("g", { title: "G", width: 70 }),
     g.text("h", { title: "H", width: 70 }),
     g.text("i", { title: "I", width: 50 }),
+    g.text("j", { title: "J", width: 100 }),
   ];
 }
 
@@ -310,7 +387,7 @@ function Sheet() {
 const checks: Check[] = [
   {
     do: 'Open the "Results" table below with Batch = All.',
-    expect: "The header reads N / N passing in green. Any red row is a regression: the Actual column shows what the library returned.",
+    expect: "The header reads N / N passing in green (the count covers every case, but only the first 100 rows are listed until you press Show all). Any red row is a regression: the Actual column shows what the library returned.",
   },
   {
     do: "Pick one batch (for example 1A) in the Batch menu, then tick Failing only.",
@@ -331,6 +408,18 @@ const checks: Check[] = [
   {
     do: "Look at the two RAND rows and the dice row, then edit any other cell (this re-evaluates the sheet).",
     expect: "RAND stays between 0 and 1 and RANDBETWEEN(1,6) stays a whole number from 1 to 6 after each edit; over a few edits you see different values.",
+  },
+  {
+    do: "Type =HOUR(DATE(2024,1,15)+TIME(9,30,0)) into the Try box, then =MINUTE(DATE(2024,1,15)+TIME(9,30,0)).",
+    expect: "9, then 30. TIME gives milliseconds since midnight (not Excel's 0.5-style day fraction), so adding it to a DATE makes a real date and time.",
+  },
+  {
+    do: 'Type =DATEVALUE("2024-02-30") into the Try box, then =DAY(DATEVALUE("2024-02-29")).',
+    expect: "#VALUE! (February 2024 has no 30th), then 29 (the leap day).",
+  },
+  {
+    do: "In the sheet, change J1 from 2024-01-01 to 2024-01-06 (a Saturday) and look at the NETWORKDAYS row that uses J1:J3.",
+    expect: "It becomes 22: a holiday on a weekend is not counted. The F column text (21) no longer applies to that row.",
   },
   {
     do: "Type a function that is not implemented yet, for example =HLOOKUP(1,2,3).",

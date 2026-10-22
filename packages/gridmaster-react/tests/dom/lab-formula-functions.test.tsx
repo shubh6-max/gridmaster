@@ -2,7 +2,7 @@
 // This guards the view itself: it lists the cases, reports all of them as passing, and mounts
 // cleanly under StrictMode. It mounts the scenario directly (not through the registry glob).
 // Language: TypeScript 6 (strict), React 19, vitest + jsdom.
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { createFormulaEvaluator } from "../../src";
@@ -32,6 +32,22 @@ describe("lab: formula functions", () => {
     expect(match, `summary was "${summary}"`).not.toBeNull();
     expect(Number(match?.[2])).toBeGreaterThan(0); // at least one port case is listed
     expect(match?.[1]).toBe(match?.[2]); // and all of them pass
+  });
+
+  it("lists the first 100 rows until Show all is pressed, while the count covers every case", () => {
+    mount();
+    const results = screen.getByTestId("port-results");
+    const rowCount = () => results.querySelectorAll("tbody tr").length;
+    expect(rowCount()).toBe(100);
+    // Batch 1D has more than 100 cases (picked rather than "All" so the full render stays small).
+    fireEvent.change(screen.getByLabelText("Batch"), { target: { value: "1D" } });
+    const showAll = screen.getByRole("button", { name: /^Show all \d+$/ });
+    const total = Number(/\d+/.exec(showAll.textContent ?? "")?.[0]);
+    expect(total).toBeGreaterThan(100);
+    expect(rowCount()).toBe(100);
+    fireEvent.click(showAll);
+    expect(rowCount()).toBe(total);
+    expect(screen.getByTestId("port-summary").textContent).toBe(`${total} / ${total} passing`);
   });
 
   it("every live-sheet formula evaluates to the expected text beside it", () => {
