@@ -12371,5 +12371,1738 @@
   "formula": "=ERROR.TYPE(1,2)",
   "expected": "#VALUE!",
   "note": "GridCraft port batch 1E (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc2-row-noarg",
+  "auditId": null,
+  "grid": [],
+  "at": "H3",
+  "formula": "=ROW()",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (no argument: the formula's own row)"
+ },
+ {
+  "id": "gc2-column-noarg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COLUMN()",
+  "expected": 8,
+  "note": "GridCraft port batch 2 (no argument: the formula's own column (H))"
+ },
+ {
+  "id": "gc2-row-ref",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROW(B7)",
+  "expected": 7,
+  "note": "GridCraft port batch 2 (reads the reference, works past the grid's rows)"
+ },
+ {
+  "id": "gc2-row-range",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROW(A3:A5)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (a range gives its top row)"
+ },
+ {
+  "id": "gc2-row-range-reversed",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROW(A5:A3)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (reversed range still gives the top row)"
+ },
+ {
+  "id": "gc2-column-ref",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COLUMN(D2)",
+  "expected": 4,
+  "note": "GridCraft port batch 2 (column of a reference)"
+ },
+ {
+  "id": "gc2-column-range",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COLUMN(B2:D5)",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (a range gives its left column)"
+ },
+ {
+  "id": "gc2-column-wide",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COLUMN(AA1)",
+  "expected": 27,
+  "note": "GridCraft port batch 2 (two-letter column)"
+ },
+ {
+  "id": "gc2-row-number-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROW(5)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (argument must be a reference)"
+ },
+ {
+  "id": "gc2-row-text-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROW(\"A5\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (text is not a reference)"
+ },
+ {
+  "id": "gc2-row-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROW(A1,A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (at most one argument)"
+ },
+ {
+  "id": "gc2-rows-range",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROWS(A1:C5)",
+  "expected": 5,
+  "note": "GridCraft port batch 2 (counts the reference rows without reading cells)"
+ },
+ {
+  "id": "gc2-rows-cell",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROWS(B2)",
+  "expected": 1,
+  "note": "GridCraft port batch 2 (one cell is one row)"
+ },
+ {
+  "id": "gc2-rows-reversed",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROWS(A5:A1)",
+  "expected": 5,
+  "note": "GridCraft port batch 2 (reversed range)"
+ },
+ {
+  "id": "gc2-rows-error-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "=1/0"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ROWS(A1:A2)",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (an error cell inside the range does not matter)"
+ },
+ {
+  "id": "gc2-rows-scalar",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROWS(5)",
+  "expected": 1,
+  "note": "GridCraft port batch 2 (a scalar is a 1x1 array)"
+ },
+ {
+  "id": "gc2-rows-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROWS()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (needs exactly one argument)"
+ },
+ {
+  "id": "gc2-columns-range",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COLUMNS(A1:C5)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (counts the reference columns)"
+ },
+ {
+  "id": "gc2-columns-cell",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COLUMNS(B2)",
+  "expected": 1,
+  "note": "GridCraft port batch 2 (one cell is one column)"
+ },
+ {
+  "id": "gc2-columns-two-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COLUMNS(A1,B1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (needs exactly one argument)"
+ },
+ {
+  "id": "gc2-address-default",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3)",
+  "expected": "$C$2",
+  "note": "GridCraft port batch 2 (abs_num defaults to 1: absolute)"
+ },
+ {
+  "id": "gc2-address-abs2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3,2)",
+  "expected": "C$2",
+  "note": "GridCraft port batch 2 (abs row, relative column)"
+ },
+ {
+  "id": "gc2-address-abs3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3,3)",
+  "expected": "$C2",
+  "note": "GridCraft port batch 2 (relative row, abs column)"
+ },
+ {
+  "id": "gc2-address-abs4",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3,4)",
+  "expected": "C2",
+  "note": "GridCraft port batch 2 (fully relative)"
+ },
+ {
+  "id": "gc2-address-r1c1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3,1,FALSE)",
+  "expected": "R2C3",
+  "note": "GridCraft port batch 2 (R1C1 style, absolute)"
+ },
+ {
+  "id": "gc2-address-r1c1-abs2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3,2,FALSE)",
+  "expected": "R2C[3]",
+  "note": "GridCraft port batch 2 (R1C1, relative column is bracketed)"
+ },
+ {
+  "id": "gc2-address-r1c1-abs3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3,3,FALSE)",
+  "expected": "R[2]C3",
+  "note": "GridCraft port batch 2 (R1C1, relative row is bracketed)"
+ },
+ {
+  "id": "gc2-address-r1c1-abs4",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3,4,FALSE)",
+  "expected": "R[2]C[3]",
+  "note": "GridCraft port batch 2 (R1C1, fully relative)"
+ },
+ {
+  "id": "gc2-address-sheet",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2,3,1,TRUE,\"Sheet2\")",
+  "expected": "Sheet2!$C$2",
+  "note": "GridCraft port batch 2 (sheet name prefix)"
+ },
+ {
+  "id": "gc2-address-sheet-space",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(1,1,1,TRUE,\"My Sheet\")",
+  "expected": "'My Sheet'!$A$1",
+  "note": "GridCraft port batch 2 (sheet with a space is quoted)"
+ },
+ {
+  "id": "gc2-address-sheet-numeric",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(1,1,1,TRUE,\"2024\")",
+  "expected": "'2024'!$A$1",
+  "note": "GridCraft port batch 2 (numeric-looking sheet is quoted)"
+ },
+ {
+  "id": "gc2-address-wide-column",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(1,27)",
+  "expected": "$AA$1",
+  "note": "GridCraft port batch 2 (column 27 is AA)"
+ },
+ {
+  "id": "gc2-address-row-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(0,1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (row below 1)"
+ },
+ {
+  "id": "gc2-address-abs-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(1,1,0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (abs_num 0 does not exist)"
+ },
+ {
+  "id": "gc2-address-abs-five",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(1,1,5)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (abs_num 5 does not exist)"
+ },
+ {
+  "id": "gc2-address-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (needs row and column)"
+ },
+ {
+  "id": "gc2-address-abs-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ADDRESS(1,1,\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (abs_num must be a number)"
+ },
+ {
+  "id": "gc2-address-range-arg",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ADDRESS(A1:A2,1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (range arguments are rejected)"
+ },
+ {
+  "id": "gc2-address-row-column",
+  "auditId": null,
+  "grid": [],
+  "at": "H2",
+  "formula": "=ADDRESS(ROW(),COLUMN())",
+  "expected": "$H$2",
+  "note": "GridCraft port batch 2 (composes with ROW()/COLUMN())"
+ },
+ {
+  "id": "gc2-hlookup-exact",
+  "auditId": null,
+  "grid": [
+   [
+    "Axles",
+    "Bearings",
+    "Bolts"
+   ],
+   [
+    4,
+    4,
+    9
+   ],
+   [
+    5,
+    7,
+    10
+   ],
+   [
+    6,
+    8,
+    11
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(\"Bolts\",A1:C4,4,FALSE)",
+  "expected": 11,
+  "note": "GridCraft port batch 2 (Microsoft's doc example)"
+ },
+ {
+  "id": "gc2-hlookup-row1",
+  "auditId": null,
+  "grid": [
+   [
+    "Axles",
+    "Bearings",
+    "Bolts"
+   ],
+   [
+    4,
+    4,
+    9
+   ],
+   [
+    5,
+    7,
+    10
+   ],
+   [
+    6,
+    8,
+    11
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(\"Bearings\",A1:C4,1,FALSE)",
+  "expected": "Bearings",
+  "note": "GridCraft port batch 2 (row_index 1 returns the header itself)"
+ },
+ {
+  "id": "gc2-hlookup-case-insensitive",
+  "auditId": null,
+  "grid": [
+   [
+    "Axles",
+    "Bearings",
+    "Bolts"
+   ],
+   [
+    4,
+    4,
+    9
+   ],
+   [
+    5,
+    7,
+    10
+   ],
+   [
+    6,
+    8,
+    11
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(\"bolts\",A1:C4,2,FALSE)",
+  "expected": 9,
+  "note": "GridCraft port batch 2 (lookup ignores case like VLOOKUP)"
+ },
+ {
+  "id": "gc2-hlookup-exact-miss",
+  "auditId": null,
+  "grid": [
+   [
+    "Axles",
+    "Bearings",
+    "Bolts"
+   ],
+   [
+    4,
+    4,
+    9
+   ],
+   [
+    5,
+    7,
+    10
+   ],
+   [
+    6,
+    8,
+    11
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(\"Nuts\",A1:C4,2,FALSE)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 2 (exact match not found)"
+ },
+ {
+  "id": "gc2-hlookup-approx",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    20,
+    30
+   ],
+   [
+    "a",
+    "b",
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(25,A1:C2,2,TRUE)",
+  "expected": "b",
+  "note": "GridCraft port batch 2 (largest first-row value <= lookup)"
+ },
+ {
+  "id": "gc2-hlookup-approx-default",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    20,
+    30
+   ],
+   [
+    "a",
+    "b",
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(25,A1:C2,2)",
+  "expected": "b",
+  "note": "GridCraft port batch 2 (approximate is the default)"
+ },
+ {
+  "id": "gc2-hlookup-approx-below",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    20,
+    30
+   ],
+   [
+    "a",
+    "b",
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(5,A1:C2,2,TRUE)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 2 (below the smallest key)"
+ },
+ {
+  "id": "gc2-hlookup-row-too-big",
+  "auditId": null,
+  "grid": [
+   [
+    "Axles",
+    "Bearings",
+    "Bolts"
+   ],
+   [
+    4,
+    4,
+    9
+   ],
+   [
+    5,
+    7,
+    10
+   ],
+   [
+    6,
+    8,
+    11
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(\"Bolts\",A1:C4,5,FALSE)",
+  "expected": "#REF!",
+  "note": "GridCraft port batch 2 (row_index past the table)"
+ },
+ {
+  "id": "gc2-hlookup-row-zero",
+  "auditId": null,
+  "grid": [
+   [
+    "Axles",
+    "Bearings",
+    "Bolts"
+   ],
+   [
+    4,
+    4,
+    9
+   ],
+   [
+    5,
+    7,
+    10
+   ],
+   [
+    6,
+    8,
+    11
+   ]
+  ],
+  "at": "H1",
+  "formula": "=HLOOKUP(\"Bolts\",A1:C4,0,FALSE)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (row_index below 1)"
+ },
+ {
+  "id": "gc2-lookup-vector",
+  "auditId": null,
+  "grid": [
+   [
+    4.14,
+    "red"
+   ],
+   [
+    4.19,
+    "orange"
+   ],
+   [
+    5.17,
+    "yellow"
+   ],
+   [
+    5.77,
+    "green"
+   ],
+   [
+    6.39,
+    "blue"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=LOOKUP(4.19,A1:A5,B1:B5)",
+  "expected": "orange",
+  "note": "GridCraft port batch 2 (vector form (Microsoft's doc example))"
+ },
+ {
+  "id": "gc2-lookup-vector-between",
+  "auditId": null,
+  "grid": [
+   [
+    4.14,
+    "red"
+   ],
+   [
+    4.19,
+    "orange"
+   ],
+   [
+    5.17,
+    "yellow"
+   ],
+   [
+    5.77,
+    "green"
+   ],
+   [
+    6.39,
+    "blue"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=LOOKUP(5.75,A1:A5,B1:B5)",
+  "expected": "yellow",
+  "note": "GridCraft port batch 2 (largest value <= lookup)"
+ },
+ {
+  "id": "gc2-lookup-vector-below",
+  "auditId": null,
+  "grid": [
+   [
+    4.14,
+    "red"
+   ],
+   [
+    4.19,
+    "orange"
+   ],
+   [
+    5.17,
+    "yellow"
+   ],
+   [
+    5.77,
+    "green"
+   ],
+   [
+    6.39,
+    "blue"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=LOOKUP(1,A1:A5,B1:B5)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 2 (below the smallest value)"
+ },
+ {
+  "id": "gc2-lookup-vector-above",
+  "auditId": null,
+  "grid": [
+   [
+    4.14,
+    "red"
+   ],
+   [
+    4.19,
+    "orange"
+   ],
+   [
+    5.17,
+    "yellow"
+   ],
+   [
+    5.77,
+    "green"
+   ],
+   [
+    6.39,
+    "blue"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=LOOKUP(100,A1:A5,B1:B5)",
+  "expected": "blue",
+  "note": "GridCraft port batch 2 (above the largest value: the last one)"
+ },
+ {
+  "id": "gc2-lookup-array-tall",
+  "auditId": null,
+  "grid": [
+   [
+    4.14,
+    "red"
+   ],
+   [
+    4.19,
+    "orange"
+   ],
+   [
+    5.17,
+    "yellow"
+   ],
+   [
+    5.77,
+    "green"
+   ],
+   [
+    6.39,
+    "blue"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=LOOKUP(5.17,A1:B5)",
+  "expected": "yellow",
+  "note": "GridCraft port batch 2 (tall array: first column to last column)"
+ },
+ {
+  "id": "gc2-lookup-array-wide",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    20,
+    30
+   ],
+   [
+    "a",
+    "b",
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=LOOKUP(20,A1:C2)",
+  "expected": "b",
+  "note": "GridCraft port batch 2 (wide array: first row to last row)"
+ },
+ {
+  "id": "gc2-lookup-array-square",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    "a"
+   ],
+   [
+    2,
+    "b"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=LOOKUP(2,A1:B2)",
+  "expected": "b",
+  "note": "GridCraft port batch 2 (square array searches the first column)"
+ },
+ {
+  "id": "gc2-lookup-mismatched-vectors",
+  "auditId": null,
+  "grid": [
+   [
+    4.14,
+    "red"
+   ],
+   [
+    4.19,
+    "orange"
+   ],
+   [
+    5.17,
+    "yellow"
+   ],
+   [
+    5.77,
+    "green"
+   ],
+   [
+    6.39,
+    "blue"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=LOOKUP(1,A1:A5,B1:B3)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (result vector of a different size)"
+ },
+ {
+  "id": "gc2-lookup-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOOKUP(1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (needs 2 or 3 arguments)"
+ },
+ {
+  "id": "gc2-xmatch-exact",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Cherry"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Date"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(\"Cherry\",A1:A5)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (exact match is the default)"
+ },
+ {
+  "id": "gc2-xmatch-exact-first",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Cherry"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Date"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(\"Banana\",A1:A5)",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (first hit wins)"
+ },
+ {
+  "id": "gc2-xmatch-reverse",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Cherry"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Date"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(\"Banana\",A1:A5,0,-1)",
+  "expected": 4,
+  "note": "GridCraft port batch 2 (search_mode -1 scans last to first)"
+ },
+ {
+  "id": "gc2-xmatch-not-found",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Cherry"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Date"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(\"Fig\",A1:A5)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 2 (no match)"
+ },
+ {
+  "id": "gc2-xmatch-wildcard",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Cherry"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Date"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(\"Ban*\",A1:A5,2)",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (match_mode 2: * wildcard)"
+ },
+ {
+  "id": "gc2-xmatch-wildcard-q",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Cherry"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Date"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(\"?herry\",A1:A5,2)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (? is any one character)"
+ },
+ {
+  "id": "gc2-xmatch-wildcard-reverse",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Cherry"
+   ],
+   [
+    "Banana"
+   ],
+   [
+    "Date"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(\"Ban*\",A1:A5,2,-1)",
+  "expected": 4,
+  "note": "GridCraft port batch 2 (wildcard scanning backwards)"
+ },
+ {
+  "id": "gc2-xmatch-next-smaller",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(25,A1:A3,-1)",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (match_mode -1: exact or next smaller)"
+ },
+ {
+  "id": "gc2-xmatch-next-larger",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(25,A1:A3,1)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (match_mode 1: exact or next larger)"
+ },
+ {
+  "id": "gc2-xmatch-next-smaller-exact",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(20,A1:A3,-1)",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (an exact match wins)"
+ },
+ {
+  "id": "gc2-xmatch-next-smaller-none",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(5,A1:A3,-1)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 2 (nothing smaller)"
+ },
+ {
+  "id": "gc2-xmatch-next-larger-none",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(35,A1:A3,1)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 2 (nothing larger)"
+ },
+ {
+  "id": "gc2-xmatch-unsorted-smaller",
+  "auditId": null,
+  "grid": [
+   [
+    30
+   ],
+   [
+    10
+   ],
+   [
+    20
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(25,A1:A3,-1)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (next smaller on unsorted data finds the best value)"
+ },
+ {
+  "id": "gc2-xmatch-binary-asc",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(20,A1:A3,0,2)",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (binary search mode runs as the linear scan)"
+ },
+ {
+  "id": "gc2-xmatch-binary-desc",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(20,A1:A3,0,-2)",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (reverse binary mode scans last to first)"
+ },
+ {
+  "id": "gc2-xmatch-bad-mode",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(1,A1:A3,3)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (match_mode 3 does not exist)"
+ },
+ {
+  "id": "gc2-xmatch-bad-search",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(1,A1:A3,0,0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (search_mode 0 does not exist)"
+ },
+ {
+  "id": "gc2-xmatch-2d-array",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XMATCH(1,A1:B2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (2-D lookup array needs Phase 4 spill)"
+ },
+ {
+  "id": "gc2-xmatch-scalar-array",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=XMATCH(5,5)",
+  "expected": 1,
+  "note": "GridCraft port batch 2 (a scalar is a 1-item array)"
+ },
+ {
+  "id": "gc2-xlookup-exact",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple",
+    5
+   ],
+   [
+    "Banana",
+    8
+   ],
+   [
+    "Cherry",
+    3
+   ],
+   [
+    "Banana",
+    9
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"Cherry\",A1:A4,B1:B4)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (exact match is the default)"
+ },
+ {
+  "id": "gc2-xlookup-first",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple",
+    5
+   ],
+   [
+    "Banana",
+    8
+   ],
+   [
+    "Cherry",
+    3
+   ],
+   [
+    "Banana",
+    9
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"Banana\",A1:A4,B1:B4)",
+  "expected": 8,
+  "note": "GridCraft port batch 2 (first hit wins)"
+ },
+ {
+  "id": "gc2-xlookup-reverse",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple",
+    5
+   ],
+   [
+    "Banana",
+    8
+   ],
+   [
+    "Cherry",
+    3
+   ],
+   [
+    "Banana",
+    9
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"Banana\",A1:A4,B1:B4,\"x\",0,-1)",
+  "expected": 9,
+  "note": "GridCraft port batch 2 (search_mode -1 takes the last hit)"
+ },
+ {
+  "id": "gc2-xlookup-case-insensitive",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple",
+    5
+   ],
+   [
+    "Banana",
+    8
+   ],
+   [
+    "Cherry",
+    3
+   ],
+   [
+    "Banana",
+    9
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"banana\",A1:A4,B1:B4)",
+  "expected": 8,
+  "note": "GridCraft port batch 2 (lookup ignores case)"
+ },
+ {
+  "id": "gc2-xlookup-not-found-default",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple",
+    5
+   ],
+   [
+    "Banana",
+    8
+   ],
+   [
+    "Cherry",
+    3
+   ],
+   [
+    "Banana",
+    9
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"Fig\",A1:A4,B1:B4)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 2 (no if_not_found argument)"
+ },
+ {
+  "id": "gc2-xlookup-if-not-found",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple",
+    5
+   ],
+   [
+    "Banana",
+    8
+   ],
+   [
+    "Cherry",
+    3
+   ],
+   [
+    "Banana",
+    9
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"Fig\",A1:A4,B1:B4,\"missing\")",
+  "expected": "missing",
+  "note": "GridCraft port batch 2 (if_not_found text)"
+ },
+ {
+  "id": "gc2-xlookup-if-not-found-number",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple",
+    5
+   ],
+   [
+    "Banana",
+    8
+   ],
+   [
+    "Cherry",
+    3
+   ],
+   [
+    "Banana",
+    9
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"Fig\",A1:A4,B1:B4,0)",
+  "expected": 0,
+  "note": "GridCraft port batch 2 (if_not_found number)"
+ },
+ {
+  "id": "gc2-xlookup-wildcard",
+  "auditId": null,
+  "grid": [
+   [
+    "Apple",
+    5
+   ],
+   [
+    "Banana",
+    8
+   ],
+   [
+    "Cherry",
+    3
+   ],
+   [
+    "Banana",
+    9
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"Ch*\",A1:A4,B1:B4,\"x\",2)",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (match_mode 2: wildcard)"
+ },
+ {
+  "id": "gc2-xlookup-next-smaller",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    "a"
+   ],
+   [
+    20,
+    "b"
+   ],
+   [
+    30,
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(25,A1:A3,B1:B3,\"x\",-1)",
+  "expected": "b",
+  "note": "GridCraft port batch 2 (match_mode -1: exact or next smaller)"
+ },
+ {
+  "id": "gc2-xlookup-next-larger",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    "a"
+   ],
+   [
+    20,
+    "b"
+   ],
+   [
+    30,
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(25,A1:A3,B1:B3,\"x\",1)",
+  "expected": "c",
+  "note": "GridCraft port batch 2 (match_mode 1: exact or next larger)"
+ },
+ {
+  "id": "gc2-xlookup-row-vector",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    20,
+    30
+   ],
+   [
+    "a",
+    "b",
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(20,A1:C1,A2:C2)",
+  "expected": "b",
+  "note": "GridCraft port batch 2 (row vectors work too)"
+ },
+ {
+  "id": "gc2-xlookup-length-mismatch",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    "a"
+   ],
+   [
+    20,
+    "b"
+   ],
+   [
+    30,
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(1,A1:A3,B1:B2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (lookup and return sizes differ)"
+ },
+ {
+  "id": "gc2-xlookup-2d-lookup",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(1,A1:B2,A1:B2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (2-D arrays need Phase 4 spill)"
+ },
+ {
+  "id": "gc2-xlookup-bad-search",
+  "auditId": null,
+  "grid": [
+   [
+    10,
+    "a"
+   ],
+   [
+    20,
+    "b"
+   ],
+   [
+    30,
+    "c"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(1,A1:A3,B1:B3,0,5)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (match_mode 5 does not exist)"
+ },
+ {
+  "id": "gc2-xlookup-two-args",
+  "auditId": null,
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(1,A1:A3)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (needs the return array)"
+ },
+ {
+  "id": "gc2-xlookup-blank-return",
+  "auditId": null,
+  "grid": [
+   [
+    "k"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=XLOOKUP(\"k\",A1:A1,B1:B1)",
+  "expected": null,
+  "note": "GridCraft port batch 2 (a blank return cell stays blank)"
+ },
+ {
+  "id": "gc2-transpose-index",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=INDEX(TRANSPOSE(A1:C2),3,2)",
+  "expected": 6,
+  "note": "GridCraft port batch 2 (INDEX reads the transposed matrix)"
+ },
+ {
+  "id": "gc2-transpose-sum",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUM(TRANSPOSE(A1:C2))",
+  "expected": 21,
+  "note": "GridCraft port batch 2 (aggregates take a transposed range)"
+ },
+ {
+  "id": "gc2-transpose-rows",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=ROWS(TRANSPOSE(A1:C2))",
+  "expected": 3,
+  "note": "GridCraft port batch 2 (2x3 transposes to 3x2)"
+ },
+ {
+  "id": "gc2-transpose-columns",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COLUMNS(TRANSPOSE(A1:C2))",
+  "expected": 2,
+  "note": "GridCraft port batch 2 (2x3 transposes to 3x2)"
+ },
+ {
+  "id": "gc2-transpose-scalar",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRANSPOSE(42)",
+  "expected": 42,
+  "note": "GridCraft port batch 2 (a scalar passes through)"
+ },
+ {
+  "id": "gc2-transpose-1x1",
+  "auditId": null,
+  "grid": [
+   [
+    7
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TRANSPOSE(A1:A1)",
+  "expected": 7,
+  "note": "GridCraft port batch 2 (a 1x1 range is its value)"
+ },
+ {
+  "id": "gc2-transpose-toplevel",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TRANSPOSE(A1:C2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (a bare matrix result cannot spill until Phase 4)"
+ },
+ {
+  "id": "gc2-transpose-two-args",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TRANSPOSE(1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 2 (needs exactly one argument)"
  }
 ]

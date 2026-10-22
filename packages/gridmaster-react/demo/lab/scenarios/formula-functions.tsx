@@ -335,6 +335,32 @@ export const SHEET: [label: string, formula: string, expected: string][] = [
   ["ERROR.TYPE of #DIV/0!", "=ERROR.TYPE(1/0)", "2"],
   ["ERROR.TYPE of #N/A", "=ERROR.TYPE(NA())", "7"],
   ["ERROR.TYPE of a value that is not an error", "=ERROR.TYPE(5)", "#N/A"],
+  // Batch 2: lookup and reference (uses the sales table in G1:I6; formulas sit in column E).
+  ["ROW of a reference", "=ROW(J3)", "3"],
+  ["ROW() of this cell", "=ROW()", "a row number: this line's position in the sheet"],
+  ["COLUMN of a reference", "=COLUMN(D2)", "4"],
+  ["COLUMN() of this cell (formulas sit in E)", "=COLUMN()", "5"],
+  ["ROWS of the sales table", "=ROWS(G1:I6)", "6"],
+  ["COLUMNS of the sales table", "=COLUMNS(G1:I6)", "3"],
+  ["ADDRESS, absolute (default)", "=ADDRESS(2,3)", "$C$2"],
+  ["ADDRESS, relative", "=ADDRESS(2,3,4)", "C2"],
+  ["ADDRESS, R1C1 style", "=ADDRESS(2,3,1,FALSE)", "R2C3"],
+  ["ADDRESS with a sheet name", '=ADDRESS(1,1,1,TRUE,"My Sheet")', "'My Sheet'!$A$1"],
+  ["ADDRESS of this cell", "=ADDRESS(ROW(),COLUMN(),4)", "a cell address like E123"],
+  ["HLOOKUP along the first sales row", "=HLOOKUP(5,G1:I2,2,FALSE)", "3"],
+  ["HLOOKUP, value missing", '=HLOOKUP("Pear",G1:I2,2,FALSE)', "#N/A"],
+  ["LOOKUP in a sorted vector (A1:A3)", "=LOOKUP(3.5,A1:A3,B1:B3)", "36"],
+  ["LOOKUP below the vector", "=LOOKUP(1,A1:A3,B1:B3)", "#N/A"],
+  ["XLOOKUP a product's qty", '=XLOOKUP("Pear",H1:H6,I1:I6)', "7"],
+  ["XLOOKUP with if_not_found", '=XLOOKUP("Mango",H1:H6,I1:I6,"none")', "none"],
+  ["XLOOKUP from last to first", '=XLOOKUP("Apple",H1:H6,G1:G6,"none",0,-1)', "North"],
+  ["XLOOKUP next smaller (I1:I5 qtys)", '=XLOOKUP(6,I1:I5,G1:G5,"none",-1)', "East"],
+  ["XMATCH position of Pear", '=XMATCH("Pear",H1:H6)', "3"],
+  ["XMATCH with a wildcard", '=XMATCH("P*",H1:H6,2)', "3"],
+  ["XMATCH searching backwards", '=XMATCH("Apple",H1:H6,0,-1)', "6"],
+  ["TRANSPOSE flips, INDEX reads it", "=INDEX(TRANSPOSE(G1:I2),2,2)", "Apple"],
+  ["TRANSPOSE of one cell", "=TRANSPOSE(B1)", "24"],
+  ["TRANSPOSE alone cannot spill yet", "=TRANSPOSE(G1:I2)", "#VALUE!"],
 ];
 
 // Holidays for the NETWORKDAYS / WORKDAY rows, in J1:J3.
@@ -422,8 +448,12 @@ const checks: Check[] = [
     expect: "It becomes 22: a holiday on a weekend is not counted. The F column text (21) no longer applies to that row.",
   },
   {
-    do: "Type a function that is not implemented yet, for example =HLOOKUP(1,2,3).",
+    do: "Type a function that is not implemented yet, for example =MEDIAN(1,2,3).",
     expect: "#NAME? (it will start working when its batch lands and then appears in the table).",
+  },
+  {
+    do: 'Change H3 from Pear to Kiwi and look at the three rows that search H1:H6 for Pear ("XLOOKUP a product\'s qty", "XMATCH position of Pear", "XMATCH with a wildcard").',
+    expect: "The remaining Pear is now row 4, so XLOOKUP gives 2 (its qty) and both XMATCH rows give 4. Type Pear back and they return to 7, 3 and 3.",
   },
 ];
 

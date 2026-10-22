@@ -972,6 +972,60 @@ function lookupGreaterOrEqual(cell: unknown, target: unknown): boolean {
   return normalizeValue(cell).toLowerCase().localeCompare(normalizeValue(target).toLowerCase()) >= 0;
 }
 
+/**
+ * Full-text wildcard match (`*` any run, `?` any one character), case-insensitive. Shared by the
+ * COUNTIF-family criteria matcher and XLOOKUP/XMATCH match_mode 2. No `~` escape (known limit).
+ */
+function matchesWildcardPattern(value: unknown, pattern: string): boolean {
+  const regexSource = pattern
+    .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+    .replace(/\*/g, ".*")
+    .replace(/\?/g, ".");
+  return new RegExp(`^${regexSource}$`, "i").test(normalizeValue(value));
+}
+
+/**
+ * A lookup argument as a flat vector. A scalar is a 1-item vector; a 2-D range (both dimensions
+ * above 1) is null — XLOOKUP/XMATCH take one row or one column until Phase 4 spill.
+ */
+function asLookupVector(value: unknown): unknown[] | null {
+  if (!isFormulaRangeValue(value)) return [value];
+  const matrix = asMatrix(value);
+  if (matrix.length > 1 && (matrix[0]?.length ?? 0) > 1) return null;
+  return flattenFormulaValues([value]);
+}
+
+/**
+ * XLOOKUP/XMATCH scan: 0-based index into `values`, or null when nothing matches.
+ * matchMode 0 = exact, -1 = exact or next smaller, 1 = exact or next larger, 2 = wildcard.
+ * `reverse` scans last-to-first (search_mode -1/-2). Binary search modes run as this same linear
+ * scan: on the sorted data they require, the answer is identical.
+ */
+function xLookupScan(
+  lookupValue: unknown,
+  values: unknown[],
+  matchMode: number,
+  reverse: boolean
+): number | null {
+  const order = values.map((_, i) => i);
+  if (reverse) order.reverse();
+  if (matchMode === 2) {
+    const pattern = normalizeValue(lookupValue);
+    for (const i of order) if (matchesWildcardPattern(values[i], pattern)) return i;
+    return null;
+  }
+  let best: number | null = null;
+  for (const i of order) {
+    if (lookupEquals(values[i], lookupValue)) return i;
+    if (matchMode === -1 && lookupLessOrEqual(values[i], lookupValue)) {
+      if (best === null || compareFormulaValues(values[i], values[best]) > 0) best = i;
+    } else if (matchMode === 1 && lookupGreaterOrEqual(values[i], lookupValue)) {
+      if (best === null || compareFormulaValues(values[i], values[best]) < 0) best = i;
+    }
+  }
+  return matchMode === 0 ? null : best;
+}
+
 function normalizeFormulaErrorResult(
   rawValue: unknown,
   formula: string | null,
@@ -1016,11 +1070,7 @@ function matchFormulaCriteria(value: unknown, criteria: unknown): boolean {
     return false;
   }
   if (criteriaStr.includes("*") || criteriaStr.includes("?")) {
-    const pattern = criteriaStr
-      .replace(/[.+^${}()|[\]\\]/g, "\\$&")
-      .replace(/\*/g, ".*")
-      .replace(/\?/g, ".");
-    return new RegExp(`^${pattern}$`, "i").test(normalizeValue(value));
+    return matchesWildcardPattern(value, criteriaStr);
   }
   return normalizeValue(value).toLowerCase() === criteriaStr.toLowerCase();
 }
@@ -1152,6 +1202,7 @@ const SCALAR_ARITY = new Map<string, [min: number, max: number]>([
   ["ISEVEN", [1, 1]],
   ["ISODD", [1, 1]],
   ["N", [1, 1]],
+  ["ADDRESS", [2, 5]],
 ]);
 
 /** Windows-1252 characters for codes 128-159 (CHAR / CODE use the ANSI code page); unassigned codes stay C1 controls. */
@@ -1658,6 +1709,9 @@ export function createFormulaEvaluator<T extends object = GridRow>(
   const rangeCache = new Map<string, unknown[][]>();
   let rangeMaterializations = 0;
   let warming = false;
+  // The cell whose formula is being evaluated, for no-argument ROW()/COLUMN(). Saved and restored
+  // around each evaluateCell so nested evaluation of other cells' formulas sees its own cell.
+  let currentCell: { row: number; col: number } | null = null;
 
   const parseCached = (formula: string): GridFormulaAstNode | { error: true } => {
     const existing = astCache.get(formula);
@@ -1947,6 +2001,63 @@ export function createFormulaEvaluator<T extends object = GridRow>(
             const isText = inner.error === null && typeof inner.value === "string";
             const isLogical = inner.error === null && typeof inner.value === "boolean";
             return { value: callee === "ISLOGICAL" ? isLogical : !isText, error: null };
+          }
+          // Reference functions (batch 2). Lazy: they read the reference itself, never the cell
+          // values, so an error cell or an out-of-grid range does not matter (Excel semantics).
+          case "ROW":
+          case "COLUMN": {
+            if (args.length > 1) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            const arg = args[0];
+            if (!arg) {
+              if (!currentCell) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+              const own = callee === "ROW" ? currentCell.row : currentCell.col;
+              return { value: own + 1, error: null };
+            }
+            let indexes: { rowIndex: number; columnIndex: number } | null = null;
+            if (arg.type === "CellRef") {
+              indexes = cellRefToIndexes(arg.ref);
+            } else if (arg.type === "RangeRef") {
+              const start = cellRefToIndexes(arg.startRef);
+              const end = cellRefToIndexes(arg.endRef);
+              if (start && end) {
+                // Top-left corner: the scalar answer until arrays can spill (Phase 4).
+                indexes = {
+                  rowIndex: Math.min(start.rowIndex, end.rowIndex),
+                  columnIndex: Math.min(start.columnIndex, end.columnIndex),
+                };
+              }
+            } else {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            if (!indexes) return { value: GRID_FORMULA_REF, error: GRID_FORMULA_REF };
+            return {
+              value: (callee === "ROW" ? indexes.rowIndex : indexes.columnIndex) + 1,
+              error: null,
+            };
+          }
+          case "ROWS":
+          case "COLUMNS": {
+            if (args.length !== 1) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            const arg = args[0];
+            if (arg.type === "CellRef") return { value: 1, error: null };
+            if (arg.type === "RangeRef") {
+              const start = cellRefToIndexes(arg.startRef);
+              const end = cellRefToIndexes(arg.endRef);
+              if (!start || !end) return { value: GRID_FORMULA_REF, error: GRID_FORMULA_REF };
+              const span =
+                callee === "ROWS"
+                  ? Math.abs(end.rowIndex - start.rowIndex)
+                  : Math.abs(end.columnIndex - start.columnIndex);
+              return { value: span + 1, error: null };
+            }
+            // Not a reference (e.g. ROWS(TRANSPOSE(...))): evaluate and measure the value.
+            const inner = evaluateNode(arg, stack);
+            if (inner.error) return inner;
+            const matrix = asMatrix(inner.value);
+            return {
+              value: callee === "ROWS" ? matrix.length : (matrix[0]?.length ?? 0),
+              error: null,
+            };
           }
         }
 
@@ -2507,6 +2618,170 @@ export function createFormulaEvaluator<T extends object = GridRow>(
             }
             if (found < 0) return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
             return { value: matrix[found][resultIndex - 1], error: null };
+          }
+
+          case "HLOOKUP": {
+            const lookupValue = evaluatedArgs[0];
+            const matrix = asMatrix(evaluatedArgs[1]);
+            const indexArg = coerceToNumber(evaluatedArgs[2]);
+            const approximate = !(evaluatedArgs[3] === 0 || evaluatedArgs[3] === false);
+            if (indexArg === null || indexArg < 1) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const resultIndex = Math.trunc(indexArg);
+            if (resultIndex > matrix.length) {
+              return { value: GRID_FORMULA_REF, error: GRID_FORMULA_REF };
+            }
+            const firstRow = matrix[0] ?? [];
+
+            if (!approximate) {
+              for (let col = 0; col < firstRow.length; col++) {
+                if (lookupEquals(firstRow[col], lookupValue)) {
+                  return { value: matrix[resultIndex - 1][col], error: null };
+                }
+              }
+              return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
+            }
+            // Approximate (sorted ascending): largest key in row 1 that is <= lookup.
+            let found = -1;
+            for (let col = 0; col < firstRow.length; col++) {
+              if (lookupLessOrEqual(firstRow[col], lookupValue)) found = col;
+              else break;
+            }
+            if (found < 0) return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
+            return { value: matrix[resultIndex - 1][found], error: null };
+          }
+
+          case "LOOKUP": {
+            if (evaluatedArgs.length < 2 || evaluatedArgs.length > 3) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const lookupValue = evaluatedArgs[0];
+            let lookupVec: unknown[];
+            let resultVec: unknown[];
+            if (evaluatedArgs.length === 3) {
+              // Vector form: result_vector must be the lookup_vector's size.
+              lookupVec = flattenFormulaValues([evaluatedArgs[1]]);
+              resultVec = flattenFormulaValues([evaluatedArgs[2]]);
+              if (lookupVec.length !== resultVec.length) {
+                return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+              }
+            } else {
+              // Array form: taller-or-square searches column 1 → last column; wider searches
+              // row 1 → last row.
+              const matrix = asMatrix(evaluatedArgs[1]);
+              const colCount = matrix[0]?.length ?? 0;
+              if (matrix.length >= colCount) {
+                lookupVec = matrix.map((tableRow) => tableRow[0]);
+                resultVec = matrix.map((tableRow) => tableRow[colCount - 1]);
+              } else {
+                lookupVec = matrix[0];
+                resultVec = matrix[matrix.length - 1];
+              }
+            }
+            // Always approximate (sorted ascending): largest value <= lookup.
+            let found = -1;
+            for (let i = 0; i < lookupVec.length; i++) {
+              if (lookupLessOrEqual(lookupVec[i], lookupValue)) found = i;
+              else break;
+            }
+            if (found < 0) return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
+            return { value: resultVec[found], error: null };
+          }
+
+          case "XLOOKUP": {
+            if (evaluatedArgs.length < 3 || evaluatedArgs.length > 6) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const lookupVec = asLookupVector(evaluatedArgs[1]);
+            const returnVec = asLookupVector(evaluatedArgs[2]);
+            if (!lookupVec || !returnVec || lookupVec.length !== returnVec.length) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const matchMode = evaluatedArgs[4] === undefined ? 0 : coerceToNumber(evaluatedArgs[4]);
+            const searchMode = evaluatedArgs[5] === undefined ? 1 : coerceToNumber(evaluatedArgs[5]);
+            if (
+              matchMode === null ||
+              ![0, -1, 1, 2].includes(matchMode) ||
+              searchMode === null ||
+              ![1, -1, 2, -2].includes(searchMode)
+            ) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const found = xLookupScan(evaluatedArgs[0], lookupVec, matchMode, searchMode < 0);
+            if (found !== null) return { value: returnVec[found], error: null };
+            if (evaluatedArgs.length >= 4) return { value: evaluatedArgs[3], error: null };
+            return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
+          }
+
+          case "XMATCH": {
+            if (evaluatedArgs.length < 2 || evaluatedArgs.length > 4) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const lookupVec = asLookupVector(evaluatedArgs[1]);
+            const matchMode = evaluatedArgs[2] === undefined ? 0 : coerceToNumber(evaluatedArgs[2]);
+            const searchMode = evaluatedArgs[3] === undefined ? 1 : coerceToNumber(evaluatedArgs[3]);
+            if (
+              !lookupVec ||
+              matchMode === null ||
+              ![0, -1, 1, 2].includes(matchMode) ||
+              searchMode === null ||
+              ![1, -1, 2, -2].includes(searchMode)
+            ) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const found = xLookupScan(evaluatedArgs[0], lookupVec, matchMode, searchMode < 0);
+            if (found === null) return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
+            return { value: found + 1, error: null };
+          }
+
+          case "ADDRESS": {
+            // Argument count and range rejection are SCALAR_ARITY's job above.
+            const rowNum = coerceToNumber(evaluatedArgs[0]);
+            const colNum = coerceToNumber(evaluatedArgs[1]);
+            const absNum = evaluatedArgs[2] === undefined ? 1 : coerceToNumber(evaluatedArgs[2]);
+            const a1 = evaluatedArgs[3] === undefined ? true : coerceFormulaBoolean(evaluatedArgs[3]);
+            if (rowNum === null || colNum === null || absNum === null) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const rowIndex = Math.trunc(rowNum);
+            const colIndex = Math.trunc(colNum);
+            const abs = Math.trunc(absNum);
+            if (rowIndex < 1 || colIndex < 1 || abs < 1 || abs > 4) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            // abs: 1 = $A$1, 2 = A$1, 3 = $A1, 4 = A1. In R1C1, relative parts are bracketed.
+            const rowAbs = abs === 1 || abs === 2;
+            const colAbs = abs === 1 || abs === 3;
+            const ref = a1
+              ? `${colAbs ? "$" : ""}${columnLetter(colIndex - 1)}${rowAbs ? "$" : ""}${rowIndex}`
+              : `${rowAbs ? `R${rowIndex}` : `R[${rowIndex}]`}${colAbs ? `C${colIndex}` : `C[${colIndex}]`}`;
+            if (evaluatedArgs.length < 5) return { value: ref, error: null };
+            const sheet = coerceToString(evaluatedArgs[4]);
+            const quoted = /^[A-Za-z_][A-Za-z0-9_.]*$/.test(sheet)
+              ? sheet
+              : `'${sheet.replace(/'/g, "''")}'`;
+            return { value: `${quoted}!${ref}`, error: null };
+          }
+
+          case "TRANSPOSE": {
+            if (evaluatedArgs.length !== 1) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            if (!argResults[0].isRange) return { value: evaluatedArgs[0], error: null };
+            const matrix = asMatrix(evaluatedArgs[0]);
+            const rowCount = matrix.length;
+            const colCount = matrix[0]?.length ?? 0;
+            // A 1×1 result is the scalar; a larger one is a range value other functions can take
+            // (SUM, INDEX, ...). As a whole cell result it stays #VALUE! until Phase 4 spill.
+            if (rowCount === 1 && colCount === 1) return { value: matrix[0][0], error: null };
+            const transposed: unknown[][] = [];
+            for (let col = 0; col < colCount; col++) {
+              const outRow: unknown[] = [];
+              for (let row = 0; row < rowCount; row++) outRow.push(matrix[row][col]);
+              transposed.push(outRow);
+            }
+            return { value: transposed, error: null };
           }
 
           // ── Date ────────────────────────────────────────────────────
@@ -3107,6 +3382,8 @@ export function createFormulaEvaluator<T extends object = GridRow>(
       return errorResult;
     }
 
+    const previousCell = currentCell;
+    currentCell = { row: rowIndex, col: columnIndex };
     try {
       const nextStack = new Set(stack);
       nextStack.add(cacheKey);
@@ -3128,6 +3405,8 @@ export function createFormulaEvaluator<T extends object = GridRow>(
       const errorResult = normalizeFormulaErrorResult(rawValue, formula, GRID_FORMULA_ERROR);
       cache.set(cacheKey, errorResult);
       return errorResult;
+    } finally {
+      currentCell = previousCell;
     }
   };
 
