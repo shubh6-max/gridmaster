@@ -43,9 +43,13 @@ describe("lab: formula functions", () => {
       const result = evaluator.evaluateCell(i, "e");
       const actual = result.error ?? result.value;
       const want = Number(expected);
+      // Errors and text compare exactly (booleans as Excel shows them); numbers to 1e-12.
+      const shown = typeof actual === "boolean" ? (actual ? "TRUE" : "FALSE") : String(actual);
       const ok = expected.startsWith("#")
         ? actual === expected
-        : typeof actual === "number" && Number.isFinite(want) && Math.abs(actual - want) < 1e-12;
+        : typeof actual === "number"
+          ? Number.isFinite(want) && Math.abs(actual - want) < 1e-12
+          : shown === expected;
       if (!ok) mismatches.push(`${label}: ${formula} gave ${String(actual)}, expected ${expected}`);
     });
     expect(mismatches).toEqual([]);

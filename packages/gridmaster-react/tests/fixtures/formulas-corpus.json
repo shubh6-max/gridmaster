@@ -4821,5 +4821,2287 @@
   "formula": "=COUNTBLANK(A1:D1)",
   "expected": 0,
   "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-concatenate-basic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CONCATENATE(\"a\",\"b\",\"c\")",
+  "expected": "abc",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-concatenate-mixed-types",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CONCATENATE(\"x\",1,TRUE)",
+  "expected": "x1TRUE",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-concatenate-cells",
+  "auditId": null,
+  "grid": [
+   [
+    "foo",
+    "bar"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=CONCATENATE(A1,B1)",
+  "expected": "foobar",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-concatenate-blank-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "a"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=CONCATENATE(A1,\"-\",B1)",
+  "expected": "a-",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-concatenate-single",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CONCATENATE(\"a\")",
+  "expected": "a",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-concatenate-no-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CONCATENATE()",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1d-concatenate-range-arg",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ]
+  ],
+  "at": "H1",
+  "formula": "=CONCATENATE(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (no implicit intersection or spill yet: a range argument is #VALUE!)"
+ },
+ {
+  "id": "gc1d-concatenate-error-propagates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CONCATENATE(\"a\",1/0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-concatenate-too-long",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CONCATENATE(REPT(\"a\",20000),REPT(\"b\",20000))",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-basic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\", \",TRUE,\"a\",\"b\",\"c\")",
+  "expected": "a, b, c",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-skips-empty-range",
+  "auditId": null,
+  "grid": [
+   [
+    "x"
+   ],
+   [
+    ""
+   ],
+   [
+    null
+   ],
+   [
+    "y"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\"-\",TRUE,A1:A4)",
+  "expected": "x-y",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-keeps-empty-range",
+  "auditId": null,
+  "grid": [
+   [
+    "x"
+   ],
+   [
+    ""
+   ],
+   [
+    null
+   ],
+   [
+    "y"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\"-\",FALSE,A1:A4)",
+  "expected": "x---y",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-2d-row-major",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2
+   ],
+   [
+    3,
+    4
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\",\",TRUE,A1:B2)",
+  "expected": "1,2,3,4",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-range-and-scalar",
+  "auditId": null,
+  "grid": [
+   [
+    "a"
+   ],
+   [
+    "b"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\"|\",TRUE,A1:A2,\"z\")",
+  "expected": "a|b|z",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-empty-delimiter",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\"\",TRUE,\"a\",\"b\")",
+  "expected": "ab",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-types",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\" \",TRUE,1,TRUE,\"x\")",
+  "expected": "1 TRUE x",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-ignore-empty-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\"-\",0,\"a\",\"\",\"b\")",
+  "expected": "a--b",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-ignore-empty-one",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\"-\",1,\"a\",\"\",\"b\")",
+  "expected": "a-b",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-too-few-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\",\",TRUE)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1d-textjoin-ignore-empty-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\",\",\"maybe\",\"a\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-error-in-range",
+  "auditId": null,
+  "grid": [
+   [
+    "a"
+   ],
+   [
+    "=1/0"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\",\",TRUE,A1:A2)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textjoin-too-long",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTJOIN(\"\",TRUE,REPT(\"a\",20000),REPT(\"b\",20000))",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-basic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"n\",\"printer\")",
+  "expected": 4,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-case-insensitive",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"N\",\"printer\")",
+  "expected": 4,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-start-num",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"e\",\"excel\",2)",
+  "expected": 4,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-question-wildcard",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"p?n\",\"open pen\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-star-wildcard",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"s*r\",\"a star is\")",
+  "expected": 3,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-tilde-question",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"~?\",\"what? yes\")",
+  "expected": 5,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-tilde-star",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"~*\",\"2*3\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-not-found",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"z\",\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-empty-find",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"\",\"abc\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-start-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"a\",\"abc\",0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-start-past-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"a\",\"abc\",4)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-number-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(2,\"a123\")",
+  "expected": 3,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "Hello"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SEARCH(\"lo\",A1)",
+  "expected": 4,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-dot-is-literal",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\".\",\"a.b\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-paren-is-literal",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"(\",\"f(x)\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-too-few-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"a\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1d-search-several-stars",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"a*c*e\",\"xaxbxcxdxe\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-leading-star",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"*c\",\"abc\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-trailing-star",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"b*\",\"abc\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-question-run",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"a??d\",\"xabcd\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-wildcard-case",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"A*C\",\"abc\")",
+  "expected": 1,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-star-order",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"c*a\",\"abcabc\")",
+  "expected": 3,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-star-start-num",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"a*b\",\"a ab\",2)",
+  "expected": 3,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-star-later-piece-missing",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"ab*zz\",\"xabxab c\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-search-many-stars-no-match",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SEARCH(\"a*a*a*a*a*b\",REPT(\"a\",3000))",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (guards against regex backtracking: this pattern hung a RegExp version for minutes)"
+ },
+ {
+  "id": "gc1d-replace-doc-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"abcdefghijk\",6,5,\"*\")",
+  "expected": "abcde*k",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-doc-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"2009\",3,2,\"10\")",
+  "expected": "2010",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-doc-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"123456\",1,3,\"@\")",
+  "expected": "@456",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-insert",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"abc\",2,0,\"XY\")",
+  "expected": "aXYbc",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-start-past-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"abc\",10,1,\"X\")",
+  "expected": "abcX",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-count-past-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"abc\",2,99,\"Z\")",
+  "expected": "aZ",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-start-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"abc\",0,1,\"X\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-negative-count",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"abc\",1,-1,\"X\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-number-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(12345,2,2,\"x\")",
+  "expected": "1x45",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-too-few-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"a\",1,1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1d-replace-truncates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"abcdef\",2.9,1.9,\"-\")",
+  "expected": "a-cdef",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-replace-non-numeric-start",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPLACE(\"abc\",\"x\",1,\"Z\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-basic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"ab\",3)",
+  "expected": "ababab",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"-\",0)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-truncates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"a\",2.9)",
+  "expected": "aa",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"a\",-1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-number-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(5,2)",
+  "expected": "55",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-empty-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"\",5)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-text-count",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"x\",\"y\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1d-rept-limit-ok",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LEN(REPT(\"a\",32767))",
+  "expected": 32767,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-limit-over",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"a\",32768)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-rept-huge-count",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=REPT(\"ab\",1000000000)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-basic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(\"hello world\")",
+  "expected": "Hello World",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-upper",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(\"HELLO WORLD\")",
+  "expected": "Hello World",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-doc-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(\"this is a TITLE\")",
+  "expected": "This Is A Title",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-doc-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(\"2-cent's worth\")",
+  "expected": "2-Cent'S Worth",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-doc-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(\"76BudGet\")",
+  "expected": "76Budget",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(\"\")",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(123)",
+  "expected": "123",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-accents",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(\"élan vital\")",
+  "expected": "Élan Vital",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-proper-blank-cell",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PROPER(A1)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-integer",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"123\")",
+  "expected": 123,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-grouped-decimal",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"1,234.5\")",
+  "expected": 1234.5,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-dollar",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"$1,000\")",
+  "expected": 1000,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"-5\")",
+  "expected": -5,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-percent",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"50%\")",
+  "expected": 0.5,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-parentheses",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"(1,000)\")",
+  "expected": -1000,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-trims",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"  42  \")",
+  "expected": 42,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-exponent",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"1e3\")",
+  "expected": 1000,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-leading-dot",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\".5\")",
+  "expected": 0.5,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-not-a-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-empty-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-number-passthrough",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(7)",
+  "expected": 7,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-boolean",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(TRUE)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-blank-cell",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(A1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-inner-space",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"12 34\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-two-points",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"1.2.3\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-dollar-only",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"$\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-in-arithmetic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"5%\")+1",
+  "expected": 1.05,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-value-parentheses-and-sign",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=VALUE(\"(-5)\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (our rule: parentheses already mean negative)"
+ },
+ {
+  "id": "gc1d-numbervalue-doc-separators",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"2.500,27\",\",\",\".\")",
+  "expected": 2500.27,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-doc-percent",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"3.5%\")",
+  "expected": 0.035,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-doc-double-percent",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"9%%\")",
+  "expected": 0.0009,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-default-grouping",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"2,500.27\")",
+  "expected": 2500.27,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-spaces-ignored",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\" 3 000 \")",
+  "expected": 3000,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"-1,000.5\")",
+  "expected": -1000.5,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-number-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(1.5)",
+  "expected": 1.5,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-not-a-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-two-decimals",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"1.2.3\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-group-after-decimal",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"1.5,2\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-same-separators",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"1,5\",\",\",\",\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-boolean",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(TRUE)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-numbervalue-european",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NUMBERVALUE(\"1.234,5\",\",\",\".\")",
+  "expected": 1234.5,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-exact-same",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXACT(\"word\",\"word\")",
+  "expected": true,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-exact-case",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXACT(\"Word\",\"word\")",
+  "expected": false,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-exact-space",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXACT(\"w ord\",\"word\")",
+  "expected": false,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-exact-number-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXACT(1,\"1\")",
+  "expected": true,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-exact-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXACT(\"\",\"\")",
+  "expected": true,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-exact-boolean-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXACT(TRUE,\"TRUE\")",
+  "expected": true,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-exact-blank-cells",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXACT(A1,B1)",
+  "expected": true,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-exact-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXACT(\"a\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1d-char-upper",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(65)",
+  "expected": "A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-lower",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(97)",
+  "expected": "a",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-bang",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(33)",
+  "expected": "!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-newline",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(10)",
+  "expected": "\n",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-euro",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(128)",
+  "expected": "€",
+  "note": "GridCraft port batch 1D (Windows-1252, as Excel for Windows)"
+ },
+ {
+  "id": "gc1d-char-en-dash",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(150)",
+  "expected": "–",
+  "note": "GridCraft port batch 1D (Windows-1252, as Excel for Windows)"
+ },
+ {
+  "id": "gc1d-char-copyright",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(169)",
+  "expected": "©",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-e-acute",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(233)",
+  "expected": "é",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-256",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(256)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-truncates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(65.9)",
+  "expected": "A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-text-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-char-numeric-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHAR(\"66\")",
+  "expected": "B",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-code-letter",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(\"A\")",
+  "expected": 65,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-code-first-char",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(\"Alphabet\")",
+  "expected": 65,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-code-bang",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(\"!\")",
+  "expected": 33,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-code-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(\"\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-code-number-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(1)",
+  "expected": 49,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-code-euro",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(\"€\")",
+  "expected": 128,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-code-e-acute",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(\"é\")",
+  "expected": 233,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-code-outside-ansi",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(\"Ω\")",
+  "expected": 63,
+  "note": "GridCraft port batch 1D (Excel for Windows gives 63, a question mark, outside the ANSI code page; UNICODE gives the real code)"
+ },
+ {
+  "id": "gc1d-code-char-roundtrip",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CODE(CHAR(150))",
+  "expected": 150,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-bell",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CLEAN(\"a\"&CHAR(7)&\"b\")",
+  "expected": "ab",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-line-break",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CLEAN(\"line\"&CHAR(10)&\"two\")",
+  "expected": "linetwo",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-tab",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CLEAN(\"tab\"&CHAR(9)&\"x\")",
+  "expected": "tabx",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-plain",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CLEAN(\"ok text\")",
+  "expected": "ok text",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CLEAN(123)",
+  "expected": "123",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CLEAN(\"\")",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-keeps-accents",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CLEAN(\"é\")",
+  "expected": "é",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-keeps-del",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LEN(CLEAN(CHAR(127)))",
+  "expected": 1,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-clean-keeps-spaces",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CLEAN(\" a \")",
+  "expected": " a ",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-t-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=T(\"hi\")",
+  "expected": "hi",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-t-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=T(5)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-t-boolean",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=T(TRUE)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-t-blank-cell",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=T(A1)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-t-text-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "x"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=T(A1)",
+  "expected": "x",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-t-number-cell",
+  "auditId": null,
+  "grid": [
+   [
+    5
+   ]
+  ],
+  "at": "H1",
+  "formula": "=T(A1)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-t-error",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=T(1/0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-t-range-arg",
+  "auditId": null,
+  "grid": [
+   [
+    "a"
+   ],
+   [
+    "b"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=T(A1:A2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (no implicit intersection or spill yet: a range argument is #VALUE!)"
+ },
+ {
+  "id": "gc1d-unichar-letter",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(65)",
+  "expected": "A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-euro",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(8364)",
+  "expected": "€",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-snowman",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(9731)",
+  "expected": "☃",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-emoji",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(128512)",
+  "expected": "😀",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-too-big",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(1114112)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-surrogate",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(55296)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(-1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-text-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-truncates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICHAR(65.7)",
+  "expected": "A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unichar-max-is-two-units",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LEN(UNICHAR(1114111))",
+  "expected": 2,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unicode-letter",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICODE(\"A\")",
+  "expected": 65,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unicode-euro",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICODE(\"€\")",
+  "expected": 8364,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unicode-first-char",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICODE(\"Alphabet\")",
+  "expected": 65,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unicode-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICODE(\"\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unicode-emoji",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICODE(\"😀\")",
+  "expected": 128512,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unicode-number-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICODE(1)",
+  "expected": 49,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-unicode-roundtrip",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNICODE(UNICHAR(9731))",
+  "expected": 9731,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-basic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\",\")",
+  "expected": "a",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-instance-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\",\",2)",
+  "expected": "a,b",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-from-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\",\",-1)",
+  "expected": "a,b",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-from-end-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\",\",-2)",
+  "expected": "a",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-instance-missing",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\",\",3)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-instance-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\",\",0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-instance-over-length",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\",\",9)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-not-found",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\"x\")",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-if-not-found",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b,c\",\"x\",1,0,0,\"none\")",
+  "expected": "none",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-case-sensitive",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"Red red\",\"red\")",
+  "expected": "Red ",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-ignore-case",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"Red red\",\"red\",1,1)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-match-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b\",\",\",2,0,1)",
+  "expected": "a,b",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-no-match-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b\",\",\",2)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-match-end-from-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b\",\",\",-2,0,1)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-long-delimiter",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"one--two--three\",\"--\")",
+  "expected": "one",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-long-delimiter-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"one--two--three\",\"--\",2)",
+  "expected": "one--two",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-delimiter-first",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\",a\",\",\")",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-empty-delimiter",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"abc\",\"\")",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-empty-delimiter-from-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"abc\",\"\",-1)",
+  "expected": "abc",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-bad-match-mode",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a,b\",\",\",1,2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-cell",
+  "auditId": null,
+  "grid": [
+   [
+    "user@example.com"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(A1,\"@\")",
+  "expected": "user",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-number-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(12345,3)",
+  "expected": "12",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textbefore-range-arg",
+  "auditId": null,
+  "grid": [
+   [
+    "a,b"
+   ],
+   [
+    "c,d"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(A1:A2,\",\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (no implicit intersection or spill yet: a range argument is #VALUE!)"
+ },
+ {
+  "id": "gc1d-textbefore-one-arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTBEFORE(\"a\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
+ },
+ {
+  "id": "gc1d-textafter-basic",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b,c\",\",\")",
+  "expected": "b,c",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-instance-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b,c\",\",\",2)",
+  "expected": "c",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-from-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b,c\",\",\",-1)",
+  "expected": "c",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-from-end-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b,c\",\",\",-2)",
+  "expected": "b,c",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-instance-missing",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b,c\",\",\",3)",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-instance-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b,c\",\",\",0)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-match-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b\",\",\",2,0,1)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-match-end-from-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b\",\",\",-2,0,1)",
+  "expected": "a,b",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-ignore-case",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"Red red\",\"RED\",1,1)",
+  "expected": " red",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-empty-delimiter",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"abc\",\"\")",
+  "expected": "abc",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-empty-delimiter-from-end",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"abc\",\"\",-1)",
+  "expected": "",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-email",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"user@example.com\",\"@\")",
+  "expected": "example.com",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-last-dot",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a.b.c\",\".\",-1)",
+  "expected": "c",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-found-ignores-fallback",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"a,b\",\",\",1,0,0,\"nf\")",
+  "expected": "b",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-if-not-found",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"ab\",\"x\",1,0,0,\"nf\")",
+  "expected": "nf",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-if-not-found-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"ab\",\"x\",1,0,0,0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-textafter-not-found",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXTAFTER(\"ab\",\"x\")",
+  "expected": "#N/A",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-doc-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(1234.567,1)",
+  "expected": "1,234.6",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-doc-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(1234.567,-1)",
+  "expected": "1,230",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-doc-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(-1234.567,-1,TRUE)",
+  "expected": "-1230",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-doc-4",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(44.332)",
+  "expected": "44.33",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-zero-decimals",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(1234.567,0)",
+  "expected": "1,235",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-half-away",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(0.5,0)",
+  "expected": "1",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-no-commas",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(1234.5678,2,TRUE)",
+  "expected": "1234.57",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-no-commas-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(1234.567,1,1)",
+  "expected": "1234.6",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-million",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(1000000,0)",
+  "expected": "1,000,000",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-carry",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(999.995,2)",
+  "expected": "1,000.00",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(0)",
+  "expected": "0.00",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(-1234.5)",
+  "expected": "-1,234.50",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-rounds-to-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(1234.567,-5)",
+  "expected": "0",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-text-number",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-fixed-text-decimals",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIXED(5,\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-doc-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(1234.567,2)",
+  "expected": "$1,234.57",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-doc-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(1234.567,-2)",
+  "expected": "$1,200",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-doc-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(-1234.567,-2)",
+  "expected": "($1,200)",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-doc-4",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(-0.123,4)",
+  "expected": "($0.1230)",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-doc-5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(99.888)",
+  "expected": "$99.89",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(0)",
+  "expected": "$0.00",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-integer",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(1234)",
+  "expected": "$1,234.00",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-negative",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(-1)",
+  "expected": "($1.00)",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(\"x\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1d-dollar-three-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DOLLAR(1,2,3)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1D (wrong argument count is #VALUE!)"
  }
 ]

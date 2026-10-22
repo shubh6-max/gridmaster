@@ -1104,6 +1104,128 @@ function gcdPair(a: number, b: number): number {
   return x;
 }
 
+/** Excel caps a text result at 32,767 characters; REPT / TEXTJOIN / CONCATENATE / REPLACE give #VALUE! past it. */
+const MAX_TEXT_LENGTH = 32767;
+
+function textResult(value: string): GridFormulaScalarResult {
+  if (value.length > MAX_TEXT_LENGTH) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+  return { value, error: null };
+}
+
+/**
+ * [min, max] argument counts of the single-value text functions. A wrong count or a range argument
+ * (there is no implicit intersection or spill yet) is #VALUE!. TEXTJOIN takes ranges, so it checks itself.
+ */
+const SCALAR_TEXT_ARITY = new Map<string, [min: number, max: number]>([
+  ["CONCATENATE", [1, 255]],
+  ["SEARCH", [2, 3]],
+  ["REPLACE", [4, 4]],
+  ["REPT", [2, 2]],
+  ["PROPER", [1, 1]],
+  ["VALUE", [1, 1]],
+  ["EXACT", [2, 2]],
+  ["CHAR", [1, 1]],
+  ["CODE", [1, 1]],
+  ["CLEAN", [1, 1]],
+  ["T", [1, 1]],
+  ["UNICHAR", [1, 1]],
+  ["UNICODE", [1, 1]],
+  ["TEXTBEFORE", [2, 6]],
+  ["TEXTAFTER", [2, 6]],
+  ["NUMBERVALUE", [1, 3]],
+  ["FIXED", [1, 3]],
+  ["DOLLAR", [1, 2]],
+]);
+
+/** Windows-1252 characters for codes 128-159 (CHAR / CODE use the ANSI code page); unassigned codes stay C1 controls. */
+const CP1252_HIGH =
+  "€\u0081‚ƒ„…†‡ˆ‰Š‹Œ\u008dŽ\u008f" +
+  "\u0090‘’“”•–—˜™š›œ\u009džŸ";
+
+/**
+ * SEARCH core: 0-based index of the leftmost case-insensitive match of a wildcard pattern in `text` at or
+ * after `from`, or -1. `?` is any one character, `*` any run, `~` escapes `?` `*` `~`.
+ * Not a RegExp: several `*` backtrack catastrophically (4 of them on 800 characters took 19 s). The pattern
+ * is cut at its `*`s into pieces of literals and `?` (null). The first must match at the start index and each
+ * later piece is taken at its leftmost spot after the one before it; that is exact because the text after
+ * the match is free, and it means a missing piece rules out every later start too.
+ */
+function wildcardSearch(text: string, pattern: string, from: number): number {
+  const pieces: (string | null)[][] = [[]];
+  for (let i = 0; i < pattern.length; i++) {
+    const ch = pattern[i];
+    if (ch === "~" && "?*~".includes(pattern[i + 1] ?? "")) pieces[pieces.length - 1].push(pattern[++i].toLowerCase());
+    else if (ch === "*") pieces.push([]);
+    else pieces[pieces.length - 1].push(ch === "?" ? null : ch.toLowerCase());
+  }
+  const fitsAt = (piece: (string | null)[], at: number) =>
+    at + piece.length <= text.length && piece.every((ch, k) => ch === null || text[at + k].toLowerCase() === ch);
+  const [head, ...rest] = pieces;
+  for (let start = from; start + head.length <= text.length; start++) {
+    if (!fitsAt(head, start)) continue;
+    let end = start + head.length;
+    for (const piece of rest) {
+      let at = end;
+      while (at + piece.length <= text.length && !fitsAt(piece, at)) at++;
+      if (at + piece.length > text.length) return -1;
+      end = at + piece.length;
+    }
+    return start;
+  }
+  return -1;
+}
+
+/**
+ * VALUE / NUMBERVALUE text parser: optional sign, group separators (integer part only), one decimal
+ * separator, an `e` exponent and trailing `%` signs (each divides by 100). `null` means not a number.
+ */
+function parseNumberText(text: string, decimal: string, group: string): number | null {
+  const stripped = text.replace(/%+$/, "");
+  const percents = text.length - stripped.length;
+  const [whole, fraction, ...extra] = stripped.split(decimal);
+  if (extra.length || fraction?.includes(group)) return null;
+  const plain = whole.split(group).join("") + (fraction === undefined ? "" : `.${fraction}`);
+  const num = strictStringToNumber(plain);
+  return num === null ? null : num / 100 ** percents;
+}
+
+/**
+ * TEXTBEFORE / TEXTAFTER core. `instance` > 0 counts delimiters from the start, < 0 from the end
+ * (non-overlapping). `matchEnd` lets the end of the text (the start, counting from the end) stand in for
+ * the one delimiter that is missing. Returns `null` when the instance is not found.
+ */
+function textAroundDelimiter(
+  text: string,
+  delimiter: string,
+  instance: number,
+  ignoreCase: boolean,
+  matchEnd: boolean,
+  before: boolean
+): string | null {
+  // ponytail: positions come from the lowercased copy, so a character whose lowercase has another length
+  // (such as İ) would shift the cut; fine for ordinary text.
+  const hay = ignoreCase ? text.toLowerCase() : text;
+  const needle = ignoreCase ? delimiter.toLowerCase() : delimiter;
+  const wanted = Math.abs(instance);
+  const forward = instance > 0;
+  let from = forward ? 0 : hay.length - needle.length; // forward: where to search from; backward: latest match start
+  let at = -1;
+  let found = 0;
+  while (found < wanted) {
+    at = forward ? hay.indexOf(needle, from) : from < 0 ? -1 : hay.lastIndexOf(needle, from);
+    if (at < 0) break;
+    found += 1;
+    from = forward ? at + needle.length : at - needle.length;
+  }
+  let size = needle.length;
+  if (found < wanted) {
+    if (!matchEnd || found < wanted - 1) return null;
+    at = forward ? text.length : 0; // the text boundary is the missing delimiter
+    size = 0;
+  }
+  return before ? text.slice(0, at) : text.slice(at + size);
+}
+
 /** Excel's SIN/COS/TAN reject angles at or beyond 2^27 radians. */
 const TRIG_ANGLE_LIMIT = 2 ** 27;
 
@@ -1560,6 +1682,16 @@ export function createFormulaEvaluator<T extends object = GridRow>(
           }
           return nums;
         };
+
+        const textArity = SCALAR_TEXT_ARITY.get(callee);
+        if (
+          textArity &&
+          (evaluatedArgs.length < textArity[0] ||
+            evaluatedArgs.length > textArity[1] ||
+            argResults.some((entry) => entry.isRange))
+        ) {
+          return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+        }
 
         const unaryMath = UNARY_MATH_FUNCTIONS.get(callee);
         if (unaryMath) {
@@ -2202,6 +2334,192 @@ export function createFormulaEvaluator<T extends object = GridRow>(
               return { value: result, error: null };
             }
             return { value: text.split(oldText).join(newText), error: null };
+          }
+
+          // ── Text (GridCraft port batch 1D) ───────────────────────────
+          case "CONCATENATE":
+            return textResult(evaluatedArgs.map(coerceToString).join(""));
+
+          case "TEXTJOIN": {
+            // (delimiter, ignore_empty, text1, [text2], ...): range items are read row by row.
+            const ignoreEmpty = scalarToNumber(evaluatedArgs[1]);
+            if (evaluatedArgs.length < 3 || argResults[0].isRange || ignoreEmpty === null) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const parts = flattenFormulaValues(evaluatedArgs.slice(2)).map(coerceToString);
+            const kept = ignoreEmpty !== 0 ? parts.filter((part) => part !== "") : parts;
+            return textResult(kept.join(coerceToString(evaluatedArgs[0])));
+          }
+
+          case "SEARCH": {
+            const withinText = coerceToString(evaluatedArgs[1]);
+            const startNum = evaluatedArgs[2] === undefined ? 1 : scalarToNumber(evaluatedArgs[2]);
+            if (startNum === null || startNum < 1 || startNum > withinText.length) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const idx = wildcardSearch(withinText, coerceToString(evaluatedArgs[0]), Math.trunc(startNum) - 1);
+            if (idx < 0) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: idx + 1, error: null };
+          }
+
+          case "REPLACE": {
+            const text = coerceToString(evaluatedArgs[0]);
+            const start = scalarToNumber(evaluatedArgs[1]);
+            const count = scalarToNumber(evaluatedArgs[2]);
+            if (start === null || count === null || start < 1 || count < 0) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const from = Math.trunc(start) - 1;
+            return textResult(
+              text.slice(0, from) + coerceToString(evaluatedArgs[3]) + text.slice(from + Math.trunc(count))
+            );
+          }
+
+          case "REPT": {
+            const text = coerceToString(evaluatedArgs[0]);
+            const times = scalarToNumber(evaluatedArgs[1]);
+            // Check the size first so a huge count never allocates.
+            if (times === null || times < 0 || text.length * Math.trunc(times) > MAX_TEXT_LENGTH) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            return { value: text.repeat(Math.trunc(times)), error: null };
+          }
+
+          case "PROPER":
+            // Every run of letters is capitalised, so digits and apostrophes start a new word ("It'S").
+            return {
+              value: coerceToString(evaluatedArgs[0]).replace(
+                /\p{L}+/gu,
+                (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+              ),
+              error: null,
+            };
+
+          case "VALUE": {
+            const input = evaluatedArgs[0];
+            if (typeof input === "number") return { value: input, error: null };
+            if (input === null || input === undefined) return { value: 0, error: null }; // blank cell
+            if (typeof input !== "string") return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            // Numbers only: one leading `$` and `(1,000)` negatives are accepted; dates and times wait for 1E.
+            const trimmed = input.trim();
+            const negative = /^\(.*\)$/.test(trimmed);
+            const unwrapped = (negative ? trimmed.slice(1, -1) : trimmed).replace(/^([+-]?)\$/, "$1");
+            // "(-5)" is not a number: the parentheses already mean negative.
+            const num = negative && /^[+-]/.test(unwrapped) ? null : parseNumberText(unwrapped, ".", ",");
+            if (num === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: negative ? -num : num, error: null };
+          }
+
+          case "NUMBERVALUE": {
+            // (text, [decimal_separator="."], [group_separator=","]): spaces are ignored; empty text is 0.
+            const separator = (arg: unknown, fallback: string) => coerceToString(arg).charAt(0) || fallback;
+            const decimal = separator(evaluatedArgs[1], ".");
+            const group = separator(evaluatedArgs[2], ",");
+            const text = coerceToString(evaluatedArgs[0]).replace(/\s+/g, "");
+            if (decimal === group) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            if (text === "") return { value: 0, error: null };
+            const num = parseNumberText(text, decimal, group);
+            if (num === null) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: num, error: null };
+          }
+
+          case "EXACT":
+            return {
+              value: coerceToString(evaluatedArgs[0]) === coerceToString(evaluatedArgs[1]),
+              error: null,
+            };
+
+          case "CHAR": {
+            const code = scalarToNumber(evaluatedArgs[0]);
+            const n = code === null ? 0 : Math.trunc(code);
+            if (n < 1 || n > 255) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: n >= 128 && n <= 159 ? CP1252_HIGH[n - 128] : String.fromCharCode(n), error: null };
+          }
+
+          case "CODE": {
+            const text = coerceToString(evaluatedArgs[0]);
+            if (text === "") return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            // Windows-1252 code; a character outside it comes back as "?" (63), as in Excel. UNICODE has them all.
+            const ansi = CP1252_HIGH.indexOf(text[0]);
+            const code = text.charCodeAt(0);
+            return { value: ansi >= 0 ? 128 + ansi : code <= 255 ? code : 63, error: null };
+          }
+
+          case "CLEAN":
+            // Drops the 32 ASCII control characters (0-31), line breaks included.
+            return {
+              value: [...coerceToString(evaluatedArgs[0])].filter((ch) => ch.charCodeAt(0) > 31).join(""),
+              error: null,
+            };
+
+          case "T":
+            return { value: typeof evaluatedArgs[0] === "string" ? evaluatedArgs[0] : "", error: null };
+
+          case "UNICHAR": {
+            const code = scalarToNumber(evaluatedArgs[0]);
+            const n = code === null ? 0 : Math.trunc(code);
+            if (n < 1 || n > 0x10ffff) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            // A lone surrogate is not a character: #N/A, as in Excel.
+            if (n >= 0xd800 && n <= 0xdfff) return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
+            return { value: String.fromCodePoint(n), error: null };
+          }
+
+          case "UNICODE": {
+            const code = coerceToString(evaluatedArgs[0]).codePointAt(0);
+            if (code === undefined) return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            return { value: code, error: null };
+          }
+
+          case "TEXTBEFORE":
+          case "TEXTAFTER": {
+            // (text, delimiter, [instance_num=1], [match_mode=0], [match_end=0], [if_not_found=#N/A])
+            // One delimiter only (no delimiter arrays yet). Blank arguments can't be skipped: the parser has no
+            // empty-argument syntax, so if_not_found needs the three before it written out.
+            const text = coerceToString(evaluatedArgs[0]);
+            const instance = evaluatedArgs[2] === undefined ? 1 : scalarToNumber(evaluatedArgs[2]);
+            const mode = evaluatedArgs[3] === undefined ? 0 : scalarToNumber(evaluatedArgs[3]);
+            const matchEnd = evaluatedArgs[4] === undefined ? 0 : scalarToNumber(evaluatedArgs[4]);
+            if (
+              instance === null ||
+              mode === null ||
+              matchEnd === null ||
+              Math.trunc(instance) === 0 ||
+              Math.abs(instance) > text.length ||
+              (mode !== 0 && mode !== 1)
+            ) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const piece = textAroundDelimiter(
+              text,
+              coerceToString(evaluatedArgs[1]),
+              Math.trunc(instance),
+              mode === 1,
+              matchEnd !== 0,
+              callee === "TEXTBEFORE"
+            );
+            if (piece !== null) return { value: piece, error: null };
+            if (evaluatedArgs.length > 5) return { value: evaluatedArgs[5], error: null };
+            return { value: GRID_FORMULA_NA, error: GRID_FORMULA_NA };
+          }
+
+          case "FIXED":
+          case "DOLLAR": {
+            // FIXED(number, [decimals=2], [no_commas=FALSE]); DOLLAR(number, [decimals=2]) adds "$" and
+            // wraps a negative in parentheses. A negative `decimals` rounds left of the point.
+            const number = scalarToNumber(evaluatedArgs[0]);
+            const decimals = evaluatedArgs[1] === undefined ? 2 : scalarToNumber(evaluatedArgs[1]);
+            const noCommas = evaluatedArgs[2] === undefined ? 0 : scalarToNumber(evaluatedArgs[2]);
+            if (number === null || decimals === null || noCommas === null || decimals > 100) {
+              return { value: GRID_FORMULA_VALUE, error: GRID_FORMULA_VALUE };
+            }
+            const places = Math.trunc(decimals);
+            const rounded = excelRound(number, places);
+            const body = formatNumberPattern(
+              Math.abs(rounded),
+              `${noCommas !== 0 ? "0" : "#,##0"}${places > 0 ? `.${"0".repeat(places)}` : ""}`
+            );
+            if (callee === "FIXED") return { value: `${rounded < 0 ? "-" : ""}${body}`, error: null };
+            return { value: rounded < 0 ? `($${body})` : `$${body}`, error: null };
           }
 
           default:

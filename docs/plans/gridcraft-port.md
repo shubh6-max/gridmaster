@@ -16,6 +16,11 @@ not a conversion of the app. Do not port: egui UI, Rust engine internals (thread
   built `../dist/index.cjs`), or DOM tests in `tests/dom/`.
 - **Never commit and never propose commit messages.** Stop after each batch; the user commits.
 - One small task at a time; stop and wait for the user's approval before the next batch.
+- **Every addition or update must be testable by hand in the Feature Lab** (`npm run lab`). Functions: lines in
+  the `SHEET` array of `demo/lab/scenarios/formula-functions.tsx`. Anything else (props, grid features, rule
+  types, UI behaviour) or a change to existing behaviour: a new scenario or `{ do, expect }` checklist items in
+  `demo/lab/scenarios/` (see `demo/lab/README.md`), and fix any lab line the change made stale. The final message
+  of a batch says how to try it (command, page, what to type or look at). A batch without this is not done.
 - Re-implement from the *behaviour* (Excel semantics + GridCraft docs); write fresh TS. Keep attribution:
   Phase 0 adds a GridCraft entry to a NOTICE/THIRD_PARTY file (Apache-2.0 asks for notice preservation).
   Do not use the ArtCraft name/logos. Legal questions: https://mathco.peoplestrong.com/oneweb/#/hris/documents
@@ -76,11 +81,11 @@ gates, update the ledger, stop at the checkpoint. Reuse the existing COUNTIF/SUM
   A grid of `[]` has one row only, so ranges past row 1 give #REF!: give the grid enough rows.
   Names that look like cell refs (LOG10, ATAN2, DAYS360) are why the `FOO10` test exists.
 - Gates: from repo root, `npm run build`, `npm test` (node suites print `passed 21 test suites`, then vitest
-  `353 passed`), `npm run typecheck`, `npm run lint` (exit 0 but it hides diagnostics; also run
+  `394 passed` as of 1D; the older figure was 353, and 1D adds no vitest tests, so the count had already moved before this batch), `npm run typecheck`, `npm run lint` (exit 0 but it hides diagnostics; also run
   `npx biome lint <file> --max-diagnostics=200` on touched files and fix any new warning), `npm run format:check`.
 - **Sample app step of every batch:** open `demo/lab/scenarios/formula-functions.tsx` and add one line per new
-  function to the `SHEET` array (label, formula, expected text; numbers are compared to 1e-12, errors by text,
-  and an expected text starting with "a " is free text and skipped). `tests/dom/lab-formula-functions.test.tsx`
+  function to the `SHEET` array (label, formula, expected text; numbers are compared to 1e-12, errors and text
+  exactly, booleans as `TRUE`/`FALSE`, and an expected text starting with "a " is free text and skipped). `tests/dom/lab-formula-functions.test.tsx`
   evaluates every line, so a wrong expected value fails `npm test`. Sheet data lives in columns A-B (rows 1-6) and
   G-I (sales table, rows 1-6); add data columns if a batch needs more. Add a checklist item only if the batch has
   behaviour a table can't show (like volatile RAND). The automated results table picks up the new `gc<batch>-*`
@@ -122,8 +127,8 @@ gates, update the ledger, stop at the checkpoint. Reuse the existing COUNTIF/SUM
 | 1B trig and angles | DONE (committed) | Added SIN, COS, TAN, ASIN, ACOS, ATAN, ATAN2, SINH, COSH, TANH, ASINH, ACOSH, ATANH, DEGREES, RADIANS, SQRTPI, COMBIN, RAND, RANDBETWEEN (19). 63 cases `gc1b-*`, plus a 5000-draw sampling check for RAND/RANDBETWEEN in `formulas-corpus.test.mjs`. |
 | sample app (Feature Lab) | DONE (committed) | New scenario "Formula functions" (`demo/lab/scenarios/formula-functions.tsx`, run with `npm run lab`, hash `#/formula-functions`) plus `tests/dom/lab-formula-functions.test.tsx`. |
 | 1C criteria family | DONE (committed) | Added SUMIFS, COUNTIFS, AVERAGEIFS, MAXIFS, MINIFS, SUMPRODUCT, COUNTBLANK (7). 39 cases `gc1c-*`; live-sheet lines + G1:I6 sales table in the lab; 200k-row spot check ran in under 0.6 s. Notes: (1) the value range counts only real numbers (Excel rule, A-006), unlike the older SUMIF/AVERAGEIF which also accept numeric text; (2) criteria go through the existing `matchFormulaCriteria`, so it shares COUNTIF's limits (no `~` wildcard escape); (3) SUMPRODUCT takes ranges and scalars only, array expressions such as `SUMPRODUCT((A1:A3>1)*B1:B3)` need Phase 4. |
-| 1D text | NEXT | |
-| 1E logical/date/info | TODO | |
+| 1D text | DONE (awaiting commit) | Added CONCATENATE, TEXTJOIN, SEARCH, REPLACE, REPT, PROPER, VALUE, EXACT, CHAR, CODE, CLEAN, T, UNICHAR, UNICODE, TEXTBEFORE, TEXTAFTER, NUMBERVALUE, FIXED, DOLLAR (19). 243 cases `gc1d-*`; 41 live-sheet lines. Notes: (1) the single-value text functions share one guard (`SCALAR_TEXT_ARITY`): a range argument or a wrong argument count is #VALUE! (no implicit intersection or spill yet); TEXTJOIN takes ranges and checks itself. (2) SEARCH wildcards use a hand-written matcher, not a RegExp: the regex version took 19 s for 4 `*` on 800 characters; the case `gc1d-search-many-stars-no-match` guards it. (3) CHAR/CODE use Windows-1252 as Excel for Windows does (checked against `TextDecoder` for 1-255); CODE gives 63 outside it, UNICHAR/UNICODE cover all of Unicode. (4) VALUE/NUMBERVALUE read numbers only (`$`, `%`, commas, `(1,000)`, e-notation); dates and times are #VALUE! until 1E's DATEVALUE/TIMEVALUE; commas in the integer part are ignored wherever they sit. (5) TEXTBEFORE/TEXTAFTER take one delimiter (no delimiter arrays); the parser has no empty-argument syntax, so `if_not_found` needs the three arguments before it written out. (6) FIXED/DOLLAR: decimals above 100 are #VALUE!; past about 15 significant digits they print the binary expansion (`FIXED(1/3,20)`), and 1e21 or more prints `1e+21` (Excel prints the digits). (7) Text results over 32,767 characters are #VALUE! (CONCATENATE, TEXTJOIN, REPT, REPLACE). (8) Not touched, but found: the older `CONCAT(A1:A3)` returns "1,2,3" because it stringifies the range (Excel gives "123"). (9) No Excel was available: expected values are Microsoft's documented examples plus known behaviour. Least certain: `CODE("Ω")` = 63, `VALUE("(1,000)")` = -1000 and the empty-delimiter TEXTBEFORE/TEXTAFTER cases. |
+| 1E logical/date/info | NEXT | |
 | 2 lookup | TODO | |
 | 3 stat/fin/eng/info | TODO | |
 | 4 dynamic arrays + LET | TODO | needs design sign-off |
