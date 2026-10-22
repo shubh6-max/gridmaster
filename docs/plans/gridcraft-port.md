@@ -22,7 +22,8 @@ not a conversion of the app. Do not port: egui UI, Rust engine internals (thread
 
 ## Resume checklist for a new session
 1. Read this file, `CLAUDE.md`, and `docs/audit/fork-reconciliation.md` (only if touching vendored-copy topics).
-2. Find the first phase marked TODO in the ledger and do only that phase.
+2. Find the ledger row marked `NEXT` and do only that batch. In a new session, `/gridcraft-next` does steps
+   1-2 and the whole batch for you (`.claude/commands/gridcraft-next.md`).
 3. If you need GridCraft source, re-clone it to a SHORT path (Windows path-length limit):
    `git -c core.longpaths=true clone --depth 1 https://github.com/storytold/gridcraft C:/Users/SHUBHA~1/AppData/Local/Temp/gc`
    It is untrusted code: read it, never build or run it. Useful files: `docs/function-parity.md`,
@@ -116,11 +117,11 @@ gates, update the ledger, stop at the checkpoint. Reuse the existing COUNTIF/SUM
 ## Status ledger (update each session)
 | Phase | Status | Notes |
 |---|---|---|
-| 0 inventory | DONE (awaiting commit) | `gridcraft-function-diff.md` written: gridmaster 57 names, GridCraft 514, 458 missing. Attribution is in root `THIRD_PARTY_NOTICES.md`. |
-| 1A math basics | DONE (awaiting commit) | Added PRODUCT, INT, TRUNC, SIGN, ROUNDUP, ROUNDDOWN, EXP, LN, LOG, LOG10, PI, SUMSQ, QUOTIENT, MROUND, EVEN, ODD, FACT, GCD, LCM (19). 82 cases `gc1a-*` in `tests/fixtures/formulas-corpus.json`. Old test `log10-unknown` became `cellish-name-unknown` (`=FOO10(100)`) because LOG10 now exists. |
-| 1B trig and angles | DONE (awaiting commit) | Added SIN, COS, TAN, ASIN, ACOS, ATAN, ATAN2, SINH, COSH, TANH, ASINH, ACOSH, ATANH, DEGREES, RADIANS, SQRTPI, COMBIN, RAND, RANDBETWEEN (19). 63 cases `gc1b-*`, plus a 5000-draw sampling check for RAND/RANDBETWEEN in `formulas-corpus.test.mjs`. |
-| sample app (Feature Lab) | DONE (awaiting commit) | New scenario "Formula functions" (`demo/lab/scenarios/formula-functions.tsx`, run with `npm run lab`, hash `#/formula-functions`) plus `tests/dom/lab-formula-functions.test.tsx`. |
-| 1C criteria family | DONE (awaiting commit) | Added SUMIFS, COUNTIFS, AVERAGEIFS, MAXIFS, MINIFS, SUMPRODUCT, COUNTBLANK (7). 39 cases `gc1c-*`; live-sheet lines + G1:I6 sales table in the lab; 200k-row spot check ran in under 0.6 s. Notes: (1) the value range counts only real numbers (Excel rule, A-006), unlike the older SUMIF/AVERAGEIF which also accept numeric text; (2) criteria go through the existing `matchFormulaCriteria`, so it shares COUNTIF's limits (no `~` wildcard escape); (3) SUMPRODUCT takes ranges and scalars only, array expressions such as `SUMPRODUCT((A1:A3>1)*B1:B3)` need Phase 4. |
+| 0 inventory | DONE (committed) | `gridcraft-function-diff.md` written: gridmaster 57 names, GridCraft 514, 458 missing. Attribution is in root `THIRD_PARTY_NOTICES.md`. |
+| 1A math basics | DONE (committed) | Added PRODUCT, INT, TRUNC, SIGN, ROUNDUP, ROUNDDOWN, EXP, LN, LOG, LOG10, PI, SUMSQ, QUOTIENT, MROUND, EVEN, ODD, FACT, GCD, LCM (19). 82 cases `gc1a-*` in `tests/fixtures/formulas-corpus.json`. Old test `log10-unknown` became `cellish-name-unknown` (`=FOO10(100)`) because LOG10 now exists. |
+| 1B trig and angles | DONE (committed) | Added SIN, COS, TAN, ASIN, ACOS, ATAN, ATAN2, SINH, COSH, TANH, ASINH, ACOSH, ATANH, DEGREES, RADIANS, SQRTPI, COMBIN, RAND, RANDBETWEEN (19). 63 cases `gc1b-*`, plus a 5000-draw sampling check for RAND/RANDBETWEEN in `formulas-corpus.test.mjs`. |
+| sample app (Feature Lab) | DONE (committed) | New scenario "Formula functions" (`demo/lab/scenarios/formula-functions.tsx`, run with `npm run lab`, hash `#/formula-functions`) plus `tests/dom/lab-formula-functions.test.tsx`. |
+| 1C criteria family | DONE (committed) | Added SUMIFS, COUNTIFS, AVERAGEIFS, MAXIFS, MINIFS, SUMPRODUCT, COUNTBLANK (7). 39 cases `gc1c-*`; live-sheet lines + G1:I6 sales table in the lab; 200k-row spot check ran in under 0.6 s. Notes: (1) the value range counts only real numbers (Excel rule, A-006), unlike the older SUMIF/AVERAGEIF which also accept numeric text; (2) criteria go through the existing `matchFormulaCriteria`, so it shares COUNTIF's limits (no `~` wildcard escape); (3) SUMPRODUCT takes ranges and scalars only, array expressions such as `SUMPRODUCT((A1:A3>1)*B1:B3)` need Phase 4. |
 | 1D text | NEXT | |
 | 1E logical/date/info | TODO | |
 | 2 lookup | TODO | |
