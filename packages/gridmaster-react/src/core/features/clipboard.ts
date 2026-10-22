@@ -7,6 +7,7 @@ import type {
 import { EMPTY_CLIPBOARD } from "../constants";
 import {
   clipboardToText,
+  formatCellValue,
   getRowValue,
   normalizeRange,
   parseCellValue,
@@ -31,9 +32,23 @@ export type GridCopyResult = {
   text: string;
 };
 
-export type GridPasteResult<T extends GridRow = GridRow> = {
+export type GridPasteResult<T extends object = GridRow> = {
   rows: T[];
   affectedBounds: GridClipboardBounds | null;
+};
+
+/**
+ * How copy builders turn a stored cell value into clipboard text (A-064).
+ * - `"raw"` (default, unchanged behaviour): the stored value stringified. A formula cell copies its
+ *   source text (`=A1+B1`) so an in-grid paste round-trips back to a live formula.
+ * - `"displayed"`: the column's formatted text (`formatValue`, date formatting, select labels).
+ * Computing a formula's RESULT needs a formula evaluator, which these pure core builders do not
+ * hold; the clipboard hook (Task 7) wires the evaluator for displayed formula results.
+ */
+export type GridCopyValueMode = "raw" | "displayed";
+
+export type GridCopyOptions = {
+  valueMode?: GridCopyValueMode;
 };
 
 /* =========================================================
@@ -143,15 +158,24 @@ export function getSelectionBounds(
    Copy helpers
    ========================================================= */
 
-export function extractSelectionMatrix<T extends GridRow>(
+export function extractSelectionMatrix<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
-  selection: GridSelectionState
+  selection: GridSelectionState,
+  options?: GridCopyOptions
 ): { data: string[][]; bounds: GridClipboardBounds | null } {
   const bounds = getSelectionBounds(selection, rows.length, columns.length);
   if (!bounds) {
     return { data: [], bounds: null };
   }
+
+  // `"raw"` keeps today's exact stringification; `"displayed"` routes through the column formatter.
+  const displayed = options?.valueMode === "displayed";
+  const cellText = (row: T, column: GridResolvedColumnDef<T>): string => {
+    const value = getRowValue(row, column);
+    if (displayed) return formatCellValue(value, row, column);
+    return value === null || value === undefined ? "" : String(value);
+  };
 
   const data: string[][] = [];
 
@@ -162,13 +186,7 @@ export function extractSelectionMatrix<T extends GridRow>(
       const row = rows[rowIndex];
       if (!row) continue;
 
-      data.push(
-        columns.map((column) => {
-          const value = getRowValue(row, column);
-          if (value === null || value === undefined) return "";
-          return String(value);
-        })
-      );
+      data.push(columns.map((column) => cellText(row, column)));
     }
 
     return { data, bounds };
@@ -185,9 +203,7 @@ export function extractSelectionMatrix<T extends GridRow>(
         selectedCols.map((colIndex) => {
           const column = columns[colIndex];
           if (!column) return "";
-          const value = getRowValue(row, column);
-          if (value === null || value === undefined) return "";
-          return String(value);
+          return cellText(row, column);
         })
       );
     }
@@ -208,8 +224,7 @@ export function extractSelectionMatrix<T extends GridRow>(
         continue;
       }
 
-      const value = getRowValue(row, column);
-      line.push(value === null || value === undefined ? "" : String(value));
+      line.push(cellText(row, column));
     }
 
     data.push(line);
@@ -218,13 +233,14 @@ export function extractSelectionMatrix<T extends GridRow>(
   return { data, bounds };
 }
 
-export function copySelection<T extends GridRow>(
+export function copySelection<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
   selection: GridSelectionState,
-  isCut = false
+  isCut = false,
+  options?: GridCopyOptions
 ): GridCopyResult {
-  const { data, bounds } = extractSelectionMatrix(rows, columns, selection);
+  const { data, bounds } = extractSelectionMatrix(rows, columns, selection, options);
 
   if (!bounds) {
     return {
@@ -269,7 +285,7 @@ export function getPasteMatrix(text?: string, clipboard?: GridClipboardData | nu
   return clipboard?.data ?? [];
 }
 
-export function pasteMatrixAt<T extends GridRow>(
+export function pasteMatrixAt<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
   startRow: number,
@@ -317,7 +333,7 @@ export function pasteMatrixAt<T extends GridRow>(
   };
 }
 
-export async function pasteFromClipboard<T extends GridRow>(
+export async function pasteFromClipboard<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
   startRow: number,
@@ -333,7 +349,7 @@ export async function pasteFromClipboard<T extends GridRow>(
    Cut helpers
    ========================================================= */
 
-export function clearCutSelection<T extends GridRow>(
+export function clearCutSelection<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
   clipboard: GridClipboardData

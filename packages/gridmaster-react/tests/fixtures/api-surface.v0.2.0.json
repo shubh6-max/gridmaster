@@ -1,0 +1,1626 @@
+[
+  {
+    "name": "CheckboxEditor",
+    "kind": "value"
+  },
+  {
+    "name": "CheckboxRenderer",
+    "kind": "value"
+  },
+  {
+    "name": "ColorMenu",
+    "kind": "value"
+  },
+  {
+    "name": "ColumnMenu",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_CELL_META",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_COLOR_LABELS",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_COLOR_PALETTE",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_COLUMN_ALIGN",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_COLUMN_TYPE",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_COLUMN_WIDTH",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_CELL_COLORING",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_CLIPBOARD",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_COLUMN_AUTOFIT",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_COLUMN_RESIZE",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_COLUMN_SELECTION",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_COLUMN_VISIBILITY",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_DELETE_COLUMN",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_DELETE_ROW",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_EDITING",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_FILL_HANDLE",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_FILTERING",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_INSERT_COLUMN",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_INSERT_ROW",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_RANGE_SELECTION",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_ROW_SELECTION",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_SELECTION",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_SORTING",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_UNDO_REDO",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ENABLE_WRAP_TEXT",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_FROZEN_COLUMNS",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_GRID_HEIGHT",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_GRID_MODE",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_GRID_WIDTH",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_HEADER_HEIGHT",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_MAX_COLUMN_WIDTH",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_MIN_COLUMN_WIDTH",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ROW_HEIGHT",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_ROW_NUMBER_WIDTH",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_SHOW_FORMULA_BAR",
+    "kind": "value"
+  },
+  {
+    "name": "DEFAULT_SHOW_STATUS_BAR",
+    "kind": "value"
+  },
+  {
+    "name": "DateEditor",
+    "kind": "value"
+  },
+  {
+    "name": "DateRenderer",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_CELL_COORD",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_CLIPBOARD",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_COLUMN_MENU",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_DROPDOWN_EDIT",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_EDIT_CELL",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_FILL_STATE",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_FILTERS",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_SELECTION_RANGE",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_SORT",
+    "kind": "value"
+  },
+  {
+    "name": "EMPTY_VALUE_SET_FILTER",
+    "kind": "value"
+  },
+  {
+    "name": "FilterMenu",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_CLASSNAMES",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_COLUMN_DEFAULTS",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_COLUMN_TYPES",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_COLUMN_TYPE_LABELS",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_FORMULA_CYCLE",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_FORMULA_DIV_ZERO",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_FORMULA_ERROR",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_FORMULA_NAME",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_FORMULA_REF",
+    "kind": "value"
+  },
+  {
+    "name": "GRID_FORMULA_VALUE",
+    "kind": "value"
+  },
+  {
+    "name": "GridBounds",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellChangeEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellContext",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellCoord",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellEditorProps",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellMeta",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellMetaGetter",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellMetaPatch",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellRendererProps",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellValidator",
+    "kind": "type"
+  },
+  {
+    "name": "GridCellValue",
+    "kind": "type"
+  },
+  {
+    "name": "GridClipboardData",
+    "kind": "type"
+  },
+  {
+    "name": "GridClipboardEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridClipboardOrigin",
+    "kind": "type"
+  },
+  {
+    "name": "GridColorFilter",
+    "kind": "type"
+  },
+  {
+    "name": "GridColorFilterChangeEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridColorFilters",
+    "kind": "type"
+  },
+  {
+    "name": "GridColorOption",
+    "kind": "type"
+  },
+  {
+    "name": "GridColorSort",
+    "kind": "type"
+  },
+  {
+    "name": "GridColorSortChangeEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnDef",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnDeleteEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnFactory",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnFilter",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnInsertEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnInsertPosition",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnMenuState",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnResizeEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnType",
+    "kind": "type"
+  },
+  {
+    "name": "GridColumnWidths",
+    "kind": "type"
+  },
+  {
+    "name": "GridContextMenu",
+    "kind": "value"
+  },
+  {
+    "name": "GridCreateColumnOptions",
+    "kind": "type"
+  },
+  {
+    "name": "GridDefaultCellEditor",
+    "kind": "type"
+  },
+  {
+    "name": "GridDefaultCellRenderer",
+    "kind": "type"
+  },
+  {
+    "name": "GridDropdownEditState",
+    "kind": "type"
+  },
+  {
+    "name": "GridEditCell",
+    "kind": "type"
+  },
+  {
+    "name": "GridEditingTarget",
+    "kind": "type"
+  },
+  {
+    "name": "GridFillState",
+    "kind": "type"
+  },
+  {
+    "name": "GridFilterChangeEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridFilterOperator",
+    "kind": "type"
+  },
+  {
+    "name": "GridFilters",
+    "kind": "type"
+  },
+  {
+    "name": "GridFormatPainterClipboard",
+    "kind": "type"
+  },
+  {
+    "name": "GridFormatPainterMode",
+    "kind": "type"
+  },
+  {
+    "name": "GridFormulaEvaluationResult",
+    "kind": "type"
+  },
+  {
+    "name": "GridFormulaEvaluator",
+    "kind": "type"
+  },
+  {
+    "name": "GridHistoryAction",
+    "kind": "type"
+  },
+  {
+    "name": "GridHistoryCloneOptions",
+    "kind": "type"
+  },
+  {
+    "name": "GridHistoryState",
+    "kind": "type"
+  },
+  {
+    "name": "GridHorizontalAlign",
+    "kind": "type"
+  },
+  {
+    "name": "GridInsertedColumnFactory",
+    "kind": "type"
+  },
+  {
+    "name": "GridInsertedColumnFactoryContext",
+    "kind": "type"
+  },
+  {
+    "name": "GridInsertedRowFactory",
+    "kind": "type"
+  },
+  {
+    "name": "GridInsertedRowFactoryContext",
+    "kind": "type"
+  },
+  {
+    "name": "GridMaster",
+    "kind": "value"
+  },
+  {
+    "name": "GridMasterProps",
+    "kind": "type"
+  },
+  {
+    "name": "GridMixedFormatValue",
+    "kind": "type"
+  },
+  {
+    "name": "GridMode",
+    "kind": "type"
+  },
+  {
+    "name": "GridPrimitive",
+    "kind": "type"
+  },
+  {
+    "name": "GridResolvedColumnDef",
+    "kind": "type"
+  },
+  {
+    "name": "GridRow",
+    "kind": "type"
+  },
+  {
+    "name": "GridRowDeleteEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridRowIdGetter",
+    "kind": "type"
+  },
+  {
+    "name": "GridRowInsertEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridRowInsertPosition",
+    "kind": "type"
+  },
+  {
+    "name": "GridRowMeta",
+    "kind": "type"
+  },
+  {
+    "name": "GridRowMetaGetter",
+    "kind": "type"
+  },
+  {
+    "name": "GridSelectionChangeEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridSelectionFormattingSummary",
+    "kind": "type"
+  },
+  {
+    "name": "GridSelectionFormattingValue",
+    "kind": "type"
+  },
+  {
+    "name": "GridSelectionMode",
+    "kind": "type"
+  },
+  {
+    "name": "GridSelectionRange",
+    "kind": "type"
+  },
+  {
+    "name": "GridSelectionState",
+    "kind": "type"
+  },
+  {
+    "name": "GridSnapshot",
+    "kind": "type"
+  },
+  {
+    "name": "GridSort",
+    "kind": "type"
+  },
+  {
+    "name": "GridSortChangeEvent",
+    "kind": "type"
+  },
+  {
+    "name": "GridSortDirection",
+    "kind": "type"
+  },
+  {
+    "name": "GridState",
+    "kind": "type"
+  },
+  {
+    "name": "GridTextOrientation",
+    "kind": "type"
+  },
+  {
+    "name": "GridToolbar",
+    "kind": "value"
+  },
+  {
+    "name": "GridUiState",
+    "kind": "type"
+  },
+  {
+    "name": "GridValueFormatter",
+    "kind": "type"
+  },
+  {
+    "name": "GridValueGetter",
+    "kind": "type"
+  },
+  {
+    "name": "GridValueParser",
+    "kind": "type"
+  },
+  {
+    "name": "GridValueSetter",
+    "kind": "type"
+  },
+  {
+    "name": "GridVerticalAlign",
+    "kind": "type"
+  },
+  {
+    "name": "INITIAL_SELECTION_STATE",
+    "kind": "value"
+  },
+  {
+    "name": "INITIAL_UI_STATE",
+    "kind": "value"
+  },
+  {
+    "name": "KEYBOARD_KEYS",
+    "kind": "value"
+  },
+  {
+    "name": "LinkRenderer",
+    "kind": "value"
+  },
+  {
+    "name": "MAX_HISTORY_SIZE",
+    "kind": "value"
+  },
+  {
+    "name": "MIXED_FORMAT_VALUE",
+    "kind": "value"
+  },
+  {
+    "name": "NumberEditor",
+    "kind": "value"
+  },
+  {
+    "name": "SelectEditor",
+    "kind": "value"
+  },
+  {
+    "name": "SelectRenderer",
+    "kind": "value"
+  },
+  {
+    "name": "TextEditor",
+    "kind": "value"
+  },
+  {
+    "name": "TextRenderer",
+    "kind": "value"
+  },
+  {
+    "name": "UseGridMasterResult",
+    "kind": "type"
+  },
+  {
+    "name": "Z_INDEX",
+    "kind": "value"
+  },
+  {
+    "name": "appendRow",
+    "kind": "value"
+  },
+  {
+    "name": "applyCellMetaPatchToBounds",
+    "kind": "value"
+  },
+  {
+    "name": "applyCellStyleToBounds",
+    "kind": "value"
+  },
+  {
+    "name": "applyColorSortToRowIndexes",
+    "kind": "value"
+  },
+  {
+    "name": "applyColumnTypeDefaults",
+    "kind": "value"
+  },
+  {
+    "name": "applyFillFromSelection",
+    "kind": "value"
+  },
+  {
+    "name": "applyFillFromState",
+    "kind": "value"
+  },
+  {
+    "name": "applyFormatPainterToBounds",
+    "kind": "value"
+  },
+  {
+    "name": "autoFitColumn",
+    "kind": "value"
+  },
+  {
+    "name": "autoFitManyColumns",
+    "kind": "value"
+  },
+  {
+    "name": "buildColumnOffsets",
+    "kind": "value"
+  },
+  {
+    "name": "calculateAutoFitWidth",
+    "kind": "value"
+  },
+  {
+    "name": "canRedo",
+    "kind": "value"
+  },
+  {
+    "name": "canUndo",
+    "kind": "value"
+  },
+  {
+    "name": "cellAddress",
+    "kind": "value"
+  },
+  {
+    "name": "clamp",
+    "kind": "value"
+  },
+  {
+    "name": "clampCellToBounds",
+    "kind": "value"
+  },
+  {
+    "name": "clampFrozenColumns",
+    "kind": "value"
+  },
+  {
+    "name": "clearCellRange",
+    "kind": "value"
+  },
+  {
+    "name": "clearCellValue",
+    "kind": "value"
+  },
+  {
+    "name": "clearClipboard",
+    "kind": "value"
+  },
+  {
+    "name": "clearColorFilter",
+    "kind": "value"
+  },
+  {
+    "name": "clearColorFilters",
+    "kind": "value"
+  },
+  {
+    "name": "clearCutSelection",
+    "kind": "value"
+  },
+  {
+    "name": "clearFillState",
+    "kind": "value"
+  },
+  {
+    "name": "clearFilter",
+    "kind": "value"
+  },
+  {
+    "name": "clearFilters",
+    "kind": "value"
+  },
+  {
+    "name": "clearSelection",
+    "kind": "value"
+  },
+  {
+    "name": "clearSnapshotRange",
+    "kind": "value"
+  },
+  {
+    "name": "clearSort",
+    "kind": "value"
+  },
+  {
+    "name": "clipboardToText",
+    "kind": "value"
+  },
+  {
+    "name": "clone2DArray",
+    "kind": "value"
+  },
+  {
+    "name": "cloneCellMetaMap",
+    "kind": "value"
+  },
+  {
+    "name": "cloneColumns",
+    "kind": "value"
+  },
+  {
+    "name": "cloneRowMetaMap",
+    "kind": "value"
+  },
+  {
+    "name": "cloneRows",
+    "kind": "value"
+  },
+  {
+    "name": "cloneSelectionState",
+    "kind": "value"
+  },
+  {
+    "name": "cloneSnapshot",
+    "kind": "value"
+  },
+  {
+    "name": "columnLetter",
+    "kind": "value"
+  },
+  {
+    "name": "compareValues",
+    "kind": "value"
+  },
+  {
+    "name": "copyFormatFromSelection",
+    "kind": "value"
+  },
+  {
+    "name": "copySelection",
+    "kind": "value"
+  },
+  {
+    "name": "createCellCoord",
+    "kind": "value"
+  },
+  {
+    "name": "createCellMetaKey",
+    "kind": "value"
+  },
+  {
+    "name": "createClipboardData",
+    "kind": "value"
+  },
+  {
+    "name": "createColorFilter",
+    "kind": "value"
+  },
+  {
+    "name": "createColumn",
+    "kind": "value"
+  },
+  {
+    "name": "createColumnFactory",
+    "kind": "value"
+  },
+  {
+    "name": "createCompactGridPreset",
+    "kind": "value"
+  },
+  {
+    "name": "createConditionFilter",
+    "kind": "value"
+  },
+  {
+    "name": "createDefaultCellMeta",
+    "kind": "value"
+  },
+  {
+    "name": "createDefaultInsertedColumn",
+    "kind": "value"
+  },
+  {
+    "name": "createDefaultInsertedRow",
+    "kind": "value"
+  },
+  {
+    "name": "createEditableGridPreset",
+    "kind": "value"
+  },
+  {
+    "name": "createEmptyRow",
+    "kind": "value"
+  },
+  {
+    "name": "createEmptySnapshot",
+    "kind": "value"
+  },
+  {
+    "name": "createFillState",
+    "kind": "value"
+  },
+  {
+    "name": "createFormatPainterBounds",
+    "kind": "value"
+  },
+  {
+    "name": "createFormulaCellReference",
+    "kind": "value"
+  },
+  {
+    "name": "createFormulaEvaluator",
+    "kind": "value"
+  },
+  {
+    "name": "createInitialColumnWidths",
+    "kind": "value"
+  },
+  {
+    "name": "createInitialHistoryState",
+    "kind": "value"
+  },
+  {
+    "name": "createInitialSelectionState",
+    "kind": "value"
+  },
+  {
+    "name": "createMultipleEmptyRows",
+    "kind": "value"
+  },
+  {
+    "name": "createRange",
+    "kind": "value"
+  },
+  {
+    "name": "createReadonlyGridPreset",
+    "kind": "value"
+  },
+  {
+    "name": "createSelectionRange",
+    "kind": "value"
+  },
+  {
+    "name": "createSort",
+    "kind": "value"
+  },
+  {
+    "name": "createValueSetFilter",
+    "kind": "value"
+  },
+  {
+    "name": "defaultCellEditors",
+    "kind": "value"
+  },
+  {
+    "name": "defaultCellRenderers",
+    "kind": "value"
+  },
+  {
+    "name": "deleteCellMetaForColumn",
+    "kind": "value"
+  },
+  {
+    "name": "deleteColumnAtIndex",
+    "kind": "value"
+  },
+  {
+    "name": "deleteColumnValueFromRows",
+    "kind": "value"
+  },
+  {
+    "name": "deleteRowAt",
+    "kind": "value"
+  },
+  {
+    "name": "deleteRowsAt",
+    "kind": "value"
+  },
+  {
+    "name": "ensureHttps",
+    "kind": "value"
+  },
+  {
+    "name": "evaluateGridCell",
+    "kind": "value"
+  },
+  {
+    "name": "expandSelectionDown",
+    "kind": "value"
+  },
+  {
+    "name": "expandSelectionLeft",
+    "kind": "value"
+  },
+  {
+    "name": "expandSelectionRight",
+    "kind": "value"
+  },
+  {
+    "name": "expandSelectionUp",
+    "kind": "value"
+  },
+  {
+    "name": "extractSelectionMatrix",
+    "kind": "value"
+  },
+  {
+    "name": "fillHorizontal",
+    "kind": "value"
+  },
+  {
+    "name": "fillRangeWithSource",
+    "kind": "value"
+  },
+  {
+    "name": "fillVertical",
+    "kind": "value"
+  },
+  {
+    "name": "filterRowIndexes",
+    "kind": "value"
+  },
+  {
+    "name": "filterRows",
+    "kind": "value"
+  },
+  {
+    "name": "findSortableColumn",
+    "kind": "value"
+  },
+  {
+    "name": "formatCellValue",
+    "kind": "value"
+  },
+  {
+    "name": "formatDateValue",
+    "kind": "value"
+  },
+  {
+    "name": "getClipboardSelectionBounds",
+    "kind": "value"
+  },
+  {
+    "name": "getColumnTypeDefaults",
+    "kind": "value"
+  },
+  {
+    "name": "getColumnWidth",
+    "kind": "value"
+  },
+  {
+    "name": "getCurrentCell",
+    "kind": "value"
+  },
+  {
+    "name": "getDefaultCellEditor",
+    "kind": "value"
+  },
+  {
+    "name": "getDefaultCellRenderer",
+    "kind": "value"
+  },
+  {
+    "name": "getDisplayRowIndexes",
+    "kind": "value"
+  },
+  {
+    "name": "getDisplayRows",
+    "kind": "value"
+  },
+  {
+    "name": "getEffectiveHorizontalAlign",
+    "kind": "value"
+  },
+  {
+    "name": "getEffectiveIndentLevel",
+    "kind": "value"
+  },
+  {
+    "name": "getEffectiveTextOrientation",
+    "kind": "value"
+  },
+  {
+    "name": "getEffectiveVerticalAlign",
+    "kind": "value"
+  },
+  {
+    "name": "getEffectiveWrapText",
+    "kind": "value"
+  },
+  {
+    "name": "getFillBounds",
+    "kind": "value"
+  },
+  {
+    "name": "getFilterValuesForColumn",
+    "kind": "value"
+  },
+  {
+    "name": "getFilteredColorOptionsForColumn",
+    "kind": "value"
+  },
+  {
+    "name": "getFilteredUniqueValuesForColumn",
+    "kind": "value"
+  },
+  {
+    "name": "getFrozenColumnKeys",
+    "kind": "value"
+  },
+  {
+    "name": "getFrozenColumns",
+    "kind": "value"
+  },
+  {
+    "name": "getInsertColumnIndex",
+    "kind": "value"
+  },
+  {
+    "name": "getInsertRowIndex",
+    "kind": "value"
+  },
+  {
+    "name": "getPasteMatrix",
+    "kind": "value"
+  },
+  {
+    "name": "getResizedWidth",
+    "kind": "value"
+  },
+  {
+    "name": "getRowValue",
+    "kind": "value"
+  },
+  {
+    "name": "getSelectionBounds",
+    "kind": "value"
+  },
+  {
+    "name": "getSelectionCellMeta",
+    "kind": "value"
+  },
+  {
+    "name": "getTotalTableWidth",
+    "kind": "value"
+  },
+  {
+    "name": "getUniqueColumnValues",
+    "kind": "value"
+  },
+  {
+    "name": "getVisibleColumns",
+    "kind": "value"
+  },
+  {
+    "name": "goBottom",
+    "kind": "value"
+  },
+  {
+    "name": "goEnd",
+    "kind": "value"
+  },
+  {
+    "name": "goHome",
+    "kind": "value"
+  },
+  {
+    "name": "goToCell",
+    "kind": "value"
+  },
+  {
+    "name": "goTop",
+    "kind": "value"
+  },
+  {
+    "name": "hasActiveColorFilters",
+    "kind": "value"
+  },
+  {
+    "name": "hasActiveFilters",
+    "kind": "value"
+  },
+  {
+    "name": "hasColumnSelection",
+    "kind": "value"
+  },
+  {
+    "name": "hasRangeSelection",
+    "kind": "value"
+  },
+  {
+    "name": "hasRowSelection",
+    "kind": "value"
+  },
+  {
+    "name": "historyReducer",
+    "kind": "value"
+  },
+  {
+    "name": "insertCellReferenceIntoFormula",
+    "kind": "value"
+  },
+  {
+    "name": "insertColumnAtIndex",
+    "kind": "value"
+  },
+  {
+    "name": "insertColumnValueIntoRows",
+    "kind": "value"
+  },
+  {
+    "name": "insertRowAt",
+    "kind": "value"
+  },
+  {
+    "name": "isBlankValue",
+    "kind": "value"
+  },
+  {
+    "name": "isCellActive",
+    "kind": "value"
+  },
+  {
+    "name": "isCellSelected",
+    "kind": "value"
+  },
+  {
+    "name": "isCoordInRange",
+    "kind": "value"
+  },
+  {
+    "name": "isDate",
+    "kind": "value"
+  },
+  {
+    "name": "isEmptyFormatMeta",
+    "kind": "value"
+  },
+  {
+    "name": "isFilteredColumn",
+    "kind": "value"
+  },
+  {
+    "name": "isFormulaValue",
+    "kind": "value"
+  },
+  {
+    "name": "isFrozenColumnIndex",
+    "kind": "value"
+  },
+  {
+    "name": "isGridColumnType",
+    "kind": "value"
+  },
+  {
+    "name": "isNil",
+    "kind": "value"
+  },
+  {
+    "name": "isPlainObject",
+    "kind": "value"
+  },
+  {
+    "name": "isRowBlank",
+    "kind": "value"
+  },
+  {
+    "name": "isSameCoord",
+    "kind": "value"
+  },
+  {
+    "name": "isSortedColumn",
+    "kind": "value"
+  },
+  {
+    "name": "mapDisplayRowToSourceIndex",
+    "kind": "value"
+  },
+  {
+    "name": "matchesColorFilterValue",
+    "kind": "value"
+  },
+  {
+    "name": "matchesConditionFilter",
+    "kind": "value"
+  },
+  {
+    "name": "matchesFilter",
+    "kind": "value"
+  },
+  {
+    "name": "matchesValueSetFilter",
+    "kind": "value"
+  },
+  {
+    "name": "matrixToRows",
+    "kind": "value"
+  },
+  {
+    "name": "moveCursor",
+    "kind": "value"
+  },
+  {
+    "name": "moveDown",
+    "kind": "value"
+  },
+  {
+    "name": "moveEnter",
+    "kind": "value"
+  },
+  {
+    "name": "moveLeft",
+    "kind": "value"
+  },
+  {
+    "name": "moveRight",
+    "kind": "value"
+  },
+  {
+    "name": "moveTab",
+    "kind": "value"
+  },
+  {
+    "name": "moveToCell",
+    "kind": "value"
+  },
+  {
+    "name": "moveUp",
+    "kind": "value"
+  },
+  {
+    "name": "navigateByKey",
+    "kind": "value"
+  },
+  {
+    "name": "nextSortOnHeaderClick",
+    "kind": "value"
+  },
+  {
+    "name": "normalizeColumns",
+    "kind": "value"
+  },
+  {
+    "name": "normalizeRange",
+    "kind": "value"
+  },
+  {
+    "name": "normalizeSelectionRange",
+    "kind": "value"
+  },
+  {
+    "name": "normalizeValue",
+    "kind": "value"
+  },
+  {
+    "name": "parseCellValue",
+    "kind": "value"
+  },
+  {
+    "name": "parseColumnLetter",
+    "kind": "value"
+  },
+  {
+    "name": "pasteFromClipboard",
+    "kind": "value"
+  },
+  {
+    "name": "pasteMatrixAt",
+    "kind": "value"
+  },
+  {
+    "name": "pushHistory",
+    "kind": "value"
+  },
+  {
+    "name": "rangeSize",
+    "kind": "value"
+  },
+  {
+    "name": "readClipboardText",
+    "kind": "value"
+  },
+  {
+    "name": "redoHistory",
+    "kind": "value"
+  },
+  {
+    "name": "reorderColumns",
+    "kind": "value"
+  },
+  {
+    "name": "resetColumnWidth",
+    "kind": "value"
+  },
+  {
+    "name": "resetHistory",
+    "kind": "value"
+  },
+  {
+    "name": "resizeColumn",
+    "kind": "value"
+  },
+  {
+    "name": "resolveColumnDef",
+    "kind": "value"
+  },
+  {
+    "name": "resolveColumns",
+    "kind": "value"
+  },
+  {
+    "name": "resolveGridRowId",
+    "kind": "value"
+  },
+  {
+    "name": "rowMatchesColorFilters",
+    "kind": "value"
+  },
+  {
+    "name": "rowMatchesFilters",
+    "kind": "value"
+  },
+  {
+    "name": "rowsToMatrix",
+    "kind": "value"
+  },
+  {
+    "name": "safeDomRect",
+    "kind": "value"
+  },
+  {
+    "name": "selectAllCells",
+    "kind": "value"
+  },
+  {
+    "name": "selectColumnRange",
+    "kind": "value"
+  },
+  {
+    "name": "selectRowRange",
+    "kind": "value"
+  },
+  {
+    "name": "selectSingleColumn",
+    "kind": "value"
+  },
+  {
+    "name": "selectSingleRow",
+    "kind": "value"
+  },
+  {
+    "name": "setActiveCell",
+    "kind": "value"
+  },
+  {
+    "name": "setColorFilter",
+    "kind": "value"
+  },
+  {
+    "name": "setColumnWidth",
+    "kind": "value"
+  },
+  {
+    "name": "setFilter",
+    "kind": "value"
+  },
+  {
+    "name": "setManyColumnWidths",
+    "kind": "value"
+  },
+  {
+    "name": "setRangeSelection",
+    "kind": "value"
+  },
+  {
+    "name": "setRowValue",
+    "kind": "value"
+  },
+  {
+    "name": "shallowEqualColumns",
+    "kind": "value"
+  },
+  {
+    "name": "shallowEqualObjects",
+    "kind": "value"
+  },
+  {
+    "name": "shallowEqualRows",
+    "kind": "value"
+  },
+  {
+    "name": "shiftCellMetaForDeletedRow",
+    "kind": "value"
+  },
+  {
+    "name": "shiftCellMetaForInsertedRow",
+    "kind": "value"
+  },
+  {
+    "name": "shiftRowMetaForDeletedRow",
+    "kind": "value"
+  },
+  {
+    "name": "shiftRowMetaForInsertedRow",
+    "kind": "value"
+  },
+  {
+    "name": "showOnlyColumns",
+    "kind": "value"
+  },
+  {
+    "name": "sortRowIndexes",
+    "kind": "value"
+  },
+  {
+    "name": "sortRows",
+    "kind": "value"
+  },
+  {
+    "name": "startResizeState",
+    "kind": "value"
+  },
+  {
+    "name": "summarizeSelectionFormatting",
+    "kind": "value"
+  },
+  {
+    "name": "syncWidthMapWithColumns",
+    "kind": "value"
+  },
+  {
+    "name": "textToClipboardMatrix",
+    "kind": "value"
+  },
+  {
+    "name": "titleize",
+    "kind": "value"
+  },
+  {
+    "name": "toBoolean",
+    "kind": "value"
+  },
+  {
+    "name": "toDateInputString",
+    "kind": "value"
+  },
+  {
+    "name": "toDisplayString",
+    "kind": "value"
+  },
+  {
+    "name": "toNumber",
+    "kind": "value"
+  },
+  {
+    "name": "toSafeString",
+    "kind": "value"
+  },
+  {
+    "name": "toggleColumnSelection",
+    "kind": "value"
+  },
+  {
+    "name": "toggleColumnSort",
+    "kind": "value"
+  },
+  {
+    "name": "toggleFrozenThroughColumn",
+    "kind": "value"
+  },
+  {
+    "name": "toggleRowSelection",
+    "kind": "value"
+  },
+  {
+    "name": "toggleSortDirection",
+    "kind": "value"
+  },
+  {
+    "name": "transformCellMetaInBounds",
+    "kind": "value"
+  },
+  {
+    "name": "undoHistory",
+    "kind": "value"
+  },
+  {
+    "name": "uniqueSorted",
+    "kind": "value"
+  },
+  {
+    "name": "updateCellValue",
+    "kind": "value"
+  },
+  {
+    "name": "updateFillState",
+    "kind": "value"
+  },
+  {
+    "name": "updateManyCells",
+    "kind": "value"
+  },
+  {
+    "name": "updateRowAt",
+    "kind": "value"
+  },
+  {
+    "name": "updateSnapshotCell",
+    "kind": "value"
+  },
+  {
+    "name": "useCellFormatting",
+    "kind": "value"
+  },
+  {
+    "name": "useClipboard",
+    "kind": "value"
+  },
+  {
+    "name": "useColumnSizing",
+    "kind": "value"
+  },
+  {
+    "name": "useEditing",
+    "kind": "value"
+  },
+  {
+    "name": "useFloatingAnchorRect",
+    "kind": "value"
+  },
+  {
+    "name": "useFloatingPortal",
+    "kind": "value"
+  },
+  {
+    "name": "useFormatPainter",
+    "kind": "value"
+  },
+  {
+    "name": "useGridMaster",
+    "kind": "value"
+  },
+  {
+    "name": "validateCell",
+    "kind": "value"
+  },
+  {
+    "name": "validateRow",
+    "kind": "value"
+  },
+  {
+    "name": "writeClipboardText",
+    "kind": "value"
+  }
+]

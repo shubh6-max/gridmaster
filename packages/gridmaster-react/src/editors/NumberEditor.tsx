@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { GridCellEditorProps, GridRow } from "../core/types";
 
-export function NumberEditor<T extends GridRow = GridRow>({
+export function NumberEditor<T extends object = GridRow>({
   value,
   commit,
   cancel,
   updateValue,
   requestViewportFocusAfterEdit,
   autoSelectOnFocus = true,
+  isInvalid = false,
 }: GridCellEditorProps<T>) {
   const [localValue, setLocalValue] = useState<string>(value == null ? "" : String(value));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,12 +37,16 @@ export function NumberEditor<T extends GridRow = GridRow>({
       type="text"
       inputMode="decimal"
       value={localValue}
+      aria-invalid={isInvalid || undefined}
+      className={isInvalid ? "gm-number-editor gm-cell-editor-invalid" : "gm-number-editor"}
       onChange={(event) => {
         const nextValue = event.target.value;
         setLocalValue(nextValue);
         updateValue(nextValue);
       }}
-      onBlur={commit}
+      // item 7: blur with unparsable input CANCELS (restores the stored value) rather than
+      // committing null over it; Enter keeps the editor open via the commit guard.
+      onBlur={() => (isInvalid ? cancel() : commit())}
       onKeyDown={(event) => {
         if (event.key === "Enter") {
           event.preventDefault();

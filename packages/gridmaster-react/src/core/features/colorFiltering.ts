@@ -10,16 +10,17 @@ import { getRowValue, normalizeValue } from "../utils";
 import { rowMatchesFilters } from "./filtering";
 import { createFormulaEvaluator, type GridFormulaEvaluator } from "./formulas";
 
-function resolveColorFieldValue<T extends GridRow>(
+function resolveColorFieldValue<T extends object>(
   row: T,
   rowIndex: number,
   columns: GridResolvedColumnDef<T>[],
   columnKey: string,
-  evaluator: GridFormulaEvaluator<T> | null
+  evaluator: GridFormulaEvaluator<T> | null,
+  columnMap?: Map<string, GridResolvedColumnDef<T>>
 ): unknown {
-  const column = columns.find((col) => col.key === columnKey);
+  const column = columnMap ? columnMap.get(columnKey) : columns.find((col) => col.key === columnKey);
   if (!column) {
-    return row[columnKey];
+    return (row as Record<string, unknown>)[columnKey];
   }
 
   if (evaluator && rowIndex >= 0) {
@@ -73,7 +74,7 @@ export function matchesColorFilterValue(rawValue: unknown, filter: GridColorFilt
   return filter.values.has(normalizeValue(rawValue));
 }
 
-export function rowMatchesColorFilters<T extends GridRow>(
+export function rowMatchesColorFilters<T extends object>(
   row: T,
   columns: GridResolvedColumnDef<T>[],
   colorFilters: GridColorFilters,
@@ -81,6 +82,8 @@ export function rowMatchesColorFilters<T extends GridRow>(
     rows?: T[];
     rowIndex?: number;
     evaluator?: GridFormulaEvaluator<T>;
+    /** A-071: a prebuilt column Map so the hot loop skips `columns.find` per row. */
+    columnMap?: Map<string, GridResolvedColumnDef<T>>;
   }
 ): boolean {
   const keys = Object.keys(colorFilters);
@@ -89,11 +92,12 @@ export function rowMatchesColorFilters<T extends GridRow>(
   const rowIndex = options?.rowIndex ?? options?.rows?.indexOf(row) ?? -1;
   const evaluator =
     options?.evaluator ?? (options?.rows ? createFormulaEvaluator(options.rows, columns) : null);
+  const columnMap = options?.columnMap;
 
   for (const columnKey of keys) {
     const filter = colorFilters[columnKey];
     if (!filter || filter.values.size === 0) continue;
-    const value = resolveColorFieldValue(row, rowIndex, columns, columnKey, evaluator);
+    const value = resolveColorFieldValue(row, rowIndex, columns, columnKey, evaluator, columnMap);
 
     if (!matchesColorFilterValue(value, filter)) {
       return false;
@@ -103,7 +107,7 @@ export function rowMatchesColorFilters<T extends GridRow>(
   return true;
 }
 
-export function applyColorSortToRowIndexes<T extends GridRow>(
+export function applyColorSortToRowIndexes<T extends object>(
   indexes: number[],
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
@@ -130,7 +134,7 @@ export function applyColorSortToRowIndexes<T extends GridRow>(
   return [...matching, ...remaining];
 }
 
-export function getFilteredColorOptionsForColumn<T extends GridRow>(
+export function getFilteredColorOptionsForColumn<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
   targetColumnKey: string,

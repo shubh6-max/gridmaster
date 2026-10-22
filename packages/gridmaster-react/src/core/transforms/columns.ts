@@ -1,13 +1,13 @@
 import type { GridColumnDef, GridResolvedColumnDef, GridRow } from "../types";
 import { resolveColumns } from "../utils";
 
-export function normalizeColumns<T extends GridRow>(
+export function normalizeColumns<T extends object>(
   columns: GridColumnDef<T>[]
 ): GridResolvedColumnDef<T>[] {
   return resolveColumns(columns);
 }
 
-export function reorderColumns<T extends GridRow>(
+export function reorderColumns<T extends object>(
   columns: GridColumnDef<T>[],
   orderedKeys: string[]
 ): GridColumnDef<T>[] {
@@ -20,7 +20,7 @@ export function reorderColumns<T extends GridRow>(
   });
 }
 
-export function showOnlyColumns<T extends GridRow>(
+export function showOnlyColumns<T extends object>(
   columns: GridColumnDef<T>[],
   visibleKeys: string[]
 ): GridColumnDef<T>[] {

@@ -1,9 +1,9 @@
 import type { GridColumnDef, GridResolvedColumnDef, GridRow } from "../types";
 import { getRowValue, setRowValue } from "../utils";
 
-type GridColumnInput<T extends GridRow> = GridColumnDef<T> | GridResolvedColumnDef<T>;
+type GridColumnInput<T extends object> = GridColumnDef<T> | GridResolvedColumnDef<T>;
 
-export function rowsToMatrix<T extends GridRow>(
+export function rowsToMatrix<T extends object>(
   rows: T[],
   columns: GridColumnInput<T>[]
 ): string[][] {
@@ -15,7 +15,7 @@ export function rowsToMatrix<T extends GridRow>(
   );
 }
 
-export function matrixToRows<T extends GridRow>(
+export function matrixToRows<T extends object>(
   matrix: string[][],
   columns: GridColumnInput<T>[],
   baseRows?: T[]

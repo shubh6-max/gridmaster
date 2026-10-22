@@ -50,5 +50,24 @@ split_chunks.py
 
 # Local test/experiment files (not part of main test suite)
 date_time_test_code.py 
-# intentionally kept at repo root
+date_time_test_code_1.py
+date_time_test_code_2.py
 .codegraph/
+walkthrough.md
+iterations/
+
+# Demo build output (kept out of the publishable dist/)
+demo-dist/
+
+# Root scratch files and local virtualenv (personal, never commit)
+/*.py
+/test.md
+venv/
+
+# Local tool state (per-machine; not shared): AI-assistant caches, vitest/vite temp files
+.impeccable/
+.superpowers/
+.claude/settings.local.json
+.claude/worktrees/
+.vitest-cache/
+vite.config.*.timestamp-*.mjs

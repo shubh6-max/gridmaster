@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useInsertionEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type {
   GridCellChangeEvent,
   GridColorFilters,
@@ -52,10 +59,7 @@ import {
   EMPTY_SORT,
 } from "../../core/constants";
 import { clearColorFilters } from "../../core/features/colorFiltering";
-import {
-  clearConditionalFormats,
-  getMatchingConditionalFormat,
-} from "../../core/features/conditionalFormatting";
+import { clearConditionalFormats } from "../../core/features/conditionalFormatting";
 import { clearFillState, type GridFillState } from "../../core/features/fill";
 import { createFormulaEvaluator, type GridFormulaEvaluator } from "../../core/features/formulas";
 import {
@@ -68,10 +72,13 @@ import {
   getInsertRowIndex,
   insertColumnAtIndex,
   insertColumnValueIntoRows,
+  rewriteFormulaCellsInRows,
   shiftCellMetaForDeletedRow,
   shiftCellMetaForInsertedRow,
+  shiftCellMetaForMovedRow,
   shiftRowMetaForDeletedRow,
   shiftRowMetaForInsertedRow,
+  shiftRowMetaForMovedRow,
 } from "../../core/features/structure";
 import {
   createInitialColumnWidths,
@@ -84,7 +91,14 @@ import {
   moveColumn as moveColumnHelper,
   moveRow as moveRowHelper,
 } from "../../core/features/dragDrop";
-import { createInitialHistoryState, historyReducer } from "../../core/state/historyReducer";
+import {
+  canRedo,
+  canUndo,
+  createInitialHistoryState,
+  historyReducer,
+  redoHistory,
+  undoHistory,
+} from "../../core/state/historyReducer";
 import { getDisplayRowIndexes, getDisplayRows } from "../../core/state/gridState";
 import {
   clearSelection,
@@ -92,6 +106,7 @@ import {
   setActiveCell,
 } from "../../core/state/selectionState";
 import {
+  applyLatestColumnFunctions,
   clamp,
   cloneCellMetaMap,
   cloneColumns,
@@ -99,12 +114,13 @@ import {
   cloneRows,
   resolveColumns,
   resolveGridRowId,
+  sameColumnStructure,
   shallowEqualColumns,
   shallowEqualRows,
 } from "../../core/utils";
 import { getGridPropRowSyncAction } from "./gridPropSyncPolicy";
 
-export type UseGridMasterResult<T extends GridRow = GridRow> = {
+export type UseGridMasterResult<T extends object = GridRow> = {
   props: GridMasterProps<T>;
 
   viewportRef: React.RefObject<HTMLDivElement | null>;
@@ -190,9 +206,12 @@ export type UseGridMasterResult<T extends GridRow = GridRow> = {
   enableInsertColumn: boolean;
   enableDeleteRow: boolean;
   enableDeleteColumn: boolean;
+  enableValidation: boolean;
   enableConditionalFormatting: boolean;
   enableRowDrag: boolean;
   enableColumnDrag: boolean;
+  /** False in `mode="readonly"`: no formatting may write cell meta (see useCellFormatting). */
+  canFormat: boolean;
 
   moveRow: (fromIndex: number, toIndex: number) => void;
   moveColumn: (fromKey: string, toKey: string) => void;
@@ -204,12 +223,27 @@ export type UseGridMasterResult<T extends GridRow = GridRow> = {
   deleteRow: (sourceRowIndex: number) => T | null;
   deleteColumn: (columnKey: string) => GridColumnDef<T> | null;
   emitCellChange: (event: GridCellChangeEvent<T>) => void;
+  /**
+   * Steps history back/forward and, for a controlled host, emits `onRowsChange` /
+   * `onColumnsChange` once with the reverted data. Returns false (no change, no emit) when there
+   * is nothing to step to or the grid's restriction flags forbid it.
+   */
+  undo: () => boolean;
+  redo: () => boolean;
 };
 
-export function useGridMaster<T extends GridRow = GridRow>(
+export function useGridMaster<T extends object = GridRow>(
   incomingProps: GridMasterProps<T>
 ): UseGridMasterResult<T> {
   const props = incomingProps;
+  // Latest props for event handlers and change-callback effects, so their identity never matters.
+  // Written in an insertion effect (not during render): a render React discards (concurrent
+  // rendering, Suspense) must not leak never-committed props into handlers, and unlike a layout
+  // effect it does not warn on the server and runs before any child layout effect.
+  const propsRef = useRef(props);
+  useInsertionEffect(() => {
+    propsRef.current = props;
+  });
   const viewportRef = useRef<HTMLDivElement>(null);
 
   const mode = props.mode ?? DEFAULT_GRID_MODE;
@@ -221,27 +255,40 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const showFormulaBar = props.showFormulaBar ?? DEFAULT_SHOW_FORMULA_BAR;
   const showStatusBar = props.showStatusBar ?? DEFAULT_SHOW_STATUS_BAR;
 
+  // A-004: ONE place resolves every gating flag from props + mode. Every consumer (context, hooks,
+  // views) reads these, and the shared write sinks below enforce them, so no UI path can bypass a
+  // restriction. Defaults are unchanged; only an explicit `false` (or readonly mode) restricts.
+  const isReadonly = mode === "readonly";
   const enableSelection = props.enableSelection ?? DEFAULT_ENABLE_SELECTION;
-  const enableRangeSelection = props.enableRangeSelection ?? DEFAULT_ENABLE_RANGE_SELECTION;
-  const enableRowSelection = props.enableRowSelection ?? DEFAULT_ENABLE_ROW_SELECTION;
-  const enableColumnSelection = props.enableColumnSelection ?? DEFAULT_ENABLE_COLUMN_SELECTION;
-  const enableEditing =
-    mode === "readonly" ? false : (props.enableEditing ?? DEFAULT_ENABLE_EDITING);
+  // The master switch folds into each kind: false keeps only the active-cell cursor.
+  const enableRangeSelection =
+    enableSelection && (props.enableRangeSelection ?? DEFAULT_ENABLE_RANGE_SELECTION);
+  const enableRowSelection =
+    enableSelection && (props.enableRowSelection ?? DEFAULT_ENABLE_ROW_SELECTION);
+  const enableColumnSelection =
+    enableSelection && (props.enableColumnSelection ?? DEFAULT_ENABLE_COLUMN_SELECTION);
+  // Cell VALUE writes (edit, paste, cut, clear, fill, checkbox toggle).
+  const enableEditing = !isReadonly && (props.enableEditing ?? DEFAULT_ENABLE_EDITING);
   const enableClipboard = props.enableClipboard ?? DEFAULT_ENABLE_CLIPBOARD;
-  const enableFillHandle = props.enableFillHandle ?? DEFAULT_ENABLE_FILL_HANDLE;
-  const enableUndoRedo = props.enableUndoRedo ?? DEFAULT_ENABLE_UNDO_REDO;
+  const enableFillHandle = enableEditing && (props.enableFillHandle ?? DEFAULT_ENABLE_FILL_HANDLE);
+  const enableUndoRedo = !isReadonly && (props.enableUndoRedo ?? DEFAULT_ENABLE_UNDO_REDO);
   const enableSorting = props.enableSorting ?? DEFAULT_ENABLE_SORTING;
   const enableFiltering = props.enableFiltering ?? DEFAULT_ENABLE_FILTERING;
   const enableColumnResize = props.enableColumnResize ?? DEFAULT_ENABLE_COLUMN_RESIZE;
   const enableColumnAutoFit = props.enableColumnAutoFit ?? DEFAULT_ENABLE_COLUMN_AUTOFIT;
   const enableColumnVisibility = props.enableColumnVisibility ?? DEFAULT_ENABLE_COLUMN_VISIBILITY;
-  const enableCellColoring = props.enableCellColoring ?? DEFAULT_ENABLE_CELL_COLORING;
-  const enableWrapText = props.enableWrapText ?? DEFAULT_ENABLE_WRAP_TEXT;
-  const enableInsertRow = props.enableInsertRow ?? DEFAULT_ENABLE_INSERT_ROW;
-  const enableInsertColumn = props.enableInsertColumn ?? DEFAULT_ENABLE_INSERT_COLUMN;
-  const enableDeleteRow = props.enableDeleteRow ?? DEFAULT_ENABLE_DELETE_ROW;
-  const enableDeleteColumn = props.enableDeleteColumn ?? DEFAULT_ENABLE_DELETE_COLUMN;
-  const enableValidation = props.enableValidation ?? false;
+  // Cell META writes: readonly blocks all formatting; the two props narrow it further.
+  const canFormat = !isReadonly;
+  const enableCellColoring = canFormat && (props.enableCellColoring ?? DEFAULT_ENABLE_CELL_COLORING);
+  const enableWrapText = canFormat && (props.enableWrapText ?? DEFAULT_ENABLE_WRAP_TEXT);
+  const enableInsertRow = !isReadonly && (props.enableInsertRow ?? DEFAULT_ENABLE_INSERT_ROW);
+  const enableInsertColumn =
+    !isReadonly && (props.enableInsertColumn ?? DEFAULT_ENABLE_INSERT_COLUMN);
+  const enableDeleteRow = !isReadonly && (props.enableDeleteRow ?? DEFAULT_ENABLE_DELETE_ROW);
+  const enableDeleteColumn =
+    !isReadonly && (props.enableDeleteColumn ?? DEFAULT_ENABLE_DELETE_COLUMN);
+  // Validators always ran before this prop was wired, so the default stays on.
+  const enableValidation = props.enableValidation ?? true;
   const enableConditionalFormatting = props.enableConditionalFormatting ?? false;
   const enableRowDrag = props.enableRowDrag ?? DEFAULT_ENABLE_ROW_DRAG;
   const enableColumnDrag = props.enableColumnDrag ?? DEFAULT_ENABLE_COLUMN_DRAG;
@@ -249,7 +296,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
   const historyLimit = props.historyLimit;
 
   const cloneGridRows = useCallback(
-    (sourceRows: T[]) => (rowPatchMode ? [...sourceRows] : cloneRows(sourceRows)),
+    (sourceRows: readonly T[]) => (rowPatchMode ? [...sourceRows] : cloneRows(sourceRows)),
     [rowPatchMode]
   );
   const historyCloneOptions = useMemo(
@@ -261,11 +308,18 @@ export function useGridMaster<T extends GridRow = GridRow>(
   );
 
   const lastPropRowsRef = useRef(props.rows);
-  const lastPropRowsValueRef = useRef(cloneGridRows(props.rows ?? []));
+  // A-074: lazy initialisers. `useRef(expr)` evaluates `expr` on EVERY render even though only the
+  // first result is kept, so an eager `useRef(cloneRows(props.rows))` deep-cloned the whole dataset
+  // on every selection/hover/keystroke render. Clone once, on first render.
+  const lastPropRowsValueRef = useRef<T[] | null>(null);
+  if (lastPropRowsValueRef.current === null) {
+    lastPropRowsValueRef.current = cloneGridRows(props.rows ?? []);
+  }
   const lastPropColumnsRef = useRef(props.columns);
-  const lastPropColumnsValueRef = useRef(cloneColumns(props.columns ?? []));
-  const lastPropInitialCellMetaRef = useRef(props.initialCellMeta);
-  const lastPropInitialRowMetaRef = useRef(props.initialRowMeta);
+  const lastPropColumnsValueRef = useRef<GridColumnDef<T>[] | null>(null);
+  if (lastPropColumnsValueRef.current === null) {
+    lastPropColumnsValueRef.current = cloneColumns(props.columns ?? []);
+  }
   const lastEmittedRowsRef = useRef<T[] | null>(null);
   const lastEmittedColumnsRef = useRef<GridColumnDef<T>[] | null>(null);
 
@@ -281,9 +335,29 @@ export function useGridMaster<T extends GridRow = GridRow>(
     )
   );
 
+  // Latest committed history, readable from event handlers without a stale closure (the same
+  // reason as `propsRef`). `stepHistory` also writes it so two steps in one tick chain correctly.
+  const historyRef = useRef(history);
+  useInsertionEffect(() => {
+    historyRef.current = history;
+  });
+
   const rows = history.present.rows as T[];
   const rawColumns = history.present.columns as GridColumnDef<T>[];
-  const resolvedColumns = useMemo(() => resolveColumns(rawColumns), [rawColumns]);
+  // A-003: history owns column STRUCTURE; the consumer's latest function-valued fields (renderCell,
+  // getValue, ...) are overlaid here instead of being written into history, so an inline
+  // `columns={[{ renderCell: p => ... }]}` refreshes behaviour without resetting undo or user state.
+  const latestPropColumnsByKey = useMemo(
+    () => new Map((props.columns ?? []).map((column) => [column.key, column])),
+    [props.columns]
+  );
+  const resolvedColumns = useMemo(
+    () =>
+      resolveColumns(rawColumns).map((column) =>
+        applyLatestColumnFunctions(column, latestPropColumnsByKey.get(column.key))
+      ),
+    [rawColumns, latestPropColumnsByKey]
+  );
 
   const [hiddenColumnKeys, setHiddenColumnKeys] = useState<Set<string>>(
     () => new Set(resolvedColumns.filter((column) => column.hidden).map((column) => column.key))
@@ -303,6 +377,9 @@ export function useGridMaster<T extends GridRow = GridRow>(
         next.delete(resolvedColumns[0].key);
       }
 
+      // Same members: keep the old Set so a behaviour-only column refresh causes no extra render.
+      if (next.size === prev.size && [...next].every((key) => prev.has(key))) return prev;
+
       return next;
     });
   }, [resolvedColumns]);
@@ -321,12 +398,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
     if (props.rows === lastPropRowsRef.current) return;
 
     lastPropRowsRef.current = props.rows;
-    lastPropInitialCellMetaRef.current = props.initialCellMeta;
-    lastPropInitialRowMetaRef.current = props.initialRowMeta;
     const nextRows = cloneGridRows(props.rows ?? []);
     const syncAction = getGridPropRowSyncAction({
       nextRows,
-      previousPropRows: lastPropRowsValueRef.current,
+      // Non-null: lazily seeded during the first render, only ever reassigned to arrays after.
+      previousPropRows: lastPropRowsValueRef.current ?? [],
       lastEmittedRows: lastEmittedRowsRef.current,
       currentRows: history.present.rows as T[],
       rowsEqual: shallowEqualRows,
@@ -350,20 +426,17 @@ export function useGridMaster<T extends GridRow = GridRow>(
         {
           rows: nextRows,
           columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-          cellMeta: cloneCellMetaMap(props.initialCellMeta ?? prev.present.cellMeta ?? {}),
-          rowMeta: cloneRowMetaMap(props.initialRowMeta ?? prev.present.rowMeta ?? {}),
+          // A genuine rows replacement re-seeds meta from the latest `initial*` props (read via the
+          // ref: `initialCellMeta`/`initialRowMeta` are mount/rows-replacement seeds, never triggers).
+          cellMeta: cloneCellMetaMap(
+            propsRef.current.initialCellMeta ?? prev.present.cellMeta ?? {}
+          ),
+          rowMeta: cloneRowMetaMap(propsRef.current.initialRowMeta ?? prev.present.rowMeta ?? {}),
         },
         historyCloneOptions
       )
     );
-  }, [
-    cloneGridRows,
-    history.present.rows,
-    historyCloneOptions,
-    props.initialCellMeta,
-    props.initialRowMeta,
-    props.rows,
-  ]);
+  }, [cloneGridRows, history.present.rows, historyCloneOptions, props.rows]);
 
   useEffect(() => {
     if (props.columns === lastPropColumnsRef.current) return;
@@ -371,7 +444,8 @@ export function useGridMaster<T extends GridRow = GridRow>(
     lastPropColumnsRef.current = props.columns;
     const nextColumns = cloneColumns(props.columns ?? []);
 
-    if (shallowEqualColumns(nextColumns, lastPropColumnsValueRef.current)) {
+    // Structure only: fresh inline closures / arrays with the same shape are not a change (A-003).
+    if (sameColumnStructure(nextColumns, lastPropColumnsValueRef.current ?? [])) {
       return;
     }
 
@@ -379,8 +453,8 @@ export function useGridMaster<T extends GridRow = GridRow>(
 
     if (
       (lastEmittedColumnsRef.current &&
-        shallowEqualColumns(nextColumns, lastEmittedColumnsRef.current)) ||
-      shallowEqualColumns(nextColumns, history.present.columns as GridColumnDef<T>[])
+        sameColumnStructure(nextColumns, lastEmittedColumnsRef.current)) ||
+      sameColumnStructure(nextColumns, history.present.columns as GridColumnDef<T>[])
     ) {
       lastEmittedColumnsRef.current = null;
       return;
@@ -398,27 +472,6 @@ export function useGridMaster<T extends GridRow = GridRow>(
       )
     );
   }, [cloneGridRows, history.present.columns, historyCloneOptions, props.columns]);
-
-  useEffect(() => {
-    const cellMetaChanged = props.initialCellMeta !== lastPropInitialCellMetaRef.current;
-    const rowMetaChanged = props.initialRowMeta !== lastPropInitialRowMetaRef.current;
-    if (!cellMetaChanged && !rowMetaChanged) return;
-
-    lastPropInitialCellMetaRef.current = props.initialCellMeta;
-    lastPropInitialRowMetaRef.current = props.initialRowMeta;
-
-    setHistory((prev) =>
-      createInitialHistoryState(
-        {
-          rows: cloneGridRows(prev.present.rows as T[]),
-          columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-          cellMeta: cloneCellMetaMap(props.initialCellMeta ?? {}),
-          rowMeta: cloneRowMetaMap(props.initialRowMeta ?? {}),
-        },
-        historyCloneOptions
-      )
-    );
-  }, [cloneGridRows, historyCloneOptions, props.initialCellMeta, props.initialRowMeta]);
 
   const [selection, setSelection] = useState<GridSelectionState>(() =>
     setActiveCell(createInitialSelectionState(), { row: 0, col: 0 })
@@ -480,6 +533,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
         enableSorting?: boolean;
         allowedRowIds?: Iterable<string> | null;
         preservedRowIds?: Iterable<string> | null;
+        evaluator?: GridFormulaEvaluator<T>;
       }
     ) =>
       getDisplayRowIndexes(
@@ -499,6 +553,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
               ? overrides.preservedRowIds
               : preservedFilteredRowIds,
           getRowId: props.getRowId,
+          evaluator: overrides?.evaluator,
         }
       ),
     [
@@ -545,19 +600,25 @@ export function useGridMaster<T extends GridRow = GridRow>(
     [columns.length]
   );
 
+  // One evaluator per (rows, columns) snapshot, shared by the pipeline AND render (A-066/A-040):
+  // filter/sort evaluations populate the same formula cache the cells read, so nothing is evaluated
+  // twice. Built before the pipeline so it can be injected into it.
+  const formulaEvaluator = useMemo(() => createFormulaEvaluator(rows, columns), [columns, rows]);
   const displayRowIndexes = useMemo(
-    () => computeDisplayRowIndexes(rows),
-    [computeDisplayRowIndexes, rows]
+    () =>
+      computeDisplayRowIndexes(rows, undefined, undefined, undefined, undefined, undefined, {
+        evaluator: formulaEvaluator,
+      }),
+    [computeDisplayRowIndexes, formulaEvaluator, rows]
   );
   const displayRows = useMemo(
     () => getDisplayRows(rows, displayRowIndexes),
     [rows, displayRowIndexes]
   );
-  const formulaEvaluator = useMemo(() => createFormulaEvaluator(rows, columns), [columns, rows]);
 
   useEffect(() => {
-    props.onSnapshotChange?.(history.present as GridSnapshot<T>);
-  }, [history.present, props.onSnapshotChange]);
+    propsRef.current.onSnapshotChange?.(history.present as GridSnapshot<T>);
+  }, [history.present]);
 
   const visibleRowCount = displayRows.length;
 
@@ -649,9 +710,9 @@ export function useGridMaster<T extends GridRow = GridRow>(
       );
 
       lastEmittedRowsRef.current = cloned;
-      props.onRowsChange?.(cloned);
+      propsRef.current.onRowsChange?.(cloned);
     },
-    [cloneGridRows, historyCloneOptions, props, rawColumns]
+    [cloneGridRows, historyCloneOptions, rawColumns]
   );
 
   const setColumns = useCallback(
@@ -671,27 +732,33 @@ export function useGridMaster<T extends GridRow = GridRow>(
       );
 
       lastEmittedColumnsRef.current = cloned;
-      props.onColumnsChange?.(cloned);
+      propsRef.current.onColumnsChange?.(cloned);
     },
     [
       cloneGridRows,
       history.present.cellMeta,
       history.present.rowMeta,
       historyCloneOptions,
-      props,
       rows,
     ]
   );
 
   const updateRows = useCallback(
     (nextRows: T[]) => {
-      const cloned = cloneGridRows(nextRows);
-      if (shallowEqualRows(cloned, rows)) return;
+      // Shared sink for every cell-value write (editor, clipboard, fill, checkbox): one guard.
+      if (!enableEditing) return;
+
+      // `nextRows` is the copy-on-write result of a cell write: a fresh array that shares every
+      // UNCHANGED row object with the current snapshot (only edited rows are new). A-047: store it
+      // in history BY REFERENCE (structural sharing) so retained memory is O(edits), not
+      // O(edits × rows) — no per-edit deep clone of the whole dataset. `shallowEqualRows`
+      // short-circuits on `===` for the shared rows, so the no-op check stays cheap.
+      if (shallowEqualRows(nextRows, rows)) return;
 
       if (enableFiltering && Object.keys(filters).length > 0) {
         setPreservedFilteredRowIds(
           displayRowIndexes.map((sourceRowIndex) =>
-            resolveGridRowId(rows[sourceRowIndex], sourceRowIndex, props.getRowId)
+            resolveGridRowId(rows[sourceRowIndex], sourceRowIndex, propsRef.current.getRowId)
           )
         );
       } else {
@@ -704,24 +771,41 @@ export function useGridMaster<T extends GridRow = GridRow>(
           {
             type: "PUSH",
             payload: {
-              rows: cloned,
+              rows: nextRows,
               columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
               cellMeta: prev.present.cellMeta,
               rowMeta: prev.present.rowMeta,
             },
           },
-          historyCloneOptions
+          // Force structural sharing of rows regardless of `rowPatchMode`: history never mutates its
+          // snapshots and the consumer gets its own copy below, so sharing is always safe here.
+          { ...historyCloneOptions, preserveRowReferences: true }
         )
       );
 
-      lastEmittedRowsRef.current = cloned;
-      props.onRowsChange?.(cloned);
+      // Trust boundary (unchanged contract): the consumer gets a DEFENSIVE copy, distinct from the
+      // array stored in history, so mutating an emitted row cannot corrupt an undo snapshot.
+      // `cloneGridRows` honours `rowPatchMode` exactly as before (deep copy by default; shallow when
+      // the host opted into in-place mutation).
+      const emitted = cloneGridRows(nextRows);
+      lastEmittedRowsRef.current = emitted;
+      propsRef.current.onRowsChange?.(emitted);
     },
-    [cloneGridRows, displayRowIndexes, enableFiltering, filters, historyCloneOptions, props, rows]
+    [
+      cloneGridRows,
+      displayRowIndexes,
+      enableEditing,
+      enableFiltering,
+      filters,
+      historyCloneOptions,
+      rows,
+    ]
   );
 
   const updateColumns = useCallback(
     (nextColumns: GridColumnDef<T>[]) => {
+      if (isReadonly) return;
+
       const cloned = cloneColumns(nextColumns);
       if (shallowEqualColumns(cloned, rawColumns)) return;
 
@@ -742,17 +826,26 @@ export function useGridMaster<T extends GridRow = GridRow>(
       );
 
       lastEmittedColumnsRef.current = cloned;
-      props.onColumnsChange?.(cloned);
+      propsRef.current.onColumnsChange?.(cloned);
     },
-    [cloneGridRows, historyCloneOptions, props, rawColumns]
+    [cloneGridRows, historyCloneOptions, isReadonly, rawColumns]
   );
 
   const handleMoveRow = useCallback(
     (fromIndex: number, toIndex: number) => {
-      if (!enableRowDrag) return;
+      if (isReadonly || !enableRowDrag) return;
       if (fromIndex === toIndex) return;
+      // Out-of-range indexes would splice an `undefined` row into the data.
+      if (!Number.isInteger(fromIndex) || fromIndex < 0 || fromIndex >= rows.length) return;
+      if (!Number.isInteger(toIndex) || toIndex < 0 || toIndex >= rows.length) return;
 
-      const nextRows = moveRowHelper(rows, fromIndex, toIndex);
+      // A-007: formula references retarget to the moved line (and shift the lines between), in the
+      // same history push so one undo restores values and formulas together.
+      const nextRows = rewriteFormulaCellsInRows(moveRowHelper(rows, fromIndex, toIndex), columns, {
+        type: "move-row",
+        from: fromIndex,
+        to: toIndex,
+      });
 
       setHistory((prev) =>
         historyReducer(
@@ -762,8 +855,9 @@ export function useGridMaster<T extends GridRow = GridRow>(
             payload: {
               rows: nextRows,
               columns: cloneColumns(prev.present.columns as GridColumnDef<T>[]),
-              cellMeta: prev.present.cellMeta,
-              rowMeta: prev.present.rowMeta,
+              // Meta is keyed by row index: it must travel with the row (A-038).
+              cellMeta: shiftCellMetaForMovedRow(prev.present.cellMeta, fromIndex, toIndex),
+              rowMeta: shiftRowMetaForMovedRow(prev.present.rowMeta, fromIndex, toIndex),
             },
           },
           historyCloneOptions
@@ -771,18 +865,31 @@ export function useGridMaster<T extends GridRow = GridRow>(
       );
 
       lastEmittedRowsRef.current = nextRows;
-      props.onRowsChange?.(nextRows);
-      props.onRowReorder?.(nextRows);
+      propsRef.current.onRowsChange?.(nextRows);
+      propsRef.current.onRowReorder?.(nextRows);
     },
-    [enableRowDrag, historyCloneOptions, props, rows]
+    [columns, enableRowDrag, historyCloneOptions, isReadonly, rows]
   );
 
   const handleMoveColumn = useCallback(
     (fromKey: string, toKey: string) => {
-      if (!enableColumnDrag) return;
+      if (isReadonly || !enableColumnDrag) return;
       if (fromKey === toKey) return;
 
       const nextColumns = moveColumnHelper(rawColumns, fromKey, toKey);
+
+      // A-007: formula references retarget across the column move, in the same push.
+      const fromIndex = rawColumns.findIndex((column) => column.key === fromKey);
+      const toIndex = rawColumns.findIndex((column) => column.key === toKey);
+      const nextRows =
+        fromIndex >= 0 && toIndex >= 0
+          ? rewriteFormulaCellsInRows(rows, columns, {
+              type: "move-column",
+              from: fromIndex,
+              to: toIndex,
+            })
+          : rows;
+      const rowsChanged = nextRows !== rows;
 
       setHistory((prev) =>
         historyReducer(
@@ -790,7 +897,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
           {
             type: "PUSH",
             payload: {
-              rows: cloneGridRows(prev.present.rows as T[]),
+              rows: cloneGridRows(nextRows),
               columns: nextColumns,
               cellMeta: prev.present.cellMeta,
               rowMeta: prev.present.rowMeta,
@@ -800,11 +907,15 @@ export function useGridMaster<T extends GridRow = GridRow>(
         )
       );
 
+      if (rowsChanged) {
+        lastEmittedRowsRef.current = nextRows;
+        propsRef.current.onRowsChange?.(nextRows);
+      }
       lastEmittedColumnsRef.current = nextColumns;
-      props.onColumnsChange?.(nextColumns);
-      props.onColumnReorder?.(nextColumns);
+      propsRef.current.onColumnsChange?.(nextColumns);
+      propsRef.current.onColumnReorder?.(nextColumns);
     },
-    [enableColumnDrag, historyCloneOptions, props, rawColumns]
+    [columns, enableColumnDrag, historyCloneOptions, isReadonly, rawColumns, rows]
   );
 
   const insertRow = useCallback(
@@ -814,7 +925,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const insertAt = getInsertRowIndex(sourceRowIndex, rows.length, position);
       const referenceRow = rows[Math.max(0, Math.min(sourceRowIndex, rows.length - 1))] ?? null;
       const nextRow =
-        props.createRowOnInsert?.({
+        propsRef.current.createRowOnInsert?.({
           rows,
           columns,
           insertAt,
@@ -822,7 +933,24 @@ export function useGridMaster<T extends GridRow = GridRow>(
           referenceRow,
         }) ?? createDefaultInsertedRow(rows, columns);
 
-      const nextRows = insertRowAt(rows, insertAt, nextRow);
+      // A-007: references at/after the insert point shift down, in the same history push.
+      const nextRows = rewriteFormulaCellsInRows(insertRowAt(rows, insertAt, nextRow), columns, {
+        type: "insert-rows",
+        at: insertAt,
+        count: 1,
+      });
+
+      // A-050: a blank new row matches no active filter and would vanish. Keep every currently
+      // shown row plus the new one visible, as updateRows does. Ids are resolved on the NEW rows
+      // (old source indexes shift by one past `insertAt`) so index-derived ids stay correct.
+      const filterActive =
+        enableFiltering && (Object.keys(filters).length > 0 || Object.keys(colorFilters).length > 0);
+      const nextPreservedIds = filterActive
+        ? [...displayRowIndexes.map((index) => (index >= insertAt ? index + 1 : index)), insertAt].map(
+            (index) => resolveGridRowId(nextRows[index], index, propsRef.current.getRowId)
+          )
+        : null;
+      setPreservedFilteredRowIds(nextPreservedIds);
 
       setHistory((prev) =>
         historyReducer(
@@ -841,8 +969,8 @@ export function useGridMaster<T extends GridRow = GridRow>(
       );
 
       lastEmittedRowsRef.current = nextRows;
-      props.onRowsChange?.(nextRows);
-      props.onRowInsert?.({
+      propsRef.current.onRowsChange?.(nextRows);
+      propsRef.current.onRowInsert?.({
         rowIndex: insertAt,
         row: nextRow,
       });
@@ -855,11 +983,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
         colorFilters,
         colorSort,
         {
-          allowedRowIds: props.allowedRowIds,
+          allowedRowIds: propsRef.current.allowedRowIds,
           enableFiltering,
           enableSorting,
-          preservedRowIds: preservedFilteredRowIds,
-          getRowId: props.getRowId,
+          preservedRowIds: nextPreservedIds,
+          getRowId: propsRef.current.getRowId,
         }
       );
       const insertedDisplayRowIndex = nextDisplayRowIndexes.findIndex(
@@ -881,12 +1009,12 @@ export function useGridMaster<T extends GridRow = GridRow>(
       colorFilters,
       colorSort,
       columns,
+      displayRowIndexes,
       enableFiltering,
       enableInsertRow,
       enableSorting,
       filters,
       mode,
-      props,
       rows,
       sort,
       visibleColumns.length,
@@ -904,7 +1032,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
       const insertAt = getInsertColumnIndex(sourceColumnIndex, rawColumns.length, position);
       const referenceColumn = rawColumns[sourceColumnIndex] ?? null;
       const nextColumn =
-        props.createColumnOnInsert?.({
+        propsRef.current.createColumnOnInsert?.({
           columns: cloneColumns(rawColumns),
           insertAt,
           position,
@@ -912,7 +1040,12 @@ export function useGridMaster<T extends GridRow = GridRow>(
         }) ?? createDefaultInsertedColumn(rawColumns, insertAt, referenceColumn, position);
 
       const nextColumns = insertColumnAtIndex(rawColumns, insertAt, nextColumn);
-      const nextRows = insertColumnValueIntoRows(rows, nextColumn);
+      // A-007: references at/after the inserted column shift right — same history push.
+      const nextRows = rewriteFormulaCellsInRows(
+        insertColumnValueIntoRows(rows, nextColumn),
+        columns,
+        { type: "insert-columns", at: insertAt, count: 1 }
+      );
 
       setHistory((prev) =>
         historyReducer(
@@ -932,9 +1065,9 @@ export function useGridMaster<T extends GridRow = GridRow>(
 
       lastEmittedRowsRef.current = nextRows;
       lastEmittedColumnsRef.current = nextColumns;
-      props.onRowsChange?.(nextRows);
-      props.onColumnsChange?.(nextColumns);
-      props.onColumnInsert?.({
+      propsRef.current.onRowsChange?.(nextRows);
+      propsRef.current.onColumnsChange?.(nextColumns);
+      propsRef.current.onColumnInsert?.({
         columnIndex: insertAt,
         column: nextColumn,
         position,
@@ -956,11 +1089,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
         colorFilters,
         colorSort,
         {
-          allowedRowIds: props.allowedRowIds,
+          allowedRowIds: propsRef.current.allowedRowIds,
           enableFiltering,
           enableSorting,
           preservedRowIds: preservedFilteredRowIds,
-          getRowId: props.getRowId,
+          getRowId: propsRef.current.getRowId,
         }
       ).length;
 
@@ -978,13 +1111,13 @@ export function useGridMaster<T extends GridRow = GridRow>(
     [
       colorFilters,
       colorSort,
+      columns,
       enableFiltering,
       enableInsertColumn,
       enableSorting,
       filters,
       hiddenColumnKeys,
       mode,
-      props,
       rawColumns,
       rows,
       sort,
@@ -998,7 +1131,12 @@ export function useGridMaster<T extends GridRow = GridRow>(
       if (sourceRowIndex < 0 || sourceRowIndex >= rows.length) return null;
 
       const deletedRow = rows[sourceRowIndex];
-      const nextRows = deleteRowAt(rows, sourceRowIndex);
+      // A-007: references to the deleted row become #REF!; those after it shift up — same push.
+      const nextRows = rewriteFormulaCellsInRows(deleteRowAt(rows, sourceRowIndex), columns, {
+        type: "delete-rows",
+        at: sourceRowIndex,
+        count: 1,
+      });
 
       setHistory((prev) =>
         historyReducer(
@@ -1019,8 +1157,8 @@ export function useGridMaster<T extends GridRow = GridRow>(
       setEditingCell(null);
 
       lastEmittedRowsRef.current = nextRows;
-      props.onRowsChange?.(nextRows);
-      props.onRowDelete?.({
+      propsRef.current.onRowsChange?.(nextRows);
+      propsRef.current.onRowDelete?.({
         rowIndex: sourceRowIndex,
         row: deletedRow,
       });
@@ -1033,11 +1171,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
         colorFilters,
         colorSort,
         {
-          allowedRowIds: props.allowedRowIds,
+          allowedRowIds: propsRef.current.allowedRowIds,
           enableFiltering,
           enableSorting,
           preservedRowIds: preservedFilteredRowIds,
-          getRowId: props.getRowId,
+          getRowId: propsRef.current.getRowId,
         }
       );
 
@@ -1072,7 +1210,6 @@ export function useGridMaster<T extends GridRow = GridRow>(
       enableSorting,
       filters,
       mode,
-      props,
       rows,
       sort,
       visibleColumns.length,
@@ -1092,7 +1229,16 @@ export function useGridMaster<T extends GridRow = GridRow>(
         (column) => column.key === columnKey
       );
       const nextColumns = deleteColumnAtIndex(rawColumns, sourceColumnIndex);
-      const nextRows = deleteColumnValueFromRows(rows, columnKey);
+      // Same array back when no row holds the key or the key is the row-id field (A-049).
+      const strippedRows = deleteColumnValueFromRows(rows, columnKey, propsRef.current.getRowId);
+      // A-007: references to the deleted column become #REF!; those after it shift left. Applied
+      // even when the value itself is id-protected, since formulas in OTHER columns still shift.
+      const nextRows = rewriteFormulaCellsInRows(strippedRows, columns, {
+        type: "delete-columns",
+        at: sourceColumnIndex,
+        count: 1,
+      });
+      const rowsChanged = nextRows !== rows;
       const nextSort = sort?.columnKey === columnKey ? null : sort;
       const nextColorSort = colorSort?.columnKey === columnKey ? null : colorSort;
       const nextFilters =
@@ -1134,11 +1280,13 @@ export function useGridMaster<T extends GridRow = GridRow>(
         setColorFilters(nextColorFilters);
       }
 
-      lastEmittedRowsRef.current = nextRows;
+      if (rowsChanged) {
+        lastEmittedRowsRef.current = nextRows;
+        propsRef.current.onRowsChange?.(nextRows);
+      }
       lastEmittedColumnsRef.current = nextColumns;
-      props.onRowsChange?.(nextRows);
-      props.onColumnsChange?.(nextColumns);
-      props.onColumnDelete?.({
+      propsRef.current.onColumnsChange?.(nextColumns);
+      propsRef.current.onColumnDelete?.({
         columnIndex: sourceColumnIndex,
         column: deletedColumn,
       });
@@ -1156,11 +1304,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
         nextColorFilters,
         nextColorSort,
         {
-          allowedRowIds: props.allowedRowIds,
+          allowedRowIds: propsRef.current.allowedRowIds,
           enableFiltering,
           enableSorting,
           preservedRowIds: nextFilters === filters ? preservedFilteredRowIds : null,
-          getRowId: props.getRowId,
+          getRowId: propsRef.current.getRowId,
         }
       ).length;
 
@@ -1186,13 +1334,13 @@ export function useGridMaster<T extends GridRow = GridRow>(
     [
       colorFilters,
       colorSort,
+      columns,
       enableDeleteColumn,
       enableFiltering,
       enableSorting,
       filters,
       hiddenColumnKeys,
       mode,
-      props,
       rawColumns,
       rows,
       sort,
@@ -1201,11 +1349,63 @@ export function useGridMaster<T extends GridRow = GridRow>(
     ]
   );
 
+  // A-012: undo/redo are hook-level so a controlled host hears about them. The next history is
+  // computed HERE, outside any state updater (updaters must stay pure: StrictMode double-invokes
+  // them, which would double-emit), then emitted once, and recorded in `lastEmitted*Ref` so the
+  // host echoing it back is recognised as our own emit (no history/meta reset).
+  const stepHistory = useCallback(
+    (direction: "undo" | "redo") => {
+      if (!enableUndoRedo) return false;
+
+      const prev = historyRef.current;
+      if (!(direction === "undo" ? canUndo(prev) : canRedo(prev))) return false;
+
+      const next = historyReducer(
+        prev,
+        direction === "undo" ? undoHistory<T>() : redoHistory<T>(),
+        historyCloneOptions
+      );
+      const prevRows = prev.present.rows as T[];
+      const nextRows = next.present.rows as T[];
+      const rowsChanged = !shallowEqualRows(prevRows, nextRows);
+      const columnsChanged = !shallowEqualColumns(
+        prev.present.columns as GridColumnDef<T>[],
+        next.present.columns as GridColumnDef<T>[]
+      );
+
+      // enableEditing=false forbids cell VALUE writes, and a step that restores other values is one.
+      // Formatting/column-only steps stay undoable (their own flags guarded the original change).
+      if (!enableEditing && rowsChanged) return false;
+
+      historyRef.current = next;
+      setHistory(next);
+
+      // Hosts get their own copy (same trust boundary as every other emit site).
+      if (rowsChanged) {
+        const emitted = cloneGridRows(nextRows);
+        lastEmittedRowsRef.current = emitted;
+        propsRef.current.onRowsChange?.(emitted);
+      }
+      if (columnsChanged) {
+        const emitted = cloneColumns(next.present.columns as GridColumnDef<T>[]);
+        lastEmittedColumnsRef.current = emitted;
+        propsRef.current.onColumnsChange?.(emitted);
+      }
+
+      return true;
+    },
+    [cloneGridRows, enableEditing, enableUndoRedo, historyCloneOptions]
+  );
+  const undo = useCallback(() => stepHistory("undo"), [stepHistory]);
+  const redo = useCallback(() => stepHistory("redo"), [stepHistory]);
+
   const emitCellChange = useCallback(
     (event: GridCellChangeEvent<T>) => {
-      props.onCellChange?.(event);
+      // A restricted grid never reports a cell edit (no value changed, so no event).
+      if (!enableEditing) return;
+      propsRef.current.onCellChange?.(event);
     },
-    [props]
+    [enableEditing]
   );
 
   const focusViewport = useCallback(() => {
@@ -1213,24 +1413,24 @@ export function useGridMaster<T extends GridRow = GridRow>(
   }, []);
 
   useEffect(() => {
-    props.onSelectionChange?.({ selection });
-  }, [selection, props]);
+    propsRef.current.onSelectionChange?.({ selection });
+  }, [selection]);
 
   useEffect(() => {
-    props.onSortChange?.({ sort });
-  }, [sort, props]);
+    propsRef.current.onSortChange?.({ sort });
+  }, [sort]);
 
   useEffect(() => {
-    props.onFilterChange?.({ filters });
-  }, [filters, props]);
+    propsRef.current.onFilterChange?.({ filters });
+  }, [filters]);
 
   useEffect(() => {
-    props.onColorFilterChange?.({ colorFilters });
-  }, [colorFilters, props]);
+    propsRef.current.onColorFilterChange?.({ colorFilters });
+  }, [colorFilters]);
 
   useEffect(() => {
-    props.onColorSortChange?.({ colorSort });
-  }, [colorSort, props]);
+    propsRef.current.onColorSortChange?.({ colorSort });
+  }, [colorSort]);
 
   return {
     props,
@@ -1318,9 +1518,11 @@ export function useGridMaster<T extends GridRow = GridRow>(
     enableInsertColumn,
     enableDeleteRow,
     enableDeleteColumn,
+    enableValidation,
     enableConditionalFormatting,
     enableRowDrag,
     enableColumnDrag,
+    canFormat,
 
     moveRow: handleMoveRow,
     moveColumn: handleMoveColumn,
@@ -1332,5 +1534,7 @@ export function useGridMaster<T extends GridRow = GridRow>(
     deleteRow,
     deleteColumn,
     emitCellChange,
+    undo,
+    redo,
   };
 }

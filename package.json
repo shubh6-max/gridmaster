@@ -2,36 +2,22 @@
   "name": "gridmaster",
   "version": "0.0.0",
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": ["packages/gridmaster-react"],
   "scripts": {
-    "format:check": "biome check . --formatter-enabled=true --linter-enabled=false --organize-imports-enabled=true",
+    "build": "npm run build -w gridmaster-react",
+    "build:demo": "npm run build:demo -w gridmaster-react",
+    "lab": "npm run lab -w gridmaster-react",
+    "test": "npm test -w gridmaster-react",
+    "typecheck": "npm run typecheck -w gridmaster-react",
     "lint": "biome lint .",
-    "typecheck": "tsc -b",
-    "test:unit": "vitest run",
-    "test:e2e": "playwright test",
-    "build": "npm run build --workspaces --if-present",
-    "pack:smoke": "npm run pack:smoke --workspaces --if-present",
-    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test:unit && npm run build"
+    "format:check": "biome format .",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm test"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.10.0",
-    "@biomejs/biome": "1.9.4",
-    "@changesets/cli": "^2.27.11",
-    "@playwright/test": "^1.49.0",
-    "@testing-library/react": "^16.0.1",
-    "@types/node": "^22.9.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitest/coverage-v8": "^2.1.5",
-    "playwright": "^1.49.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "typescript": "^5.7.2",
-    "vite": "^5.4.11",
-    "vitest": "^2.1.5"
+    "@biomejs/biome": "1.9.4"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   },
   "packageManager": "npm@10.9.0"
 }

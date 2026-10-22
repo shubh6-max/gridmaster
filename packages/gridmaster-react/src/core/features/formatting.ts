@@ -54,7 +54,7 @@ type GridDisplayBounds = {
   endCol: number;
 };
 
-type GridCellFormatterContext<T extends GridRow = GridRow> = {
+type GridCellFormatterContext<T extends object = GridRow> = {
   displayRow: number;
   sourceRowIndex: number;
   colIndex: number;
@@ -120,7 +120,7 @@ function updateSelectionSummary<T>(
   return MIXED_FORMAT_VALUE;
 }
 
-export function getEffectiveWrapText<T extends GridRow>(
+export function getEffectiveWrapText<T extends object>(
   meta: GridCellMeta | undefined,
   column: GridResolvedColumnDef<T>
 ): boolean {
@@ -129,7 +129,7 @@ export function getEffectiveWrapText<T extends GridRow>(
   return Boolean(column.wrap);
 }
 
-export function getEffectiveHorizontalAlign<T extends GridRow>(
+export function getEffectiveHorizontalAlign<T extends object>(
   meta: GridCellMeta | undefined,
   column: GridResolvedColumnDef<T>
 ): GridHorizontalAlign {
@@ -148,7 +148,7 @@ export function getEffectiveIndentLevel(meta: GridCellMeta | undefined): number 
   return Math.max(0, meta?.indentLevel ?? 0);
 }
 
-export function getSelectionCellMeta<T extends GridRow>(
+export function getSelectionCellMeta<T extends object>(
   cellMetaMap: Record<string, GridCellMeta>,
   displayRowIndexes: number[],
   columns: GridResolvedColumnDef<T>[],
@@ -161,7 +161,7 @@ export function getSelectionCellMeta<T extends GridRow>(
   return cellMetaMap[createCellMetaKey(sourceRowIndex, column.key)];
 }
 
-export function applyCellStyleToBounds<T extends GridRow>(
+export function applyCellStyleToBounds<T extends object>(
   cellMetaMap: Record<string, GridCellMeta>,
   stylePatch: React.CSSProperties,
   bounds: GridDisplayBounds,
@@ -179,7 +179,7 @@ export function applyCellStyleToBounds<T extends GridRow>(
   );
 }
 
-export function applyCellMetaPatchToBounds<T extends GridRow>(
+export function applyCellMetaPatchToBounds<T extends object>(
   cellMetaMap: Record<string, GridCellMeta>,
   metaPatch: GridCellMetaPatch,
   bounds: GridDisplayBounds,
@@ -239,7 +239,7 @@ export function applyCellMetaPatchToBounds<T extends GridRow>(
   );
 }
 
-export function transformCellMetaInBounds<T extends GridRow>(
+export function transformCellMetaInBounds<T extends object>(
   cellMetaMap: Record<string, GridCellMeta>,
   transform: (currentMeta: GridCellMeta, context: GridCellFormatterContext<T>) => GridCellMeta,
   bounds: GridDisplayBounds,
@@ -284,7 +284,7 @@ export function transformCellMetaInBounds<T extends GridRow>(
   return nextMetaMap;
 }
 
-export function summarizeSelectionFormatting<T extends GridRow>(
+export function summarizeSelectionFormatting<T extends object>(
   cellMetaMap: Record<string, GridCellMeta>,
   bounds: GridDisplayBounds,
   displayRowIndexes: number[],

@@ -15,6 +15,7 @@ export function FormulaBar() {
     startEditing,
     commitEditing,
     cancelEditing,
+    enableEditing = mode !== "readonly",
   } = useGridContext();
 
   const targetRowIndex = editingCell?.row ?? selection?.cursor?.row ?? 0;
@@ -25,7 +26,8 @@ export function FormulaBar() {
 
   const rawValue = row && column ? getRowValue(row, column) : "";
   const stringValue = rawValue == null ? "" : String(rawValue);
-  const isReadonly = mode === "readonly" || !column || column.readonly || !column.editable;
+  const isReadonly =
+    !enableEditing || mode === "readonly" || !column || column.readonly || !column.editable;
   const isEditingActiveCell =
     editingCell?.row === targetRowIndex && editingCell?.col === targetColIndex;
   const draftValue = isEditingActiveCell ? String(editingValue ?? "") : stringValue;
@@ -132,7 +134,7 @@ export function FormulaBar() {
           minHeight: 36,
           border: "1px solid #e2e8f0",
           borderRadius: 8,
-          background: mode === "readonly" ? "#f8fafc" : "#ffffff",
+          background: mode === "readonly" || !enableEditing ? "#f8fafc" : "#ffffff",
           padding: "7px 10px",
           fontSize: 12,
           color: "#0f172a",

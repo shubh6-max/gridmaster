@@ -9,15 +9,16 @@ import type {
 } from "../types";
 import { applyColorSortToRowIndexes, rowMatchesColorFilters } from "../features/colorFiltering";
 import { rowMatchesFilters } from "../features/filtering";
-import { createFormulaEvaluator } from "../features/formulas";
+import { createFormulaEvaluator, type GridFormulaEvaluator } from "../features/formulas";
 import { findSortableColumn } from "../features/sorting";
-import { compareValues, resolveGridRowId } from "../utils";
+import { buildColumnMap } from "../features/filtering";
+import { resolveGridRowId, sortByDecoratedKeys } from "../utils";
 
 /* =========================================================
    Display rows
    ========================================================= */
 
-export function getDisplayRowIndexes<T extends GridRow>(
+export function getDisplayRowIndexes<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
   filters: GridFilters,
@@ -30,6 +31,12 @@ export function getDisplayRowIndexes<T extends GridRow>(
     allowedRowIds?: Iterable<string> | null;
     preservedRowIds?: Iterable<string> | null;
     getRowId?: GridRowIdGetter<T>;
+    /**
+     * A-066: reuse the caller's snapshot evaluator instead of building (and re-evaluating) a second
+     * one per pipeline run. Must be built from the SAME `rows`/`columns` passed here, so the result
+     * is byte-for-byte identical; callers that pass modified rows/columns (insert/delete) omit it.
+     */
+    evaluator?: GridFormulaEvaluator<T>;
   }
 ): number[] {
   const enableFiltering = options?.enableFiltering ?? true;
@@ -49,9 +56,10 @@ export function getDisplayRowIndexes<T extends GridRow>(
     : null;
 
   let indexes = rows.map((_, index) => index);
-  const evaluator = createFormulaEvaluator(rows, columns);
+  const evaluator = options?.evaluator ?? createFormulaEvaluator(rows, columns);
 
-  if (allowedRowIds?.size) {
+  // An EMPTY allow-list means "no rows are permitted"; only null/undefined means unrestricted.
+  if (allowedRowIds) {
     indexes = indexes.filter((index) =>
       allowedRowIds.has(resolveGridRowId(rows[index], index, options?.getRowId))
     );
@@ -69,13 +77,22 @@ export function getDisplayRowIndexes<T extends GridRow>(
   }
 
   if (enableFiltering) {
+    // A-071: hoist the per-filter column lookup out of the row loop (one shared Map, not a
+    // `columns.find` per row per filter) so 100k rows × N filters no longer rescans `columns`.
+    const columnMap = buildColumnMap(columns);
     indexes = indexes.filter((index) => {
       if (
-        rowMatchesFilters(rows[index], columns, filters, { rows, rowIndex: index, evaluator }) &&
+        rowMatchesFilters(rows[index], columns, filters, {
+          rows,
+          rowIndex: index,
+          evaluator,
+          columnMap,
+        }) &&
         rowMatchesColorFilters(rows[index], columns, colorFilters, {
           rows,
           rowIndex: index,
           evaluator,
+          columnMap,
         })
       ) {
         return true;
@@ -92,12 +109,11 @@ export function getDisplayRowIndexes<T extends GridRow>(
 
     if (column) {
       const directionMultiplier = sort.direction === "asc" ? 1 : -1;
-
-      indexes.sort((indexA, indexB) => {
-        const valueA = evaluator.getCellValue(indexA, column.key);
-        const valueB = evaluator.getCellValue(indexB, column.key);
-        return compareValues(valueA, valueB) * directionMultiplier;
-      });
+      indexes = sortByDecoratedKeys(
+        indexes,
+        (index) => evaluator.getCellValue(index, column.key),
+        directionMultiplier
+      );
     }
   }
 
@@ -108,7 +124,7 @@ export function getDisplayRowIndexes<T extends GridRow>(
   return indexes;
 }
 
-export function getDisplayRows<T extends GridRow>(rows: T[], displayRowIndexes: number[]): T[] {
+export function getDisplayRows<T extends object>(rows: T[], displayRowIndexes: number[]): T[] {
   return displayRowIndexes.map((index) => rows[index]).filter(Boolean);
 }
 

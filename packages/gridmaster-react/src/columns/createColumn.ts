@@ -10,7 +10,7 @@ import { titleize } from "../core/utils";
    Internal helper
    ========================================================= */
 
-function buildColumn<T extends GridRow>(
+function buildColumn<T extends object>(
   type: GridColumnDef<T>["type"],
   key: string,
   options?: GridCreateColumnOptions<T> & { title?: string }
@@ -27,7 +27,7 @@ function buildColumn<T extends GridRow>(
    Column factory
    ========================================================= */
 
-export function createColumnFactory<T extends GridRow = GridRow>(): GridColumnFactory<T> {
+export function createColumnFactory<T extends object = GridRow>(): GridColumnFactory<T> {
   return {
     text: (key, options) => buildColumn<T>("text", key, options),
 

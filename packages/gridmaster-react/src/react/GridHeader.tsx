@@ -9,7 +9,7 @@ import {
 import type { GridColorOption } from "../core/types";
 import { isFrozenColumnIndex, toggleFrozenThroughColumn } from "../core/features/freezing";
 import { buildColumnOffsets, getColumnWidth } from "../core/features/sizing";
-import { selectSingleColumn } from "../core/state/selectionState";
+import { selectSingleColumn, setActiveCell } from "../core/state/selectionState";
 import { columnLetter } from "../core/utils";
 import { useGridContext } from "./context/GridContext";
 import { useColumnSizing } from "./hooks/useColumnSizing";
@@ -57,6 +57,9 @@ export function GridHeader() {
     enableInsertColumn,
     enableDeleteColumn,
     openContextMenu,
+    // Resolved A-004 flags; `= true` is the pre-A-004 behaviour for a hand-built provider value.
+    enableRangeSelection = true,
+    enableColumnSelection = true,
   } = useGridContext();
   const [columnMenu, setColumnMenu] = React.useState<ColumnMenuState>(null);
   const [resolvedColumnMenuFilterValues, setResolvedColumnMenuFilterValues] = React.useState<
@@ -73,17 +76,29 @@ export function GridHeader() {
     columns: visibleColumns,
     selection,
     setSelection,
-    enableRangeSelection: true,
+    enableRangeSelection,
+    // Row selection is a row-header gesture (GridBody); the header never creates it.
     enableRowSelection: true,
-    enableColumnSelection: true,
+    enableColumnSelection,
   });
 
-  const { autoFit, resizeState, startResize } = useColumnSizing({
+  const { autoFit, resizedRef, resizeState, startResize } = useColumnSizing({
     columns: visibleColumns,
     rows: displayRows,
     columnWidths,
     setColumnWidths,
     onColumnResize: props.onColumnResize,
+    // Auto-fit's formula axis is ALL columns (hidden included); only visible columns are measured.
+    allColumns: columns,
+  });
+
+  // F-010: read the latest resolvers through refs so an inline resolver (new identity each render)
+  // does not re-trigger the fetch effects; the effects depend only on the data (column/filters).
+  const resolveFilterValuesRef = React.useRef(props.resolveFilterValues);
+  const resolveColorOptionsRef = React.useRef(props.resolveColorOptions);
+  React.useEffect(() => {
+    resolveFilterValuesRef.current = props.resolveFilterValues;
+    resolveColorOptionsRef.current = props.resolveColorOptions;
   });
 
   const colOffsets = React.useMemo(
@@ -170,7 +185,8 @@ export function GridHeader() {
   }, [columnMenu, visibleColumns]);
 
   React.useEffect(() => {
-    if (!columnMenuFilterColumn || !props.resolveFilterValues) {
+    const resolveFilterValues = resolveFilterValuesRef.current;
+    if (!columnMenuFilterColumn || !resolveFilterValues) {
       setResolvedColumnMenuFilterValues(null);
       setColumnMenuFilterLoading(false);
       return;
@@ -179,7 +195,7 @@ export function GridHeader() {
     let cancelled = false;
     setColumnMenuFilterLoading(true);
 
-    Promise.resolve(props.resolveFilterValues(columnMenuFilterColumn.key, filters))
+    Promise.resolve(resolveFilterValues(columnMenuFilterColumn.key, filters))
       .then((values) => {
         if (cancelled) return;
         setResolvedColumnMenuFilterValues(Array.isArray(values) ? values : []);
@@ -196,9 +212,10 @@ export function GridHeader() {
     return () => {
       cancelled = true;
     };
-  }, [columnMenuFilterColumn, filters, props.resolveFilterValues]);
+  }, [columnMenuFilterColumn, filters]);
   React.useEffect(() => {
-    if (!columnMenuColorSourceKey || !props.resolveColorOptions) {
+    const resolveColorOptions = resolveColorOptionsRef.current;
+    if (!columnMenuColorSourceKey || !resolveColorOptions) {
       setResolvedColumnMenuColorOptions(null);
       setColumnMenuColorLoading(false);
       return;
@@ -207,7 +224,7 @@ export function GridHeader() {
     let cancelled = false;
     setColumnMenuColorLoading(true);
 
-    Promise.resolve(props.resolveColorOptions(columnMenuColorSourceKey, filters, colorFilters))
+    Promise.resolve(resolveColorOptions(columnMenuColorSourceKey, filters, colorFilters))
       .then((options) => {
         if (cancelled) return;
         setResolvedColumnMenuColorOptions(Array.isArray(options) ? options : []);
@@ -224,7 +241,7 @@ export function GridHeader() {
     return () => {
       cancelled = true;
     };
-  }, [columnMenuColorSourceKey, colorFilters, filters, props.resolveColorOptions]);
+  }, [columnMenuColorSourceKey, colorFilters, filters]);
 
   const openColumnMenu = React.useCallback((columnKey: string, trigger: HTMLElement) => {
     const nextAnchor = trigger.getBoundingClientRect();
@@ -279,7 +296,12 @@ export function GridHeader() {
 
       event.preventDefault();
       event.stopPropagation();
-      setSelection((prev) => selectSingleColumn(prev, visibleColumnIndex, displayRows.length));
+      // The menu targets `columnKey`, so it does not need a column selection to work.
+      setSelection((prev) =>
+        enableColumnSelection
+          ? selectSingleColumn(prev, visibleColumnIndex, displayRows.length)
+          : setActiveCell(prev, { row: prev.cursor?.row ?? 0, col: visibleColumnIndex })
+      );
       openContextMenu({
         kind: "column",
         anchorRect: new DOMRect(event.clientX, event.clientY, 0, 0),
@@ -287,13 +309,26 @@ export function GridHeader() {
         columnKey,
       });
     },
-    [displayRows.length, enableDeleteColumn, enableInsertColumn, openContextMenu, setSelection]
+    [
+      displayRows.length,
+      enableColumnSelection,
+      enableDeleteColumn,
+      enableInsertColumn,
+      openContextMenu,
+      setSelection,
+    ]
   );
 
   return (
     <>
-      <thead>
-        <tr style={{ height: SPREADSHEET_HEADER_HEIGHT }}>
+      {/* biome-ignore lint/a11y/noRedundantRoles: the inner <table> is role="presentation" (see
+          GridViewport), which strips implicit grid semantics — the rowgroup/row/cell roles are then
+          required, not redundant. */}
+      <thead role="rowgroup">
+        {/* A1: the letter row is decorative address chrome — presentation + hidden from AT (cell
+            addresses reach screen readers via the status/formula bar in a later task). */}
+        {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: an aria-hidden chrome row; role=presentation is intentional. */}
+        <tr role="presentation" aria-hidden="true" style={{ height: SPREADSHEET_HEADER_HEIGHT }}>
           <th
             className="gm-rh gm-rh-spreadsheet"
             style={{
@@ -353,9 +388,14 @@ export function GridHeader() {
           })}
         </tr>
 
-        <tr style={{ height: headerHeight ?? DEFAULT_HEADER_HEIGHT }}>
+        {/* A1: the TITLE row is the single exposed header row (aria-rowindex 1). */}
+        {/* biome-ignore lint/a11y/noRedundantRoles: see the thead note — presentation table requires the explicit row role. */}
+        <tr role="row" aria-rowindex={1} style={{ height: headerHeight ?? DEFAULT_HEADER_HEIGHT }}>
           <th
             className="gm-rh"
+            role="columnheader"
+            aria-colindex={1}
+            aria-label="Select all"
             onClick={onSelectAll}
             style={{
               width: DEFAULT_ROW_NUMBER_WIDTH,
@@ -420,8 +460,16 @@ export function GridHeader() {
             return (
               <th
                 key={column.key}
+                role="columnheader"
+                aria-colindex={index + 2}
                 className={["gm-th", isSelected ? "gm-th-selected" : ""].filter(Boolean).join(" ")}
                 onClick={(event) => {
+                  // A-081b: suppress the click that trails a resize drag (pointerup fires a click on
+                  // the header); consume the flag once so the next genuine header click still works.
+                  if (resizedRef.current) {
+                    resizedRef.current = false;
+                    return;
+                  }
                   onColumnHeaderClick(index, {
                     shiftKey: event.shiftKey,
                     ctrlKey: event.ctrlKey,
@@ -531,10 +579,17 @@ export function GridHeader() {
                       ]
                         .filter(Boolean)
                         .join(" ")}
-                      onMouseDown={(event) => {
+                      style={{ touchAction: "none" }}
+                      onPointerDown={(event) => {
+                        if (event.button !== 0) return;
                         event.preventDefault();
                         event.stopPropagation();
+                        // Capture keeps touch/pen drags alive past the 12px handle (jsdom stubs this).
+                        event.currentTarget.setPointerCapture?.(event.pointerId);
                         startResize(column, event.clientX);
+                        // A-081b: any handle interaction suppresses the header click that trails
+                        // pointerup, so neither a resize nor a bare handle press selects the column.
+                        resizedRef.current = true;
                       }}
                       onDoubleClick={(event) => {
                         if (!enableColumnAutoFit) return;
@@ -660,9 +715,11 @@ export function GridHeader() {
               : undefined
           }
           filterValues={columnMenuFilterValues}
+          filterTree={columnMenuFilterColumn?.filterTree}
           filterLoading={columnMenuFilterLoading}
           selectedFilterValues={selectedColumnMenuFilterValues}
           filterVisibleValueCount={props.filterMenuVisibleValueCount}
+          colorMenuVisibleValueCount={props.colorMenuVisibleValueCount}
           onApplyFilterValues={
             enableFiltering && columnMenuFilterColumn
               ? (draftValues) => {

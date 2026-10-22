@@ -31,7 +31,7 @@ export type GridContextMenuState = {
   columnKey?: string;
 } | null;
 
-export type GridContextValue<T extends GridRow = GridRow> = {
+export type GridContextValue<T extends object = GridRow> = {
   props: GridMasterProps<T>;
 
   viewportRef: React.RefObject<HTMLDivElement | null>;
@@ -84,6 +84,9 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   insertColumn: (columnKey: string, position: GridColumnInsertPosition) => GridColumnDef<T> | null;
   deleteColumn: (columnKey: string) => GridColumnDef<T> | null;
   emitCellChange?: (event: GridCellChangeEvent<T>) => void;
+  /** Step history and notify a controlled host (see `useGridMaster`); optional for hand-built providers. */
+  undo?: () => boolean;
+  redo?: () => boolean;
   setEditingValue: React.Dispatch<React.SetStateAction<unknown>>;
   requestViewportFocusAfterEdit: () => void;
   startEditing: (
@@ -126,11 +129,29 @@ export type GridContextValue<T extends GridRow = GridRow> = {
   enableInsertColumn: boolean;
   enableDeleteRow: boolean;
   enableDeleteColumn: boolean;
+
+  // A-004: RESOLVED gating flags (props + mode + presets folded in by useGridMaster, the single
+  // source of truth). Optional so a hand-built GridProvider value keeps compiling; consumers read
+  // them with a `= true` default, which is exactly the pre-A-004 behaviour.
+  /** Selection kinds; `enableSelection={false}` is already folded into the three below. */
+  enableSelection?: boolean;
+  enableRangeSelection?: boolean;
+  enableRowSelection?: boolean;
+  enableColumnSelection?: boolean;
+  /** Cell VALUE writes; false in readonly mode. */
+  enableEditing?: boolean;
+  enableClipboard?: boolean;
+  enableUndoRedo?: boolean;
+  /** Cell META writes: false in readonly mode (formatting, painter). */
+  canFormat?: boolean;
+  enableCellColoring?: boolean;
+  enableWrapText?: boolean;
+  enableValidation?: boolean;
 };
 
 const GridContext = createContext<GridContextValue<GridRow> | null>(null);
 
-export function GridProvider<T extends GridRow = GridRow>({
+export function GridProvider<T extends object = GridRow>({
   value,
   children,
 }: {
@@ -144,7 +165,7 @@ export function GridProvider<T extends GridRow = GridRow>({
   );
 }
 
-export function useGridContext<T extends GridRow = GridRow>(): GridContextValue<T> {
+export function useGridContext<T extends object = GridRow>(): GridContextValue<T> {
   const context = useContext(GridContext);
 
   if (!context) {

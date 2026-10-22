@@ -57,15 +57,20 @@ export * from "./core/features/conditionalFormatting";
 export * from "./core/features/dragDrop";
 export * from "./core/features/formulas";
 export * from "./core/features/formatPainter";
+export * from "./core/features/readonly";
 export * from "./core/features/freezing";
 export * from "./core/features/navigation";
 export * from "./core/features/sizing";
 export * from "./core/features/sorting";
 export * from "./core/features/structure";
+export * from "./core/features/validation";
 
 export * from "./core/transforms/columns";
 export * from "./core/transforms/rows";
 
+// Public since v0.2.0; removing these was a breaking change, so they stay (API is additive-only).
+export * from "./columns/columnDefaults";
+export * from "./columns/columnTypes";
 export * from "./columns/createColumn";
 
 export * from "./editors";

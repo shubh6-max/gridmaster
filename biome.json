@@ -1,5 +1,10 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "organizeImports": {
     "enabled": true
   },
@@ -12,7 +17,13 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
-    "lineWidth": 100
+    "lineWidth": 100,
+    "lineEnding": "lf",
+    "ignore": [
+      "packages/gridmaster-react/src",
+      "packages/gridmaster-react/demo",
+      "packages/gridmaster-react/tests"
+    ]
   },
   "javascript": {
     "formatter": {
@@ -21,7 +32,86 @@
       "trailingCommas": "es5"
     }
   },
+  "overrides": [
+    {
+      "include": ["packages/gridmaster-react/src", "packages/gridmaster-react/demo"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "warn",
+            "noConfusingVoidType": "warn",
+            "noGlobalIsNan": "warn",
+            "noArrayIndexKey": "warn"
+          },
+          "correctness": {
+            "useExhaustiveDependencies": "warn"
+          },
+          "a11y": {
+            "noSvgWithoutTitle": "warn",
+            "noAriaHiddenOnFocusable": "warn",
+            "noNoninteractiveTabindex": "warn",
+            "useKeyWithClickEvents": "warn",
+            "useSemanticElements": "warn",
+            "useAriaPropsForRole": "warn",
+            "useFocusableInteractive": "warn",
+            "noLabelWithoutControl": "warn",
+            "useButtonType": "warn",
+            "useValidAnchor": "warn"
+          },
+          "performance": {
+            "noDelete": "warn"
+          },
+          "complexity": {
+            "noForEach": "warn",
+            "noExtraBooleanCast": "warn"
+          },
+          "style": {
+            "useImportType": "warn",
+            "useExponentiationOperator": "warn",
+            "noParameterAssign": "warn",
+            "noNonNullAssertion": "warn"
+          }
+        }
+      }
+    },
+    {
+      "include": [
+        "packages/gridmaster-react/src/react/GridViewport.tsx",
+        "packages/gridmaster-react/src/react/GridBody.tsx",
+        "packages/gridmaster-react/src/react/GridHeader.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useSemanticElements": "off",
+            "noNoninteractiveTabindex": "off"
+          }
+        }
+      }
+    }
+  ],
   "files": {
-    "ignore": ["node_modules", "dist", "legacy", "*.log", "playwright-report"]
+    "ignore": [
+      ".superpowers",
+      "node_modules",
+      "dist",
+      "demo-dist",
+      "playwright-report",
+      "*.log",
+      ".claude",
+      ".agents",
+      ".impeccable",
+      ".codegraph",
+      "legacy",
+      "parked",
+      "apps",
+      "packages/core",
+      "packages/react",
+      "tests",
+      "docs",
+      "iterations",
+      "venv",
+      "tsconfig.base.json"
+    ]
   }
 }

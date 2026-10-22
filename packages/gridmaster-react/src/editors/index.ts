@@ -12,11 +12,11 @@ export { NumberEditor } from "./NumberEditor";
 export { SelectEditor } from "./SelectEditor";
 export { TextEditor } from "./TextEditor";
 
-export type GridDefaultCellEditor<T extends GridRow = GridRow> = ComponentType<
+export type GridDefaultCellEditor<T extends object = GridRow> = ComponentType<
   GridCellEditorProps<T>
 >;
 
-export const defaultCellEditors: Record<GridColumnType, GridDefaultCellEditor<any>> = {
+export const defaultCellEditors: Record<GridColumnType, GridDefaultCellEditor<GridRow>> = {
   text: TextEditor,
   number: NumberEditor,
   select: SelectEditor,
@@ -26,7 +26,7 @@ export const defaultCellEditors: Record<GridColumnType, GridDefaultCellEditor<an
   custom: TextEditor,
 };
 
-export function getDefaultCellEditor<T extends GridRow = GridRow>(
+export function getDefaultCellEditor<T extends object = GridRow>(
   columnType?: GridColumnType
 ): GridDefaultCellEditor<T> {
   return (defaultCellEditors[columnType ?? "text"] ??

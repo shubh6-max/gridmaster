@@ -7,7 +7,7 @@ function getEditorDateValue(value: unknown): string {
   return /^\d{4}-\d{2}-\d{2}$/.test(normalized) ? normalized : "";
 }
 
-export function DateEditor<T extends GridRow = GridRow>({
+export function DateEditor<T extends object = GridRow>({
   value,
   commit,
   cancel,
@@ -46,7 +46,7 @@ export function DateEditor<T extends GridRow = GridRow>({
         setLocalValue(nextValue);
         updateValue(nextValue);
       }}
-      onBlur={commit}
+      onBlur={() => commit()}
       onKeyDown={(event) => {
         if (event.key === "Enter") {
           event.preventDefault();

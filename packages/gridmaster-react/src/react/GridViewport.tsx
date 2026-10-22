@@ -2,6 +2,8 @@ import React from "react";
 import { GridBody } from "./GridBody";
 import { GridContextMenu } from "./GridContextMenu";
 import { GridHeader } from "./GridHeader";
+import { resolveCellReadonly } from "../core/features/readonly";
+import { setActiveCell } from "../core/state/selectionState";
 import { useGridContext } from "./context/GridContext";
 import { useCellFormatting } from "./hooks/useCellFormatting";
 import { useClipboard } from "./hooks/useClipboard";
@@ -14,6 +16,7 @@ export function GridViewport() {
     rows,
     displayRows,
     displayRowIndexes,
+    columns,
     visibleColumns,
     selection,
     setSelection,
@@ -27,6 +30,10 @@ export function GridViewport() {
     clipboard,
     setClipboard,
     updateRows,
+    emitCellChange,
+    formulaEvaluator,
+    undo,
+    redo,
     height,
     rowHeight,
     headerHeight,
@@ -39,6 +46,16 @@ export function GridViewport() {
     copyFormat,
     pasteFormatToSelection,
     stopFormatPainter,
+    // Resolved A-004 flags (defaults = the pre-A-004 behaviour for a hand-built provider value).
+    enableEditing = mode !== "readonly",
+    enableClipboard = true,
+    enableUndoRedo = true,
+    enableRangeSelection = true,
+    enableRowSelection = true,
+    enableColumnSelection = true,
+    canFormat = true,
+    enableCellColoring = true,
+    enableWrapText = true,
   } = useGridContext();
   const { toggleBold, toggleItalic, toggleUnderline } = useCellFormatting({
     history,
@@ -52,6 +69,9 @@ export function GridViewport() {
     },
     historyLimit: props.historyLimit,
     preserveRowReferences: props.rowPatchMode,
+    canFormat,
+    enableCellColoring,
+    enableWrapText,
   });
 
   const { clearSelection, copy, cut, paste } = useClipboard({
@@ -59,11 +79,32 @@ export function GridViewport() {
     displayRows,
     displayRowIndexes,
     columns: visibleColumns,
+    allColumns: columns,
     selection,
     clipboard,
     setClipboard,
     updateRows,
+    enableClipboard,
+    enableEditing,
+    isCellReadonly: (sourceRowIndex, column) =>
+      resolveCellReadonly(props, history.present.cellMeta, rows[sourceRowIndex], sourceRowIndex, column),
+    emitCellChange,
+    formulaEvaluator,
+    clipboardValueMode: props.clipboardValueMode,
+    locale: props.locale,
+    onCopy: props.onCopy,
+    onPaste: props.onPaste,
+    onClipboardError: props.onClipboardError,
   });
+
+  // Evaluated DISPLAY value at display coordinates — drives Ctrl+Arrow data-edge jumps so hidden
+  // columns / filtered rows are naturally excluded (the caller already works in display space).
+  const getCellValue = (displayRowIndex: number, displayColIndex: number): unknown => {
+    const sourceRowIndex = displayRowIndexes[displayRowIndex];
+    const column = visibleColumns[displayColIndex];
+    if (sourceRowIndex == null || !column) return undefined;
+    return formulaEvaluator.getCellDisplayString(sourceRowIndex, column.key);
+  };
 
   useKeyboardNavigation({
     containerRef: viewportRef,
@@ -71,13 +112,17 @@ export function GridViewport() {
     columns: visibleColumns,
     selection,
     setSelection,
-    history,
-    setHistory,
-    historyLimit: props.historyLimit,
-    preserveRowReferences: props.rowPatchMode,
-    enableUndoRedo: props.enableUndoRedo,
-    enableClipboard: true,
-    enableEditing: mode !== "readonly",
+    tabNavigation: props.tabNavigation,
+    getCellValue,
+    rowHeight,
+    onUndo: undo,
+    onRedo: redo,
+    enableUndoRedo,
+    enableClipboard,
+    enableEditing,
+    enableRangeSelection,
+    enableRowSelection,
+    enableColumnSelection,
     onCopy: copy,
     onCut: cut,
     onPaste: paste,
@@ -98,23 +143,49 @@ export function GridViewport() {
     isFormatPainterActive: formatPainterMode !== "idle",
   });
 
+  // A-009 / F-004: reset the cursor to A1 and scroll to the top ONLY when the view's filters / sort /
+  // colour filters / colour sort IDENTITY changes — never on a mere row-count change (insert, delete,
+  // undo, paste-append, live data, hide column). That previously jumped the user to A1 and overrode
+  // `insertRow`'s active cell; the clamp effect in useGridMaster already keeps the cursor in bounds
+  // when rows shrink, and scroll position is now preserved across insert/delete.
+  const viewIdentityRef = React.useRef({ filters, sort, colorFilters, colorSort });
+  const didMountRef = React.useRef(false);
   React.useEffect(() => {
     const container = viewportRef.current;
     if (!container) return;
 
-    container.scrollTo({
-      left: 0,
-      top: 0,
-    });
-    setSelection((prev) => {
+    const prev = viewIdentityRef.current;
+    const viewChanged =
+      prev.filters !== filters ||
+      prev.sort !== sort ||
+      prev.colorFilters !== colorFilters ||
+      prev.colorSort !== colorSort;
+    viewIdentityRef.current = { filters, sort, colorFilters, colorSort };
+
+    // Skip the first run (mount): there is nothing to reset to.
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+
+    if (!viewChanged) return;
+
+    container.scrollTo({ left: 0, top: 0 });
+    setSelection((prevSelection) => {
       if (!displayRows.length || !visibleColumns.length) {
-        return prev;
+        return prevSelection;
       }
-      return {
-        ...prev,
-        cursor: { row: 0, col: 0 },
-        anchor: { row: 0, col: 0 },
-      };
+      // Already at the origin: keep the same object so onSelectionChange does not re-emit.
+      if (
+        prevSelection.cursor?.row === 0 &&
+        prevSelection.cursor.col === 0 &&
+        prevSelection.anchor?.row === 0 &&
+        prevSelection.anchor.col === 0 &&
+        prevSelection.mode === "cell"
+      ) {
+        return prevSelection;
+      }
+      return setActiveCell(prevSelection, { row: 0, col: 0 });
     });
   }, [
     colorFilters,
@@ -214,10 +285,38 @@ export function GridViewport() {
     selection.mode,
   ]);
 
+  // A1 (WAI-ARIA APG "Grid"): the focus owner carries the grid role so there is one tab stop. The
+  // TITLE header row is the single exposed header row (see GridHeader), so the row axis is the display
+  // rows plus 1; the column axis is the visible columns plus the row-header column.
+  const headerRowsExposed = 1;
+  const ariaMultiselectable =
+    enableRangeSelection || enableRowSelection || enableColumnSelection || undefined;
+
+  // A2 (APG Grid): focus stays on the grid element; the active (cursor) cell is exposed via
+  // aria-activedescendant. `gridId` prefixes every data cell's DOM id (GridBody), unique and stable
+  // per grid instance. GridBody keeps the active row mounted under virtualization, so the referenced
+  // id is present whenever the cursor is in range — we only point at it then (never a dangling IDREF).
+  const gridId = React.useId();
+  const cursor = selection.cursor;
+  const activeDescendant =
+    cursor &&
+    cursor.row >= 0 &&
+    cursor.row < displayRows.length &&
+    cursor.col >= 0 &&
+    cursor.col < visibleColumns.length
+      ? `${gridId}-r${cursor.row}-c${cursor.col}`
+      : undefined;
+
   return (
     <div
       ref={viewportRef}
       className="gm-viewport"
+      role="grid"
+      aria-rowcount={displayRows.length + headerRowsExposed}
+      aria-colcount={visibleColumns.length + 1}
+      aria-multiselectable={ariaMultiselectable}
+      aria-readonly={enableEditing ? undefined : true}
+      aria-activedescendant={activeDescendant}
       onMouseDownCapture={(event) => {
         const target = event.target as HTMLElement | null;
         const tag = target?.tagName ?? "";
@@ -247,6 +346,7 @@ export function GridViewport() {
     >
       <table
         className="gm-table"
+        role="presentation"
         style={{
           borderCollapse: "collapse",
           tableLayout: "fixed",
@@ -255,7 +355,7 @@ export function GridViewport() {
         }}
       >
         <GridHeader />
-        <GridBody />
+        <GridBody cellIdPrefix={gridId} />
       </table>
       <GridContextMenu />
     </div>

@@ -24,6 +24,7 @@ import type { GridSelectionFormattingValue } from "../core/features/formatting";
 import { DEFAULT_COLOR_LABELS, DEFAULT_COLOR_PALETTE } from "../core/constants";
 import type { GridHorizontalAlign, GridTextOrientation, GridVerticalAlign } from "../core/types";
 import { ColorMenu } from "../menus/ColorMenu";
+import { resolveCellReadonly } from "../core/features/readonly";
 import { useGridContext } from "./context/GridContext";
 import { useClipboard } from "./hooks/useClipboard";
 import { useCellFormatting } from "./hooks/useCellFormatting";
@@ -90,6 +91,7 @@ function RibbonActionButton({
   title,
   size = "small",
   active = false,
+  disabled = false,
   onClick,
   onDoubleClick,
 }: {
@@ -98,6 +100,7 @@ function RibbonActionButton({
   title: string;
   size?: "large" | "small";
   active?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
   onDoubleClick?: () => void;
 }) {
@@ -114,6 +117,8 @@ function RibbonActionButton({
       title={title}
       aria-label={title}
       aria-pressed={active || undefined}
+      disabled={disabled}
+      aria-disabled={disabled || undefined}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
     >
@@ -135,6 +140,7 @@ function RibbonSelectField({
   compact = false,
   mixed = false,
   mixedLabel = "Mixed",
+  disabled = false,
   onChange,
 }: {
   value: string;
@@ -143,6 +149,7 @@ function RibbonSelectField({
   compact?: boolean;
   mixed?: boolean;
   mixedLabel?: string;
+  disabled?: boolean;
   onChange: (nextValue: string) => void;
 }) {
   const renderedOptions = React.useMemo(() => {
@@ -161,6 +168,8 @@ function RibbonSelectField({
         className="gm-ribbon-select"
         value={value}
         aria-label={title}
+        disabled={disabled}
+        aria-disabled={disabled || undefined}
         onChange={(event) => {
           if (event.target.value === "__mixed__") return;
           onChange(event.target.value);
@@ -217,6 +226,7 @@ function RibbonToolButton({
       aria-label={title}
       aria-pressed={active || mixed || undefined}
       disabled={disabled}
+      aria-disabled={disabled || undefined}
       onClick={onClick}
       style={style}
     >
@@ -256,29 +266,52 @@ function resolveMixedNumber(
 
 function ClipboardSection() {
   const {
+    props,
     rows,
     displayRows,
     displayRowIndexes,
+    columns,
     visibleColumns,
+    history,
     selection,
     clipboard,
     setClipboard,
     updateRows,
+    emitCellChange,
+    formulaEvaluator,
     focusViewport,
     formatPainterMode,
     startFormatPainter,
     stopFormatPainter,
+    mode,
+    // Resolved A-004 flags; `= true` is the pre-A-004 behaviour for a hand-built provider value.
+    enableClipboard = true,
+    enableEditing = mode !== "readonly",
+    canFormat = true,
   } = useGridContext();
+  const canWriteClipboard = enableClipboard && enableEditing;
 
   const { copy, cut, paste } = useClipboard({
     rows,
     displayRows,
     displayRowIndexes,
     columns: visibleColumns,
+    allColumns: columns,
     selection,
     clipboard,
     setClipboard,
     updateRows,
+    enableClipboard,
+    enableEditing,
+    isCellReadonly: (sourceRowIndex, column) =>
+      resolveCellReadonly(props, history.present.cellMeta, rows[sourceRowIndex], sourceRowIndex, column),
+    emitCellChange,
+    formulaEvaluator,
+    clipboardValueMode: props.clipboardValueMode,
+    locale: props.locale,
+    onCopy: props.onCopy,
+    onPaste: props.onPaste,
+    onClipboardError: props.onClipboardError,
   });
 
   return (
@@ -289,6 +322,7 @@ function ClipboardSection() {
           icon={<ClipboardPaste style={{ width: 15, height: 15 }} />}
           label="Paste"
           title="Paste into the current selection"
+          disabled={!canWriteClipboard}
           onClick={() => {
             void paste();
             focusViewport();
@@ -298,6 +332,7 @@ function ClipboardSection() {
           icon={<Copy style={{ width: 15, height: 15 }} />}
           label="Copy"
           title="Copy selected cells"
+          disabled={!enableClipboard}
           onClick={() => {
             void copy(false);
             focusViewport();
@@ -307,6 +342,7 @@ function ClipboardSection() {
           icon={<Scissors style={{ width: 15, height: 15 }} />}
           label="Cut"
           title="Cut selected cells"
+          disabled={!canWriteClipboard}
           onClick={() => {
             void cut();
             focusViewport();
@@ -317,6 +353,7 @@ function ClipboardSection() {
           label="Format Painter"
           title="Click to paint formatting once. Double-click to keep painting until Esc."
           active={formatPainterMode !== "idle"}
+          disabled={!canFormat && formatPainterMode === "idle"}
           onClick={() => {
             if (formatPainterMode !== "idle") {
               stopFormatPainter();
@@ -345,6 +382,8 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
     toggleItalic,
     toggleUnderline,
   } = formatting;
+  const { canFormat = true, enableCellColoring = true } = useGridContext();
+  const colorDisabled = !canFormat || !enableCellColoring;
   const [colorMenu, setColorMenu] = React.useState<{
     kind: "fill" | "text";
     anchorRect: DOMRect;
@@ -370,6 +409,7 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
             value={selectedFontFamily.value}
             options={FONT_FAMILY_OPTIONS}
             title="Apply font family to the current selection"
+            disabled={!canFormat}
             mixed={selectedFontFamily.mixed}
             onChange={(nextValue) => {
               setFontFamily(nextValue);
@@ -379,6 +419,7 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
             value={selectedFontSize.value}
             options={FONT_SIZE_OPTIONS}
             title="Apply font size to the current selection"
+            disabled={!canFormat}
             compact
             mixed={selectedFontSize.mixed}
             onChange={(nextValue) => {
@@ -391,6 +432,7 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             label="B"
             title="Bold (Ctrl/Cmd+B)"
+            disabled={!canFormat}
             accent
             active={summary.isBold === true}
             mixed={summary.isBold === "__mixed__"}
@@ -402,6 +444,7 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             label="I"
             title="Italic (Ctrl/Cmd+I)"
+            disabled={!canFormat}
             accent
             active={summary.isItalic === true}
             mixed={summary.isItalic === "__mixed__"}
@@ -413,6 +456,7 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             label="U"
             title="Underline (Ctrl/Cmd+U)"
+            disabled={!canFormat}
             accent
             active={summary.isUnderline === true}
             mixed={summary.isUnderline === "__mixed__"}
@@ -424,6 +468,7 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             label="Bdr"
             title="Toggle border on the current selection"
+            disabled={!canFormat}
             active={summary.hasBorder === true}
             mixed={summary.hasBorder === "__mixed__"}
             onClick={() => {
@@ -433,6 +478,7 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             label="Fill"
             title="Apply fill color"
+            disabled={colorDisabled}
             active={Boolean(activeFillColor)}
             mixed={summary.backgroundColor === "__mixed__"}
             indicatorColor={activeFillColor || ""}
@@ -446,6 +492,7 @@ function FontSection({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             label="A"
             title="Apply font color"
+            disabled={colorDisabled}
             active={Boolean(activeTextColor)}
             mixed={summary.textColor === "__mixed__"}
             indicatorColor={activeTextColor || "#0f172a"}
@@ -507,6 +554,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
     setVerticalAlign,
     toggleWrapText,
   } = formatting;
+  const { canFormat = true, enableWrapText = true } = useGridContext();
 
   const selectedOrientation = resolveMixedString(summary.textOrientation, "horizontal");
 
@@ -517,6 +565,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<AlignLeft style={{ width: 16, height: 16 }} />}
             title="Align Left"
+            disabled={!canFormat}
             active={summary.horizontalAlign === "left"}
             mixed={summary.horizontalAlign === "__mixed__"}
             onClick={() => {
@@ -526,6 +575,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<AlignCenter style={{ width: 16, height: 16 }} />}
             title="Align Center"
+            disabled={!canFormat}
             active={summary.horizontalAlign === "center"}
             mixed={summary.horizontalAlign === "__mixed__"}
             onClick={() => {
@@ -535,6 +585,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<AlignRight style={{ width: 16, height: 16 }} />}
             title="Align Right"
+            disabled={!canFormat}
             active={summary.horizontalAlign === "right"}
             mixed={summary.horizontalAlign === "__mixed__"}
             onClick={() => {
@@ -547,6 +598,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<AlignStartVertical style={{ width: 16, height: 16 }} />}
             title="Align Top"
+            disabled={!canFormat}
             active={summary.verticalAlign === "top"}
             mixed={summary.verticalAlign === "__mixed__"}
             onClick={() => {
@@ -556,6 +608,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<AlignCenterVertical style={{ width: 16, height: 16 }} />}
             title="Align Middle"
+            disabled={!canFormat}
             active={summary.verticalAlign === "middle"}
             mixed={summary.verticalAlign === "__mixed__"}
             onClick={() => {
@@ -565,6 +618,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<AlignEndVertical style={{ width: 16, height: 16 }} />}
             title="Align Bottom"
+            disabled={!canFormat}
             active={summary.verticalAlign === "bottom"}
             mixed={summary.verticalAlign === "__mixed__"}
             onClick={() => {
@@ -578,6 +632,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
             icon={<WrapText style={{ width: 16, height: 16 }} />}
             label="Wrap"
             title="Wrap Text"
+            disabled={!canFormat || !enableWrapText}
             active={summary.wrapText === true}
             mixed={summary.wrapText === "__mixed__"}
             onClick={() => {
@@ -588,6 +643,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
             value={selectedOrientation.value}
             options={ORIENTATION_OPTIONS}
             title="Change text orientation"
+            disabled={!canFormat}
             mixed={selectedOrientation.mixed}
             mixedLabel="Mixed"
             onChange={(nextValue) => {
@@ -600,7 +656,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<IndentDecrease style={{ width: 16, height: 16 }} />}
             title="Decrease Indent"
-            disabled={!canDecreaseIndent}
+            disabled={!canFormat || !canDecreaseIndent}
             onClick={() => {
               decreaseIndent();
             }}
@@ -608,6 +664,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<IndentIncrease style={{ width: 16, height: 16 }} />}
             title="Increase Indent"
+            disabled={!canFormat}
             onClick={() => {
               increaseIndent();
             }}
@@ -615,6 +672,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<ArrowBigUp style={{ width: 16, height: 16 }} />}
             title="Rotate Text Up"
+            disabled={!canFormat}
             active={summary.textOrientation === "rotateUp"}
             mixed={summary.textOrientation === "__mixed__"}
             onClick={() => {
@@ -624,6 +682,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<ArrowBigDown style={{ width: 16, height: 16 }} />}
             title="Rotate Text Down"
+            disabled={!canFormat}
             active={summary.textOrientation === "rotateDown"}
             mixed={summary.textOrientation === "__mixed__"}
             onClick={() => {
@@ -633,6 +692,7 @@ function AlignmentGroup({ formatting }: { formatting: CellFormattingApi }) {
           <RibbonToolButton
             icon={<Columns2 style={{ width: 16, height: 16 }} />}
             title="Vertical text"
+            disabled={!canFormat}
             active={summary.textOrientation === "vertical"}
             mixed={summary.textOrientation === "__mixed__"}
             onClick={() => {
@@ -669,6 +729,9 @@ export function GridToolbar() {
     displayRowIndexes,
     visibleColumns,
     focusViewport,
+    canFormat = true,
+    enableCellColoring = true,
+    enableWrapText = true,
   } = useGridContext();
   const formatting = useCellFormatting({
     history,
@@ -678,6 +741,9 @@ export function GridToolbar() {
     displayRowIndexes,
     visibleColumns,
     focusViewport,
+    canFormat,
+    enableCellColoring,
+    enableWrapText,
   });
 
   return (

@@ -1,0 +1,66 @@
+{
+  "name": "gridmaster-react",
+  "version": "0.2.0",
+  "description": "Excel-like React grid library with selection, editing, sorting, filtering, clipboard, and spreadsheet-style UX.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "sideEffects": ["**/*.css"],
+  "scripts": {
+    "dev": "vite --mode demo --configLoader native",
+    "lab": "vite --mode demo --configLoader native --open /lab.html",
+    "build": "npm run build:lib && npm run build:types",
+    "build:lib": "vite build --configLoader native",
+    "build:types": "tsc -p tsconfig.build.json",
+    "build:demo": "vite build --mode demo --configLoader native",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.tests.json && tsc -p tests/types/tsconfig.json",
+    "test:dom": "vitest run",
+    "size": "node scripts/size.mjs",
+    "bench:state": "node --expose-gc tests/bench/state.bench.mjs",
+    "test": "npm run build && node tests/run.mjs && npm run test:dom",
+    "prepublishOnly": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shubh6-max/gridmaster.git",
+    "directory": "packages/gridmaster-react"
+  },
+  "homepage": "https://github.com/shubh6-max/gridmaster#readme",
+  "bugs": {
+    "url": "https://github.com/shubh6-max/gridmaster/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "lucide-react": "^1.7.0"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^29.1.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3",
+    "vitest": "^5.0.4"
+  }
+}

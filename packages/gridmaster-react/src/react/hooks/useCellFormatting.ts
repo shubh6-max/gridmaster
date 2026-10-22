@@ -22,7 +22,7 @@ import type {
   GridVerticalAlign,
 } from "../../core/types";
 
-type UseCellFormattingParams<T extends GridRow = GridRow> = {
+type UseCellFormattingParams<T extends object = GridRow> = {
   history: GridHistoryState<T>;
   setHistory: React.Dispatch<React.SetStateAction<GridHistoryState<T>>>;
   selection: GridSelectionState;
@@ -32,9 +32,15 @@ type UseCellFormattingParams<T extends GridRow = GridRow> = {
   focusViewport: () => void;
   historyLimit?: number;
   preserveRowReferences?: boolean;
+  /** False in `mode="readonly"`: no formatting call may write cell meta (the single write guard). */
+  canFormat?: boolean;
+  /** `enableCellColoring`: false blocks the fill and font colour calls only. */
+  enableCellColoring?: boolean;
+  /** `enableWrapText`: false blocks the wrap toggle only. */
+  enableWrapText?: boolean;
 };
 
-type ApplyCellMetaTransform<T extends GridRow = GridRow> = (
+type ApplyCellMetaTransform<T extends object = GridRow> = (
   currentMeta: GridCellMeta,
   context: {
     displayRow: number;
@@ -44,7 +50,7 @@ type ApplyCellMetaTransform<T extends GridRow = GridRow> = (
   }
 ) => GridCellMeta;
 
-export function useCellFormatting<T extends GridRow = GridRow>({
+export function useCellFormatting<T extends object = GridRow>({
   history,
   setHistory,
   selection,
@@ -54,6 +60,9 @@ export function useCellFormatting<T extends GridRow = GridRow>({
   focusViewport,
   historyLimit,
   preserveRowReferences,
+  canFormat = true,
+  enableCellColoring = true,
+  enableWrapText = true,
 }: UseCellFormattingParams<T>) {
   const bounds = useMemo(
     () => getSelectionBounds(selection, displayRows.length, visibleColumns.length),
@@ -89,6 +98,8 @@ export function useCellFormatting<T extends GridRow = GridRow>({
 
   const pushCellMetaHistory = useCallback(
     (nextCellMeta: Record<string, GridCellMeta>) => {
+      if (!canFormat) return false;
+
       setHistory((prev) =>
         historyReducer(
           prev,
@@ -111,7 +122,7 @@ export function useCellFormatting<T extends GridRow = GridRow>({
       focusViewport();
       return true;
     },
-    [focusViewport, setHistory]
+    [canFormat, focusViewport, historyLimit, preserveRowReferences, setHistory]
   );
 
   const applyStyle = useCallback(
@@ -190,13 +201,8 @@ export function useCellFormatting<T extends GridRow = GridRow>({
         fontSize,
       }),
     applyFillColor: (color: string) =>
-      applyMetaPatch({
-        backgroundColor: color,
-      }),
-    applyTextColor: (color: string) =>
-      applyStyle({
-        color,
-      }),
+      enableCellColoring ? applyMetaPatch({ backgroundColor: color }) : false,
+    applyTextColor: (color: string) => (enableCellColoring ? applyStyle({ color }) : false),
     toggleBold: () =>
       applyStyle({
         fontWeight: boldEnabled ? "" : 700,
@@ -222,10 +228,7 @@ export function useCellFormatting<T extends GridRow = GridRow>({
         verticalAlign,
       }),
     toggleWrapText: () =>
-      applyMetaPatch({
-        wrap: !wrapEnabled,
-        wrapText: !wrapEnabled,
-      }),
+      enableWrapText ? applyMetaPatch({ wrap: !wrapEnabled, wrapText: !wrapEnabled }) : false,
     setTextOrientation: (textOrientation: GridTextOrientation) =>
       applyMetaPatch({
         textOrientation,

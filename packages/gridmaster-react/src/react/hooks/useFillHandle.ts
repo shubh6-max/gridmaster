@@ -7,25 +7,44 @@ import {
   type GridFillBounds,
   type GridFillState,
 } from "../../core/features/fill";
+import { resolveCellReadonly } from "../../core/features/readonly";
 import {
   getSelectionBounds as getSelectionStateBounds,
   setRangeSelection,
 } from "../../core/state/selectionState";
-import type { GridResolvedColumnDef, GridRow, GridSelectionState } from "../../core/types";
+import type {
+  GridCellMeta,
+  GridMasterProps,
+  GridResolvedColumnDef,
+  GridRow,
+  GridSelectionState,
+} from "../../core/types";
 import { cloneRows, getRowValue, isBlankValue } from "../../core/utils";
 
-type UseFillHandleParams<T extends GridRow = GridRow> = {
+type UseFillHandleParams<T extends object = GridRow> = {
   rows: T[];
   displayRows: T[];
   displayRowIndexes: number[];
   columns: GridResolvedColumnDef<T>[];
+  /** All resolved columns (hidden included); maps a visible column to its absolute index for the
+   * formula-reference shift under hidden columns. Defaults to `columns` (identity). */
+  allColumns?: GridResolvedColumnDef<T>[];
   selection: GridSelectionState;
   setSelection: React.Dispatch<React.SetStateAction<GridSelectionState>>;
   fill: GridFillState;
   setFill: React.Dispatch<React.SetStateAction<GridFillState>>;
   updateRows: (rows: T[]) => void;
+  /** Resolved `enableFillHandle` (already false in readonly mode / `enableEditing={false}`). */
   enableFillHandle?: boolean;
+  /** `enableRangeSelection={false}`: a fill never turns the selection into a range. */
+  enableRangeSelection?: boolean;
+  /** For per-cell/row `readonly` meta: read-only fill targets are skipped (A-084). */
+  props?: Pick<GridMasterProps<T>, "getRowMeta" | "getCellMeta">;
+  /** History cell meta merged with `getCellMeta` for the shared read-only predicate (A-084). */
+  cellMetaMap?: Record<string, GridCellMeta>;
 };
+
+const EMPTY_CELL_META_MAP: Record<string, GridCellMeta> = {};
 
 function isSameBounds(left: GridFillBounds, right: GridFillBounds): boolean {
   return (
@@ -42,7 +61,7 @@ function isCellInsideBounds(row: number, col: number, bounds: GridFillBounds): b
   );
 }
 
-function resolveAutoFillDownRow<T extends GridRow>(
+function resolveAutoFillDownRow<T extends object>(
   displayRows: T[],
   columns: GridResolvedColumnDef<T>[],
   sourceBounds: GridFillBounds
@@ -78,19 +97,32 @@ function resolveAutoFillDownRow<T extends GridRow>(
   return Math.max(displayRows.length - 1, sourceBounds.endRow);
 }
 
-export function useFillHandle<T extends GridRow = GridRow>({
+export function useFillHandle<T extends object = GridRow>({
   rows,
   displayRows,
   displayRowIndexes,
   columns,
+  allColumns,
   selection,
   setSelection,
   fill,
   setFill,
   updateRows,
   enableFillHandle = true,
+  enableRangeSelection = true,
+  props,
+  cellMetaMap,
 }: UseFillHandleParams<T>) {
   const dragSourceRef = useRef<GridFillBounds | null>(null);
+  const resolvedProps = props ?? {};
+  const resolvedCellMetaMap = cellMetaMap ?? EMPTY_CELL_META_MAP;
+
+  // Visible column index → absolute (all-columns) index, for formula column-reference shifting.
+  const absoluteColByKey = useMemo(() => {
+    const map = new Map<string, number>();
+    (allColumns ?? columns).forEach((column, index) => map.set(column.key, index));
+    return map;
+  }, [allColumns, columns]);
 
   const sourceBounds = useMemo(() => {
     if (!enableFillHandle) return null;
@@ -100,7 +132,25 @@ export function useFillHandle<T extends GridRow = GridRow>({
 
   const commitFill = useCallback(
     (activeSourceBounds: GridFillBounds, dragState: GridFillState) => {
-      const result = applyFillFromSelection(displayRows, columns, activeSourceBounds, dragState);
+      // Values/series stay in DISPLAY order (what the user sees); only formula refs shift in
+      // source/absolute space, and read-only targets are skipped (A-084 + fill-under-sort).
+      const result = applyFillFromSelection(displayRows, columns, activeSourceBounds, dragState, {
+        mapRow: (displayRowIndex) => displayRowIndexes[displayRowIndex] ?? displayRowIndex,
+        mapCol: (visibleColumnIndex) => {
+          const column = columns[visibleColumnIndex];
+          return (column && absoluteColByKey.get(column.key)) ?? visibleColumnIndex;
+        },
+        isWritable: (displayRowIndex, visibleColumnIndex) => {
+          const sourceRowIndex = displayRowIndexes[displayRowIndex] ?? -1;
+          return !resolveCellReadonly(
+            resolvedProps,
+            resolvedCellMetaMap,
+            displayRows[displayRowIndex],
+            sourceRowIndex,
+            columns[visibleColumnIndex]
+          );
+        },
+      });
       const affectedBounds = result.affectedBounds;
 
       setFill(clearFillState());
@@ -126,23 +176,41 @@ export function useFillHandle<T extends GridRow = GridRow>({
       }
 
       updateRows(nextRows);
-      setSelection((prev) =>
-        setRangeSelection(
-          prev,
-          { row: affectedBounds.startRow, col: affectedBounds.startCol },
-          { row: affectedBounds.endRow, col: affectedBounds.endCol }
-        )
-      );
+      if (enableRangeSelection) {
+        setSelection((prev) =>
+          setRangeSelection(
+            prev,
+            { row: affectedBounds.startRow, col: affectedBounds.startCol },
+            { row: affectedBounds.endRow, col: affectedBounds.endCol }
+          )
+        );
+      }
     },
-    [columns, displayRowIndexes, displayRows, rows, setFill, setSelection, updateRows]
+    [
+      absoluteColByKey,
+      columns,
+      displayRowIndexes,
+      displayRows,
+      enableRangeSelection,
+      resolvedCellMetaMap,
+      resolvedProps,
+      rows,
+      setFill,
+      setSelection,
+      updateRows,
+    ]
   );
 
-  const onFillHandleMouseDown = useCallback(
-    (event: React.MouseEvent) => {
+  const onFillHandlePointerDown = useCallback(
+    (event: React.PointerEvent) => {
       if (!sourceBounds || !enableFillHandle) return;
+      if (event.button !== 0) return;
 
       event.preventDefault();
       event.stopPropagation();
+      // Pointer capture keeps touch/pen drags alive once the pointer leaves the small handle; guarded
+      // for SSR / older browsers (jsdom stubs it in tests/dom/setup.ts).
+      event.currentTarget.setPointerCapture?.(event.pointerId);
 
       dragSourceRef.current = sourceBounds;
       setFill(
@@ -176,7 +244,7 @@ export function useFillHandle<T extends GridRow = GridRow>({
     [columns, commitFill, displayRows, enableFillHandle, sourceBounds]
   );
 
-  const onCellMouseEnter = useCallback(
+  const onCellPointerEnter = useCallback(
     (rowIndex: number, colIndex: number) => {
       const activeSourceBounds = dragSourceRef.current;
       if (!activeSourceBounds) return;
@@ -195,7 +263,7 @@ export function useFillHandle<T extends GridRow = GridRow>({
   );
 
   useEffect(() => {
-    const handleMouseUp = () => {
+    const handlePointerEnd = () => {
       const activeSourceBounds = dragSourceRef.current;
       dragSourceRef.current = null;
 
@@ -213,8 +281,12 @@ export function useFillHandle<T extends GridRow = GridRow>({
       commitFill(activeSourceBounds, fill);
     };
 
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => window.removeEventListener("mouseup", handleMouseUp);
+    window.addEventListener("pointerup", handlePointerEnd);
+    window.addEventListener("pointercancel", handlePointerEnd);
+    return () => {
+      window.removeEventListener("pointerup", handlePointerEnd);
+      window.removeEventListener("pointercancel", handlePointerEnd);
+    };
   }, [commitFill, fill, setFill]);
 
   useEffect(() => {
@@ -249,8 +321,8 @@ export function useFillHandle<T extends GridRow = GridRow>({
     previewBounds,
     isFillHandleCell,
     isPreviewCell,
-    onFillHandleMouseDown,
+    onFillHandlePointerDown,
     onFillHandleDoubleClick,
-    onCellMouseEnter,
+    onCellPointerEnter,
   };
 }

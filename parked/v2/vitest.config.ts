@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     root: ".",
-    exclude: ["**/node_modules/**", "**/legacy/**"],
+    exclude: ["**/node_modules/**", "**/legacy/**", "tests/e2e/**"],
     projects: [
       {
         extends: true,

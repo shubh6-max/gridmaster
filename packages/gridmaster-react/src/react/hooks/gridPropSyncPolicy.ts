@@ -2,7 +2,7 @@ import type { GridRow } from "../../core/types";
 
 export type GridPropRowSyncAction = "ignore" | "consume-emitted" | "reset";
 
-export function getGridPropRowSyncAction<T extends GridRow>({
+export function getGridPropRowSyncAction<T extends object>({
   nextRows,
   previousPropRows,
   lastEmittedRows,

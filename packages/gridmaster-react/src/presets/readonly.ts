@@ -1,8 +1,6 @@
-import type { GridMasterProps, GridRow } from "../core/types";
+import type { GridPresetProps, GridRow } from "../core/types";
 
-export function createReadonlyGridPreset<T extends GridRow = GridRow>(): Partial<
-  GridMasterProps<T>
-> {
+export function createReadonlyGridPreset<T extends object = GridRow>(): GridPresetProps<T> {
   return {
     mode: "readonly",
     enableEditing: false,

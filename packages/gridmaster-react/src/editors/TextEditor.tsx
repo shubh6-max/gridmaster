@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { GridCellEditorProps, GridRow } from "../core/types";
 
-export function TextEditor<T extends GridRow = GridRow>({
+export function TextEditor<T extends object = GridRow>({
   value,
   commit,
   cancel,
@@ -40,7 +40,7 @@ export function TextEditor<T extends GridRow = GridRow>({
         setLocalValue(next);
         updateValue(next);
       }}
-      onBlur={commit}
+      onBlur={() => commit()}
       onKeyDown={(e) => {
         if (e.key === "Enter" && e.altKey) {
           e.stopPropagation();

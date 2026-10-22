@@ -9,7 +9,7 @@ import { StatusBar } from "./StatusBar";
 import { GridToolbar } from "./GridToolbar";
 import { GridViewport } from "./GridViewport";
 
-export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T>) {
+export function GridMaster<T extends object = GridRow>(props: GridMasterProps<T>) {
   const grid = useGridMaster(props);
   const showToolbar = props.showToolbar ?? true;
   const [contextMenu, setContextMenu] = React.useState<GridContextMenuState>(null);
@@ -25,6 +25,9 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
     updateRows: grid.updateRows,
     focusViewport: grid.focusViewport,
     emitCellChange: grid.emitCellChange,
+    enableEditing: grid.enableEditing,
+    props: grid.props,
+    cellMetaMap: grid.history.present.cellMeta,
   });
   const formatPainter = useFormatPainter({
     history: grid.history,
@@ -37,6 +40,10 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
     focusViewport: grid.focusViewport,
     historyLimit: props.historyLimit,
     preserveRowReferences: props.rowPatchMode,
+    canFormat: grid.canFormat,
+    enableCellColoring: grid.enableCellColoring,
+    enableWrapText: grid.enableWrapText,
+    enableRangeSelection: grid.enableRangeSelection,
   });
 
   return (
@@ -94,6 +101,8 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         insertColumn: grid.insertColumn,
         deleteColumn: grid.deleteColumn,
         emitCellChange: grid.emitCellChange,
+        undo: grid.undo,
+        redo: grid.redo,
         setEditingValue: editing.setEditingValue,
         requestViewportFocusAfterEdit: editing.requestViewportFocusAfterEdit,
         startEditing: editing.startEditing,
@@ -132,6 +141,18 @@ export function GridMaster<T extends GridRow = GridRow>(props: GridMasterProps<T
         enableInsertColumn: grid.enableInsertColumn,
         enableDeleteRow: grid.enableDeleteRow,
         enableDeleteColumn: grid.enableDeleteColumn,
+
+        enableSelection: grid.enableSelection,
+        enableRangeSelection: grid.enableRangeSelection,
+        enableRowSelection: grid.enableRowSelection,
+        enableColumnSelection: grid.enableColumnSelection,
+        enableEditing: grid.enableEditing,
+        enableClipboard: grid.enableClipboard,
+        enableUndoRedo: grid.enableUndoRedo,
+        canFormat: grid.canFormat,
+        enableCellColoring: grid.enableCellColoring,
+        enableWrapText: grid.enableWrapText,
+        enableValidation: grid.enableValidation,
       }}
     >
       <div

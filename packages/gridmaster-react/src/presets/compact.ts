@@ -1,8 +1,6 @@
-import type { GridMasterProps, GridRow } from "../core/types";
+import type { GridPresetProps, GridRow } from "../core/types";
 
-export function createCompactGridPreset<T extends GridRow = GridRow>(): Partial<
-  GridMasterProps<T>
-> {
+export function createCompactGridPreset<T extends object = GridRow>(): GridPresetProps<T> {
   return {
     rowHeight: 28,
     headerHeight: 34,

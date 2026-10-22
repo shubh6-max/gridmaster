@@ -7,6 +7,7 @@ const {
   applyCellMetaPatchToBounds,
   applyCellStyleToBounds,
   createColumn,
+  getEffectiveWrapText,
   resolveColumns,
   summarizeSelectionFormatting,
   transformCellMetaInBounds,
@@ -160,4 +161,12 @@ export function runFormattingTests() {
   assert.equal(summary.fontSize, 12);
   assert.equal(summary.textColor, "#0f172a");
   assert.equal(summary.indentLevel, MIXED_FORMAT_VALUE);
+
+  // A-105 composition: once the painter stops injecting `wrap:false`, a cell with no wrap meta must
+  // fall back to the column's own `wrap`, and an explicit `wrap` still wins.
+  const [wrapCol] = resolveColumns([createColumn.text("w", { title: "W", wrap: true })]);
+  assert.equal(getEffectiveWrapText(undefined, wrapCol), true, "no meta => column wrap default");
+  assert.equal(getEffectiveWrapText({}, wrapCol), true, "empty meta => column wrap default");
+  assert.equal(getEffectiveWrapText({ wrap: false }, wrapCol), false, "explicit wrap:false wins");
+  assert.equal(getEffectiveWrapText({ wrapText: true }, wrapCol), true, "explicit wrapText wins");
 }

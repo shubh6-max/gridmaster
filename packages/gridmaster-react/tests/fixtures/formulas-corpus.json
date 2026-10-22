@@ -1,0 +1,4825 @@
+[
+ {
+  "id": "prec-add",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=1+2",
+  "expected": 3,
+  "note": "addition"
+ },
+ {
+  "id": "prec-mul-over-add",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=2+3*4",
+  "expected": 14,
+  "note": "* binds tighter than +"
+ },
+ {
+  "id": "prec-paren",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=(2+3)*4",
+  "expected": 20,
+  "note": "parentheses override"
+ },
+ {
+  "id": "prec-left-sub",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=10-2-3",
+  "expected": 5,
+  "note": "- left-associative"
+ },
+ {
+  "id": "prec-mix",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=2*3+4*5",
+  "expected": 26,
+  "note": "mul before add"
+ },
+ {
+  "id": "prec-div-left",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=20/4/5",
+  "expected": 1,
+  "note": "/ left-associative"
+ },
+ {
+  "id": "exp",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=2^3",
+  "expected": 8,
+  "note": "exponent"
+ },
+ {
+  "id": "exp-left-assoc",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=2^3^2",
+  "expected": 64,
+  "note": "^ is LEFT-assoc in Excel: (2^3)^2"
+ },
+ {
+  "id": "unary-over-exp",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=-2^2",
+  "expected": 4,
+  "note": "Excel: unary minus binds tighter than ^ => (-2)^2"
+ },
+ {
+  "id": "exp-neg-right",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=2^-2",
+  "expected": 0.25,
+  "note": "2^(-2)"
+ },
+ {
+  "id": "exp-neg-both",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=-2^-2",
+  "expected": 0.25,
+  "note": "(-2)^(-2)=0.25"
+ },
+ {
+  "id": "mul-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=3*-2",
+  "expected": -6,
+  "note": "unary minus as right operand"
+ },
+ {
+  "id": "double-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=--3",
+  "expected": 3,
+  "note": "double negation"
+ },
+ {
+  "id": "mixed-signs",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=-+-3",
+  "expected": 3,
+  "note": "-(+(-3))=3"
+ },
+ {
+  "id": "pct-10",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=10%",
+  "expected": 0.1,
+  "note": "percent postfix"
+ },
+ {
+  "id": "pct-50",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=50%",
+  "expected": 0.5,
+  "note": "percent"
+ },
+ {
+  "id": "pct-expr",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=200%*3",
+  "expected": 6,
+  "note": "200% = 2"
+ },
+ {
+  "id": "prec-chain",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=2+3*4-5/5",
+  "expected": 13,
+  "note": "2+12-1"
+ },
+ {
+  "id": "prec-exp-in-mul",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=1+2*3^2",
+  "expected": 19,
+  "note": "1+2*9"
+ },
+ {
+  "id": "paren-both",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=(1+2)*(3+4)",
+  "expected": 21,
+  "note": "grouping"
+ },
+ {
+  "id": "div-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=100/0",
+  "expected": "#DIV/0!",
+  "note": "division by zero"
+ },
+ {
+  "id": "zero-div-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=0/0",
+  "expected": "#DIV/0!",
+  "note": "0/0 is #DIV/0! in Excel"
+ },
+ {
+  "id": "neg-result",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=5-10",
+  "expected": -5,
+  "note": "negative result"
+ },
+ {
+  "id": "decimals",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=2.5+2.5",
+  "expected": 5,
+  "note": "decimal literals"
+ },
+ {
+  "id": "leading-dot",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=.5+.5",
+  "expected": 1,
+  "note": "leading-dot decimals"
+ },
+ {
+  "id": "sci-1e3",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=1e3",
+  "expected": 1000,
+  "note": "scientific literal"
+ },
+ {
+  "id": "sci-1.5e2",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=1.5e2",
+  "expected": 150,
+  "note": "scientific literal"
+ },
+ {
+  "id": "sci-2e-1",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=2E-1",
+  "expected": 0.2,
+  "note": "scientific with sign"
+ },
+ {
+  "id": "trailing-op",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=1+",
+  "expected": "#ERROR!",
+  "note": "malformed formula -> #ERROR!, never throws"
+ },
+ {
+  "id": "concat-str",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=\"a\"&\"b\"",
+  "expected": "ab",
+  "note": "& concatenation"
+ },
+ {
+  "id": "concat-num",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=1&2",
+  "expected": "12",
+  "note": "numbers concat to text"
+ },
+ {
+  "id": "concat-mixed",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=\"x\"&1&\"y\"",
+  "expected": "x1y",
+  "note": "mixed concat"
+ },
+ {
+  "id": "concat-bool",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUE&\"\"",
+  "expected": "TRUE",
+  "note": "boolean concat to TRUE"
+ },
+ {
+  "id": "escaped-quotes",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=\"He said \"\"hi\"\"\"",
+  "expected": "He said \"hi\"",
+  "note": "doubled quotes = literal quote"
+ },
+ {
+  "id": "empty-string",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=\"\"",
+  "expected": "",
+  "note": "empty string literal"
+ },
+ {
+  "id": "len",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LEN(\"hello\")",
+  "expected": 5,
+  "note": "LEN"
+ },
+ {
+  "id": "upper",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=UPPER(\"abc\")",
+  "expected": "ABC",
+  "note": "UPPER"
+ },
+ {
+  "id": "lower",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOWER(\"ABC\")",
+  "expected": "abc",
+  "note": "LOWER"
+ },
+ {
+  "id": "left",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LEFT(\"hello\",2)",
+  "expected": "he",
+  "note": "LEFT"
+ },
+ {
+  "id": "right",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=RIGHT(\"hello\",2)",
+  "expected": "lo",
+  "note": "RIGHT"
+ },
+ {
+  "id": "right-zero",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=RIGHT(\"hello\",0)",
+  "expected": "",
+  "note": "RIGHT(x,0) is empty, not whole string"
+ },
+ {
+  "id": "left-neg",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=LEFT(\"hello\",-1)",
+  "expected": "#VALUE!",
+  "note": "negative count -> #VALUE!"
+ },
+ {
+  "id": "mid",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MID(\"hello\",2,3)",
+  "expected": "ell",
+  "note": "MID"
+ },
+ {
+  "id": "mid-zero-len",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=MID(\"hello\",2,0)",
+  "expected": "",
+  "note": "MID length 0 -> empty"
+ },
+ {
+  "id": "mid-start-zero",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=MID(\"hello\",0,2)",
+  "expected": "#VALUE!",
+  "note": "MID start<1 -> #VALUE!"
+ },
+ {
+  "id": "trim",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRIM(\"  hi  \")",
+  "expected": "hi",
+  "note": "TRIM"
+ },
+ {
+  "id": "concat-fn",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CONCAT(\"a\",\"b\",\"c\")",
+  "expected": "abc",
+  "note": "CONCAT"
+ },
+ {
+  "id": "find",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FIND(\"l\",\"hello\")",
+  "expected": 3,
+  "note": "FIND"
+ },
+ {
+  "id": "substitute-all",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SUBSTITUTE(\"aaa\",\"a\",\"b\")",
+  "expected": "bbb",
+  "note": "SUBSTITUTE all"
+ },
+ {
+  "id": "substitute-nth",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SUBSTITUTE(\"aaa\",\"a\",\"b\",2)",
+  "expected": "aba",
+  "note": "SUBSTITUTE nth"
+ },
+ {
+  "id": "len-empty",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LEN(\"\")",
+  "expected": 0,
+  "note": "LEN empty"
+ },
+ {
+  "id": "eq",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=1=1",
+  "expected": true,
+  "note": "equality"
+ },
+ {
+  "id": "neq-val",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=1=2",
+  "expected": false,
+  "note": "inequality"
+ },
+ {
+  "id": "ne",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=1<>2",
+  "expected": true,
+  "note": "<>"
+ },
+ {
+  "id": "gt",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=2>1",
+  "expected": true,
+  "note": ">"
+ },
+ {
+  "id": "ge",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=2>=2",
+  "expected": true,
+  "note": ">="
+ },
+ {
+  "id": "lt",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=1<2",
+  "expected": true,
+  "note": "<"
+ },
+ {
+  "id": "le",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=2<=1",
+  "expected": false,
+  "note": "<="
+ },
+ {
+  "id": "str-eq",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=\"a\"=\"a\"",
+  "expected": true,
+  "note": "string equality"
+ },
+ {
+  "id": "str-eq-ci",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=\"a\"=\"A\"",
+  "expected": true,
+  "note": "Excel = is case-insensitive"
+ },
+ {
+  "id": "true",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUE",
+  "expected": true,
+  "note": "TRUE literal"
+ },
+ {
+  "id": "false",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FALSE",
+  "expected": false,
+  "note": "FALSE literal"
+ },
+ {
+  "id": "and",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=AND(TRUE,FALSE)",
+  "expected": false,
+  "note": "AND"
+ },
+ {
+  "id": "or",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=OR(TRUE,FALSE)",
+  "expected": true,
+  "note": "OR"
+ },
+ {
+  "id": "not",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NOT(TRUE)",
+  "expected": false,
+  "note": "NOT"
+ },
+ {
+  "id": "if-yes",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=IF(1>0,\"yes\",\"no\")",
+  "expected": "yes",
+  "note": "IF true branch"
+ },
+ {
+  "id": "if-no",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=IF(1<0,\"yes\",\"no\")",
+  "expected": "no",
+  "note": "IF false branch"
+ },
+ {
+  "id": "if-2arg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=IF(2>1,10)",
+  "expected": 10,
+  "note": "IF with only true branch"
+ },
+ {
+  "id": "iferror-div",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFERROR(1/0,99)",
+  "expected": 99,
+  "note": "IFERROR catches #DIV/0!"
+ },
+ {
+  "id": "iferror-ok",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFERROR(10/2,99)",
+  "expected": 5,
+  "note": "IFERROR passthrough"
+ },
+ {
+  "id": "iferror-str",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFERROR(1/0,\"err\")",
+  "expected": "err",
+  "note": "IFERROR fallback string"
+ },
+ {
+  "id": "iferror-both-err",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFERROR(1/0,1/0)",
+  "expected": "#DIV/0!",
+  "note": "fallback also errors"
+ },
+ {
+  "id": "ifna-na",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFNA(NA(),7)",
+  "expected": 7,
+  "note": "IFNA catches #N/A"
+ },
+ {
+  "id": "ifna-notna",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFNA(1/0,7)",
+  "expected": "#DIV/0!",
+  "note": "IFNA only catches #N/A"
+ },
+ {
+  "id": "iserror-true",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISERROR(1/0)",
+  "expected": true,
+  "note": "ISERROR true on error"
+ },
+ {
+  "id": "iserror-false",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISERROR(5)",
+  "expected": false,
+  "note": "ISERROR false on value"
+ },
+ {
+  "id": "iserr-na",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISERR(NA())",
+  "expected": false,
+  "note": "ISERR excludes #N/A"
+ },
+ {
+  "id": "iserr-div",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISERR(1/0)",
+  "expected": true,
+  "note": "ISERR true on #DIV/0!"
+ },
+ {
+  "id": "isna-na",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNA(NA())",
+  "expected": true,
+  "note": "ISNA true on #N/A"
+ },
+ {
+  "id": "isna-div",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNA(1/0)",
+  "expected": false,
+  "note": "ISNA false on #DIV/0!"
+ },
+ {
+  "id": "ifs-second",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFS(FALSE,1,TRUE,2)",
+  "expected": 2,
+  "note": "IFS first true wins"
+ },
+ {
+  "id": "ifs-none",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFS(FALSE,1,FALSE,2)",
+  "expected": "#N/A",
+  "note": "IFS no match -> #N/A"
+ },
+ {
+  "id": "ifs-expr",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=IFS(1>2,\"a\",2>1,\"b\")",
+  "expected": "b",
+  "note": "IFS conditions"
+ },
+ {
+  "id": "switch-match",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=SWITCH(2,1,\"one\",2,\"two\",\"none\")",
+  "expected": "two",
+  "note": "SWITCH match"
+ },
+ {
+  "id": "switch-default",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=SWITCH(9,1,\"one\",2,\"two\",\"none\")",
+  "expected": "none",
+  "note": "SWITCH default"
+ },
+ {
+  "id": "switch-nodefault",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=SWITCH(9,1,\"one\")",
+  "expected": "#N/A",
+  "note": "SWITCH no match no default -> #N/A"
+ },
+ {
+  "id": "choose",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHOOSE(2,\"a\",\"b\",\"c\")",
+  "expected": "b",
+  "note": "CHOOSE"
+ },
+ {
+  "id": "choose-lazy",
+  "auditId": "A-005",
+  "grid": [],
+  "at": "H1",
+  "formula": "=CHOOSE(1,\"a\",1/0)",
+  "expected": "a",
+  "note": "CHOOSE unchosen error ignored (lazy)"
+ },
+ {
+  "id": "na",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=NA()",
+  "expected": "#N/A",
+  "note": "NA() returns #N/A"
+ },
+ {
+  "id": "err-prop-add",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=1/0+5",
+  "expected": "#DIV/0!",
+  "note": "error propagates through +"
+ },
+ {
+  "id": "err-prop-sum",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SUM(1,1/0)",
+  "expected": "#DIV/0!",
+  "note": "error propagates into SUM"
+ },
+ {
+  "id": "unknown-fn",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=UNKNOWNFN(1)",
+  "expected": "#NAME?",
+  "note": "unknown function -> #NAME?"
+ },
+ {
+  "id": "cellish-name-unknown",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=FOO10(100)",
+  "expected": "#NAME?",
+  "note": "unknown function whose name looks like a cell ref (col FOO, row 10) -> #NAME?, not tokenised as cell"
+ },
+ {
+  "id": "name-digit-letter",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ABC1D",
+  "expected": "#NAME?",
+  "note": "name ending letter-after-digit not a cell -> #NAME?"
+ },
+ {
+  "id": "bare-name",
+  "auditId": "A-042",
+  "grid": [],
+  "at": "H1",
+  "formula": "=FOO",
+  "expected": "#NAME?",
+  "note": "bare unknown name -> #NAME?"
+ },
+ {
+  "id": "if-lazy",
+  "auditId": "A-005",
+  "grid": [
+   [
+    0
+   ]
+  ],
+  "at": "B1",
+  "formula": "=IF(A1=0,0,1/A1)",
+  "expected": 0,
+  "note": "IF does not evaluate untaken branch (A1=0, no #DIV/0!)"
+ },
+ {
+  "id": "iferror-cell",
+  "auditId": "A-005",
+  "grid": [
+   [
+    10,
+    0
+   ]
+  ],
+  "at": "C1",
+  "formula": "=IFERROR(A1/B1,-1)",
+  "expected": -1,
+  "note": "IFERROR catches cell div/0"
+ },
+ {
+  "id": "avg-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    10,
+    null,
+    20
+   ]
+  ],
+  "at": "E1",
+  "formula": "=AVERAGE(A1:C1)",
+  "expected": 15,
+  "note": "AVERAGE ignores blank: (10+20)/2"
+ },
+ {
+  "id": "count-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    10,
+    null,
+    20
+   ]
+  ],
+  "at": "E1",
+  "formula": "=COUNT(A1:C1)",
+  "expected": 2,
+  "note": "COUNT ignores blank"
+ },
+ {
+  "id": "sum-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    10,
+    null,
+    20
+   ]
+  ],
+  "at": "E1",
+  "formula": "=SUM(A1:C1)",
+  "expected": 30,
+  "note": "SUM ignores blank"
+ },
+ {
+  "id": "min-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    10,
+    null,
+    20
+   ]
+  ],
+  "at": "E1",
+  "formula": "=MIN(A1:C1)",
+  "expected": 10,
+  "note": "MIN ignores blank (not 0)"
+ },
+ {
+  "id": "max-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    10,
+    null,
+    20
+   ]
+  ],
+  "at": "E1",
+  "formula": "=MAX(A1:C1)",
+  "expected": 20,
+  "note": "MAX ignores blank"
+ },
+ {
+  "id": "counta-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    10,
+    null,
+    20
+   ]
+  ],
+  "at": "E1",
+  "formula": "=COUNTA(A1:C1)",
+  "expected": 2,
+  "note": "COUNTA counts non-blank"
+ },
+ {
+  "id": "blank-ref-arith",
+  "auditId": "A-006",
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "B1",
+  "formula": "=A1+1",
+  "expected": 1,
+  "note": "blank cell reference is 0 in arithmetic"
+ },
+ {
+  "id": "add-empty-string",
+  "auditId": "A-006",
+  "grid": [],
+  "at": "H1",
+  "formula": "=1+\"\"",
+  "expected": "#VALUE!",
+  "note": "empty string text in arithmetic -> #VALUE!"
+ },
+ {
+  "id": "isnumber-num",
+  "auditId": "A-006",
+  "grid": [
+   [
+    10
+   ]
+  ],
+  "at": "B1",
+  "formula": "=ISNUMBER(A1)",
+  "expected": true,
+  "note": "ISNUMBER true for number cell"
+ },
+ {
+  "id": "isnumber-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "B1",
+  "formula": "=ISNUMBER(A1)",
+  "expected": false,
+  "note": "ISNUMBER false for blank"
+ },
+ {
+  "id": "isnumber-text",
+  "auditId": "A-006",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNUMBER(\"10\")",
+  "expected": false,
+  "note": "ISNUMBER false for numeric text"
+ },
+ {
+  "id": "isnumber-lit",
+  "auditId": "A-006",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISNUMBER(10)",
+  "expected": true,
+  "note": "ISNUMBER true for number literal"
+ },
+ {
+  "id": "isblank-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    null
+   ]
+  ],
+  "at": "B1",
+  "formula": "=ISBLANK(A1)",
+  "expected": true,
+  "note": "ISBLANK true for empty cell"
+ },
+ {
+  "id": "isblank-val",
+  "auditId": "A-006",
+  "grid": [
+   [
+    10
+   ]
+  ],
+  "at": "B1",
+  "formula": "=ISBLANK(A1)",
+  "expected": false,
+  "note": "ISBLANK false for value"
+ },
+ {
+  "id": "istext-str",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISTEXT(\"x\")",
+  "expected": true,
+  "note": "ISTEXT true"
+ },
+ {
+  "id": "istext-num",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ISTEXT(5)",
+  "expected": false,
+  "note": "ISTEXT false for number"
+ },
+ {
+  "id": "min-two-blank",
+  "auditId": "A-006",
+  "grid": [
+   [
+    5,
+    null
+   ]
+  ],
+  "at": "C1",
+  "formula": "=MIN(A1:B1)",
+  "expected": 5,
+  "note": "MIN with blank ignores it"
+ },
+ {
+  "id": "sum-numeric-text",
+  "auditId": "A-006",
+  "grid": [],
+  "at": "H1",
+  "formula": "=SUM(5,\"10\")",
+  "expected": 15,
+  "note": "direct numeric-text arg coerces in SUM"
+ },
+ {
+  "id": "rng-row",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=SUM(A1:C1)",
+  "expected": 6,
+  "note": "row range"
+ },
+ {
+  "id": "rng-col",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=SUM(A1:A3)",
+  "expected": 12,
+  "note": "column range"
+ },
+ {
+  "id": "rng-2d",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=SUM(A1:C3)",
+  "expected": 45,
+  "note": "2-D range"
+ },
+ {
+  "id": "rng-rev",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=SUM(C3:A1)",
+  "expected": 45,
+  "note": "reversed range endpoints"
+ },
+ {
+  "id": "rng-rev2",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=SUM(B2:A1)",
+  "expected": 12,
+  "note": "1+2+4+5"
+ },
+ {
+  "id": "rng-avg",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=AVERAGE(A1:C3)",
+  "expected": 5,
+  "note": "average of 1..9"
+ },
+ {
+  "id": "rng-max",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=MAX(A1:C3)",
+  "expected": 9,
+  "note": "max"
+ },
+ {
+  "id": "rng-min",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=MIN(A1:C3)",
+  "expected": 1,
+  "note": "min"
+ },
+ {
+  "id": "rng-count",
+  "auditId": "A-041",
+  "grid": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6
+   ],
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  "at": "E1",
+  "formula": "=COUNT(A1:C3)",
+  "expected": 9,
+  "note": "count all"
+ },
+ {
+  "id": "vlookup-exact",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    "one"
+   ],
+   [
+    2,
+    "two"
+   ],
+   [
+    3,
+    "three"
+   ]
+  ],
+  "at": "D1",
+  "formula": "=VLOOKUP(2,A1:B3,2,FALSE)",
+  "expected": "two",
+  "note": "VLOOKUP exact"
+ },
+ {
+  "id": "vlookup-approx",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    "one"
+   ],
+   [
+    2,
+    "two"
+   ],
+   [
+    3,
+    "three"
+   ]
+  ],
+  "at": "D1",
+  "formula": "=VLOOKUP(2,A1:B3,2)",
+  "expected": "two",
+  "note": "VLOOKUP approximate sorted"
+ },
+ {
+  "id": "vlookup-col1",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    "one"
+   ],
+   [
+    2,
+    "two"
+   ],
+   [
+    3,
+    "three"
+   ]
+  ],
+  "at": "D1",
+  "formula": "=VLOOKUP(2,A1:B3,1,FALSE)",
+  "expected": 2,
+  "note": "VLOOKUP return col 1"
+ },
+ {
+  "id": "vlookup-approx-hi",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    "one"
+   ],
+   [
+    2,
+    "two"
+   ],
+   [
+    3,
+    "three"
+   ]
+  ],
+  "at": "D1",
+  "formula": "=VLOOKUP(5,A1:B3,2)",
+  "expected": "three",
+  "note": "approx: largest <= 5"
+ },
+ {
+  "id": "vlookup-exact-miss",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    "one"
+   ],
+   [
+    2,
+    "two"
+   ],
+   [
+    3,
+    "three"
+   ]
+  ],
+  "at": "D1",
+  "formula": "=VLOOKUP(5,A1:B3,2,FALSE)",
+  "expected": "#N/A",
+  "note": "exact not found"
+ },
+ {
+  "id": "vlookup-approx-lo",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    "one"
+   ],
+   [
+    2,
+    "two"
+   ],
+   [
+    3,
+    "three"
+   ]
+  ],
+  "at": "D1",
+  "formula": "=VLOOKUP(0,A1:B3,2)",
+  "expected": "#N/A",
+  "note": "approx: below first"
+ },
+ {
+  "id": "vlookup-referr",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    "one"
+   ],
+   [
+    2,
+    "two"
+   ],
+   [
+    3,
+    "three"
+   ]
+  ],
+  "at": "D1",
+  "formula": "=VLOOKUP(2,A1:B3,3)",
+  "expected": "#REF!",
+  "note": "col index > table cols -> #REF!"
+ },
+ {
+  "id": "index-2d",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    2
+   ],
+   [
+    3,
+    4
+   ]
+  ],
+  "at": "D1",
+  "formula": "=INDEX(A1:B2,2,2)",
+  "expected": 4,
+  "note": "INDEX row,col"
+ },
+ {
+  "id": "index-2d-12",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    2
+   ],
+   [
+    3,
+    4
+   ]
+  ],
+  "at": "D1",
+  "formula": "=INDEX(A1:B2,1,2)",
+  "expected": 2,
+  "note": "INDEX r1c2"
+ },
+ {
+  "id": "index-2d-21",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    2
+   ],
+   [
+    3,
+    4
+   ]
+  ],
+  "at": "D1",
+  "formula": "=INDEX(A1:B2,2,1)",
+  "expected": 3,
+  "note": "INDEX r2c1"
+ },
+ {
+  "id": "index-1d",
+  "auditId": "A-008",
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "C1",
+  "formula": "=INDEX(A1:A3,2)",
+  "expected": 20,
+  "note": "INDEX 1-D column"
+ },
+ {
+  "id": "index-oob",
+  "auditId": "A-008",
+  "grid": [
+   [
+    1,
+    2
+   ],
+   [
+    3,
+    4
+   ]
+  ],
+  "at": "D1",
+  "formula": "=INDEX(A1:B2,3,1)",
+  "expected": "#REF!",
+  "note": "INDEX row out of bounds -> #REF!"
+ },
+ {
+  "id": "match-exact",
+  "auditId": "A-008",
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "C1",
+  "formula": "=MATCH(20,A1:A3,0)",
+  "expected": 2,
+  "note": "MATCH exact"
+ },
+ {
+  "id": "match-approx",
+  "auditId": "A-008",
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "C1",
+  "formula": "=MATCH(25,A1:A3,1)",
+  "expected": 2,
+  "note": "MATCH type1 largest <= 25 (ascending)"
+ },
+ {
+  "id": "match-approx-none",
+  "auditId": "A-008",
+  "grid": [
+   [
+    10
+   ],
+   [
+    20
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "C1",
+  "formula": "=MATCH(5,A1:A3,1)",
+  "expected": "#N/A",
+  "note": "MATCH type1 all greater -> #N/A"
+ },
+ {
+  "id": "match-desc",
+  "auditId": "A-008",
+  "grid": [
+   [
+    30
+   ],
+   [
+    20
+   ],
+   [
+    10
+   ]
+  ],
+  "at": "C1",
+  "formula": "=MATCH(15,A1:A3,-1)",
+  "expected": 2,
+  "note": "MATCH type-1 smallest >= 15 (descending)"
+ },
+ {
+  "id": "match-str",
+  "auditId": "A-008",
+  "grid": [
+   [
+    "a"
+   ],
+   [
+    "b"
+   ],
+   [
+    "c"
+   ]
+  ],
+  "at": "C1",
+  "formula": "=MATCH(\"b\",A1:A3,0)",
+  "expected": 2,
+  "note": "MATCH string exact"
+ },
+ {
+  "id": "year",
+  "auditId": "A-043",
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEAR(\"2024-01-01\")",
+  "expected": 2024,
+  "note": "YEAR of date-only string, TZ-safe"
+ },
+ {
+  "id": "month",
+  "auditId": "A-043",
+  "grid": [],
+  "at": "H1",
+  "formula": "=MONTH(\"2024-07-15\")",
+  "expected": 7,
+  "note": "MONTH"
+ },
+ {
+  "id": "day",
+  "auditId": "A-043",
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAY(\"2024-07-15\")",
+  "expected": 15,
+  "note": "DAY"
+ },
+ {
+  "id": "datedif-y",
+  "auditId": "A-043",
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEDIF(\"2020-01-01\",\"2024-01-01\",\"Y\")",
+  "expected": 4,
+  "note": "DATEDIF complete years"
+ },
+ {
+  "id": "datedif-m",
+  "auditId": "A-043",
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEDIF(\"2024-01-15\",\"2024-03-10\",\"M\")",
+  "expected": 1,
+  "note": "DATEDIF complete months (day2<day1)"
+ },
+ {
+  "id": "datedif-d",
+  "auditId": "A-043",
+  "grid": [],
+  "at": "H1",
+  "formula": "=DATEDIF(\"2024-01-01\",\"2024-12-31\",\"D\")",
+  "expected": 365,
+  "note": "DATEDIF days (2024 leap)"
+ },
+ {
+  "id": "year-2023",
+  "auditId": "A-043",
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEAR(\"2023-12-31\")",
+  "expected": 2023,
+  "note": "YEAR end of year, TZ-safe"
+ },
+ {
+  "id": "edate",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=YEAR(EDATE(\"2024-01-15\",2))",
+  "expected": 2024,
+  "note": "EDATE adds months"
+ },
+ {
+  "id": "edate-clamp-leap-day",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAY(EDATE(\"2024-01-31\",1))",
+  "expected": 29,
+  "note": "EDATE clamps Jan 31 + 1 month to Feb 29 in a leap year (no overflow to Mar 2)"
+ },
+ {
+  "id": "edate-clamp-leap-month",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MONTH(EDATE(\"2024-01-31\",1))",
+  "expected": 2,
+  "note": "EDATE clamp keeps the month at Feb, not March"
+ },
+ {
+  "id": "edate-clamp-nonleap",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAY(EDATE(\"2023-01-31\",1))",
+  "expected": 28,
+  "note": "EDATE clamps Jan 31 + 1 month to Feb 28 in a non-leap year"
+ },
+ {
+  "id": "edate-clamp-back",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAY(EDATE(\"2024-03-31\",-1))",
+  "expected": 29,
+  "note": "EDATE clamps Mar 31 - 1 month to Feb 29"
+ },
+ {
+  "id": "edate-no-clamp",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DAY(EDATE(\"2024-01-15\",1))",
+  "expected": 15,
+  "note": "EDATE keeps the day when the target month has it"
+ },
+ {
+  "id": "mod-neg",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=MOD(-3,5)",
+  "expected": 2,
+  "note": "MOD sign follows divisor"
+ },
+ {
+  "id": "mod-neg-div",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=MOD(3,-5)",
+  "expected": -2,
+  "note": "MOD(3,-5) = -2 in Excel"
+ },
+ {
+  "id": "sqrt-neg",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=SQRT(-1)",
+  "expected": "#NUM!",
+  "note": "SQRT negative -> #NUM!"
+ },
+ {
+  "id": "abs-text",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ABS(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "ABS of non-number -> #VALUE!"
+ },
+ {
+  "id": "round-half-neg",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUND(-0.5,0)",
+  "expected": -1,
+  "note": "ROUND half away from zero"
+ },
+ {
+  "id": "round-half-pos",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUND(2.5,0)",
+  "expected": 3,
+  "note": "ROUND half away from zero"
+ },
+ {
+  "id": "round-1005",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUND(1.005,2)",
+  "expected": 1.01,
+  "note": "epsilon-safe rounding"
+ },
+ {
+  "id": "round-2675",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUND(2.675,2)",
+  "expected": 2.68,
+  "note": "epsilon-safe rounding"
+ },
+ {
+  "id": "abs-num",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ABS(-7)",
+  "expected": 7,
+  "note": "ABS number"
+ },
+ {
+  "id": "power",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=POWER(2,10)",
+  "expected": 1024,
+  "note": "POWER"
+ },
+ {
+  "id": "power-num",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=POWER(-1,0.5)",
+  "expected": "#NUM!",
+  "note": "POWER negative fractional -> #NUM!"
+ },
+ {
+  "id": "sqrt-ok",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SQRT(16)",
+  "expected": 4,
+  "note": "SQRT"
+ },
+ {
+  "id": "text-pct",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXT(0.5,\"0%\")",
+  "expected": "50%",
+  "note": "TEXT percent"
+ },
+ {
+  "id": "text-dec",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXT(1.5,\"0.00\")",
+  "expected": "1.50",
+  "note": "TEXT decimals"
+ },
+ {
+  "id": "text-thousands",
+  "auditId": "A-044",
+  "grid": [],
+  "at": "H1",
+  "formula": "=TEXT(1234,\"#,##0\")",
+  "expected": "1,234",
+  "note": "TEXT thousands"
+ },
+ {
+  "id": "ceiling",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=CEILING(2.1,1)",
+  "expected": 3,
+  "note": "CEILING"
+ },
+ {
+  "id": "floor",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FLOOR(2.9,1)",
+  "expected": 2,
+  "note": "FLOOR"
+ },
+ {
+  "id": "gc1a-product-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PRODUCT(2,3,4)",
+  "expected": 24,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-product-range",
+  "auditId": null,
+  "grid": [
+   [
+    2
+   ],
+   [
+    3
+   ],
+   [
+    4
+   ]
+  ],
+  "at": "H1",
+  "formula": "=PRODUCT(A1:A3)",
+  "expected": 24,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-product-no-numbers",
+  "auditId": null,
+  "grid": [
+   [
+    "x"
+   ],
+   [
+    "y"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=PRODUCT(A1:A2)",
+  "expected": 0,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-int-pos",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=INT(8.9)",
+  "expected": 8,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-int-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=INT(-8.9)",
+  "expected": -9,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-int-whole",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=INT(5)",
+  "expected": 5,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-int-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=INT(\"abc\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-trunc-pos",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUNC(8.9)",
+  "expected": 8,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-trunc-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUNC(-8.9)",
+  "expected": -8,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-trunc-float-edge",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUNC(0.29,2)",
+  "expected": 0.29,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-trunc-neg-digits",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUNC(123.456,-1)",
+  "expected": 120,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-trunc-pi",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TRUNC(PI(),3)",
+  "expected": 3.141,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-sign-pos",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIGN(10)",
+  "expected": 1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-sign-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIGN(-4)",
+  "expected": -1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-sign-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIGN(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-roundup-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDUP(3.2,0)",
+  "expected": 4,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-roundup-77",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDUP(76.9,0)",
+  "expected": 77,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-roundup-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDUP(3.14159,3)",
+  "expected": 3.142,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-roundup-neg-away",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDUP(-3.14159,1)",
+  "expected": -3.2,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-roundup-neg-digits",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDUP(31415.92654,-2)",
+  "expected": 31500,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-roundup-float-edge",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDUP(1.1,1)",
+  "expected": 1.1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-roundup-default-digits",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDUP(3.2)",
+  "expected": 4,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-rounddown-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDDOWN(3.2,0)",
+  "expected": 3,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-rounddown-76",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDDOWN(76.9,0)",
+  "expected": 76,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-rounddown-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDDOWN(3.14159,3)",
+  "expected": 3.141,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-rounddown-neg-toward-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDDOWN(-3.14159,1)",
+  "expected": -3.1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-rounddown-neg-digits",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDDOWN(31415.92654,-2)",
+  "expected": 31400,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-rounddown-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ROUNDDOWN(\"x\",1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-exp-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXP(0)",
+  "expected": 1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-exp-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXP(1)",
+  "expected": 2.718281828459045,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-exp-overflow",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EXP(1000)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-ln-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LN(1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-ln-86",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LN(86)",
+  "expected": 4.454347296253507,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-ln-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LN(0)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-ln-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LN(-1)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-log-default-base",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOG(100)",
+  "expected": 2,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-log-base-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOG(8,2)",
+  "expected": 3,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-log-1000-10",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOG(1000,10)",
+  "expected": 3,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-log-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOG(0)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-log-base-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOG(10,1)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-log10-100",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOG10(100)",
+  "expected": 2,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-log10-86",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOG10(86)",
+  "expected": 1.9344984512435677,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-log10-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LOG10(0)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-pi",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PI()",
+  "expected": 3.141592653589793,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-pi-expr",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=PI()*2",
+  "expected": 6.283185307179586,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-sumsq-args",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SUMSQ(3,4)",
+  "expected": 25,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-sumsq-range",
+  "auditId": null,
+  "grid": [
+   [
+    1
+   ],
+   [
+    2
+   ],
+   [
+    3
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMSQ(A1:A3)",
+  "expected": 14,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-quotient-pos",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=QUOTIENT(5,2)",
+  "expected": 2,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-quotient-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=QUOTIENT(-10,3)",
+  "expected": -3,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-quotient-div0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=QUOTIENT(5,0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-mround-9",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MROUND(10,3)",
+  "expected": 9,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-mround-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MROUND(-10,-3)",
+  "expected": -9,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-mround-float",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MROUND(1.3,0.2)",
+  "expected": 1.4,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-mround-half-up",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MROUND(7.5,5)",
+  "expected": 10,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-mround-sign-mismatch",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MROUND(5,-2)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-mround-zero-multiple",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=MROUND(5,0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-even-1.5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EVEN(1.5)",
+  "expected": 2,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-even-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EVEN(3)",
+  "expected": 4,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-even-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EVEN(2)",
+  "expected": 2,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-even-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EVEN(-1)",
+  "expected": -2,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-even-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=EVEN(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-odd-1.5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ODD(1.5)",
+  "expected": 3,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-odd-3",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ODD(3)",
+  "expected": 3,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-odd-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ODD(2)",
+  "expected": 3,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-odd-neg-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ODD(-1)",
+  "expected": -1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-odd-neg-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ODD(-2)",
+  "expected": -3,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-odd-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ODD(0)",
+  "expected": 1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-fact-5",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FACT(5)",
+  "expected": 120,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-fact-truncates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FACT(1.9)",
+  "expected": 1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-fact-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FACT(0)",
+  "expected": 1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-fact-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FACT(-1)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-fact-171",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=FACT(171)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-gcd-coprime",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=GCD(5,2)",
+  "expected": 1,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-gcd-24-36",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=GCD(24,36)",
+  "expected": 12,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-gcd-with-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=GCD(5,0)",
+  "expected": 5,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-gcd-all-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=GCD(0,0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-gcd-range",
+  "auditId": null,
+  "grid": [
+   [
+    12
+   ],
+   [
+    18
+   ],
+   [
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=GCD(A1:A3)",
+  "expected": 6,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-gcd-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=GCD(-1,2)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-lcm-5-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LCM(5,2)",
+  "expected": 10,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-lcm-24-36",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LCM(24,36)",
+  "expected": 72,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-lcm-with-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LCM(5,0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1a-lcm-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=LCM(-1,2)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1A (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sin-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIN(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sin-half-pi",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIN(PI()/2)",
+  "expected": 1,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sin-30deg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIN(30*PI()/180)",
+  "expected": 0.5,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sin-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIN(-PI()/2)",
+  "expected": -1,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sin-too-big",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIN(134217728)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sin-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SIN(\"a\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-cos-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COS(0)",
+  "expected": 1,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-cos-pi",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COS(PI())",
+  "expected": -1,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-cos-60deg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COS(60*PI()/180)",
+  "expected": 0.5,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-cos-too-big",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COS(134217728)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-tan-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TAN(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-tan-quarter-pi",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TAN(PI()/4)",
+  "expected": 1,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-tan-too-big",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TAN(-134217728)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-asin-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ASIN(1)",
+  "expected": 1.5707963267948966,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-asin-half",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ASIN(0.5)",
+  "expected": 0.5235987755982989,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-asin-domain",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ASIN(2)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-acos-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ACOS(1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-acos-half",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ACOS(0.5)",
+  "expected": 1.0471975511965979,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-acos-domain",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ACOS(-1.1)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atan-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATAN(1)",
+  "expected": 0.7853981633974483,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atan-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATAN(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atan2-1-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATAN2(1,1)",
+  "expected": 0.7853981633974483,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atan2-neg-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATAN2(-1,-1)",
+  "expected": -2.356194490192345,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atan2-negx-zeroy",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATAN2(-1,0)",
+  "expected": 3.141592653589793,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atan2-order-xy",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATAN2(0,1)",
+  "expected": 1.5707963267948966,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atan2-both-zero",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATAN2(0,0)",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sinh-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SINH(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sinh-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SINH(1)",
+  "expected": 1.1752011936438014,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sinh-overflow",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SINH(1000)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-cosh-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COSH(0)",
+  "expected": 1,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-cosh-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COSH(1)",
+  "expected": 1.5430806348152437,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-tanh-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TANH(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-tanh-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=TANH(1)",
+  "expected": 0.7615941559557649,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-asinh-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ASINH(1)",
+  "expected": 0.881373587019543,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-acosh-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ACOSH(1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-acosh-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ACOSH(2)",
+  "expected": 1.3169578969248166,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-acosh-domain",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ACOSH(0.5)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atanh-half",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATANH(0.5)",
+  "expected": 0.5493061443340548,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atanh-domain-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATANH(1)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-atanh-domain-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=ATANH(-1.5)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-degrees-pi",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DEGREES(PI())",
+  "expected": 180,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-degrees-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=DEGREES(1)",
+  "expected": 57.29577951308232,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-radians-180",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=RADIANS(180)",
+  "expected": 3.141592653589793,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-radians-90",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=RADIANS(90)",
+  "expected": 1.5707963267948966,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sqrtpi-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SQRTPI(1)",
+  "expected": 1.772453850905516,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sqrtpi-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SQRTPI(2)",
+  "expected": 2.5066282746310002,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sqrtpi-0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SQRTPI(0)",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-sqrtpi-neg",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SQRTPI(-1)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-8-2",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(8,2)",
+  "expected": 28,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-k0",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(5,0)",
+  "expected": 1,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-k-eq-n",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(5,5)",
+  "expected": 1,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-cards",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(52,5)",
+  "expected": 2598960,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-truncates",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(5.9,2.9)",
+  "expected": 10,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-k-gt-n",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(5,6)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-neg-n",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(-1,0)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-overflow",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(2000,1000)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-combin-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=COMBIN(\"a\",1)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-rand-below-1",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=INT(RAND())",
+  "expected": 0,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-randbetween-fixed",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=RANDBETWEEN(5,5)",
+  "expected": 5,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-randbetween-ceil-floor",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=RANDBETWEEN(2.2,2.9)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-randbetween-ceil-floor-ok",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=RANDBETWEEN(2.2,3.9)",
+  "expected": 3,
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-randbetween-bottom-gt-top",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=RANDBETWEEN(5,4)",
+  "expected": "#NUM!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1b-randbetween-text",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=RANDBETWEEN(\"a\",4)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1B (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-one",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(C1:C6,A1:A6,\"East\")",
+  "expected": 16,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-two",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(C1:C6,A1:A6,\"East\",B1:B6,\"Apple\")",
+  "expected": 9,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-num-crit",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(D1:D6,C1:C6,\">3\")",
+  "expected": 320,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-text-value-skipped",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(C1:C6,A1:A6,\"North\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-wildcard",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(D1:D6,B1:B6,\"P*\")",
+  "expected": 190,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-no-match",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(C1:C6,A1:A6,\"South\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-case-insensitive",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(C1:C6,A1:A6,\"east\")",
+  "expected": 16,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-not-equal",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(C1:C6,A1:A6,\"<>East\")",
+  "expected": 5,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-shape-mismatch",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(C1:C6,A1:A5,\"East\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumifs-missing-criteria",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMIFS(C1:C6,A1:A6)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countifs-one",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTIFS(A1:A6,\"East\")",
+  "expected": 3,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countifs-two",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTIFS(A1:A6,\"East\",B1:B6,\"Apple\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countifs-num-crit",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTIFS(C1:C6,\">=4\")",
+  "expected": 3,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countifs-mixed",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTIFS(A1:A6,\"East\",C1:C6,\">4\")",
+  "expected": 2,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countifs-none",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTIFS(A1:A6,\"Mars\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countifs-shape-mismatch",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTIFS(A1:A6,\"East\",B1:B5,\"Apple\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countifs-odd-args",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTIFS(A1:A6)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-averageifs-one",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=AVERAGEIFS(C1:C6,A1:A6,\"East\")",
+  "expected": 5.333333333333333,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-averageifs-two",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=AVERAGEIFS(D1:D6,A1:A6,\"East\",B1:B6,\"Apple\")",
+  "expected": 90,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-averageifs-no-match",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=AVERAGEIFS(C1:C6,A1:A6,\"Mars\")",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-averageifs-text-only",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=AVERAGEIFS(C1:C6,A1:A6,\"North\")",
+  "expected": "#DIV/0!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-averageifs-shape-mismatch",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=AVERAGEIFS(C1:C6,A1:A5,\"East\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-maxifs-one",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MAXIFS(C1:C6,A1:A6,\"East\")",
+  "expected": 7,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-minifs-one",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MINIFS(C1:C6,A1:A6,\"East\")",
+  "expected": 4,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-maxifs-two",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MAXIFS(D1:D6,B1:B6,\"Apple\",A1:A6,\"West\")",
+  "expected": 60,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-maxifs-no-match",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MAXIFS(C1:C6,A1:A6,\"Mars\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-minifs-text-only",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MINIFS(C1:C6,A1:A6,\"North\")",
+  "expected": 0,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-maxifs-negatives",
+  "auditId": null,
+  "grid": [
+   [
+    -5,
+    "a"
+   ],
+   [
+    -2,
+    "a"
+   ],
+   [
+    -9,
+    "b"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MAXIFS(A1:A3,B1:B3,\"a\")",
+  "expected": -2,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-minifs-negatives",
+  "auditId": null,
+  "grid": [
+   [
+    -5,
+    "a"
+   ],
+   [
+    -2,
+    "a"
+   ],
+   [
+    -9,
+    "b"
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MINIFS(A1:A3,B1:B3,\"a\")",
+  "expected": -5,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-maxifs-shape-mismatch",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=MAXIFS(C1:C6,A1:A5,\"East\")",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumproduct-two",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    4
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    3,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMPRODUCT(A1:A3,B1:B3)",
+  "expected": 32,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumproduct-one",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    4
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    3,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMPRODUCT(A1:A3)",
+  "expected": 6,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumproduct-text-is-zero",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    4
+   ],
+   [
+    "x",
+    5
+   ],
+   [
+    3,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMPRODUCT(A1:A3,B1:B3)",
+  "expected": 22,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumproduct-shape-mismatch",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    4
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    3,
+    6
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMPRODUCT(A1:A3,B1:B2)",
+  "expected": "#VALUE!",
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumproduct-scalars",
+  "auditId": null,
+  "grid": [],
+  "at": "H1",
+  "formula": "=SUMPRODUCT(2,3)",
+  "expected": 6,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-sumproduct-2d",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    2,
+    3,
+    4
+   ],
+   [
+    5,
+    6,
+    7,
+    8
+   ]
+  ],
+  "at": "H1",
+  "formula": "=SUMPRODUCT(A1:B2,C1:D2)",
+  "expected": 94,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countblank-block",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    null
+   ],
+   [
+    null,
+    null
+   ],
+   [
+    "",
+    3
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTBLANK(A1:B3)",
+  "expected": 4,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countblank-column",
+  "auditId": null,
+  "grid": [
+   [
+    1,
+    null
+   ],
+   [
+    null,
+    null
+   ],
+   [
+    "",
+    3
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTBLANK(A1:A3)",
+  "expected": 2,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ },
+ {
+  "id": "gc1c-countblank-none",
+  "auditId": null,
+  "grid": [
+   [
+    "East",
+    "Apple",
+    5,
+    100
+   ],
+   [
+    "West",
+    "Apple",
+    3,
+    60
+   ],
+   [
+    "East",
+    "Pear",
+    7,
+    140
+   ],
+   [
+    "West",
+    "Pear",
+    2,
+    50
+   ],
+   [
+    "East",
+    "Apple",
+    4,
+    80
+   ],
+   [
+    "North",
+    "Apple",
+    "x",
+    30
+   ]
+  ],
+  "at": "H1",
+  "formula": "=COUNTBLANK(A1:D1)",
+  "expected": 0,
+  "note": "GridCraft port batch 1C (expected = Excel's documented result)"
+ }
+]

@@ -1,7 +1,7 @@
 import React from "react";
 import type { GridCellRendererProps, GridRow } from "../core/types";
 
-export function TextRenderer<T extends GridRow = GridRow>({
+export function TextRenderer<T extends object = GridRow>({
   formattedValue,
 }: GridCellRendererProps<T>) {
   return (

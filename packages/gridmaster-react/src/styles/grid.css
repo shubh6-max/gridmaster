@@ -585,6 +585,12 @@
   color: #1d4ed8;
 }
 
+/* A-081: a touch-drag on either handle resizes/fills instead of scrolling the viewport. */
+.gm-resize-handle,
+.gm-fill-handle {
+  touch-action: none;
+}
+
 .gm-fill-handle {
   position: absolute;
   right: 1px;
@@ -964,6 +970,163 @@
   color: #94a3b8;
   font-size: 12px;
   text-align: center;
+}
+
+/* Column menu layout: flex column capped to the viewport, one scrollable list, fixed header/footer. */
+.gm-column-menu {
+  display: flex;
+  flex-direction: column;
+  max-height: min(88vh, 720px);
+}
+
+.gm-menu-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.gm-menu-values {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.gm-menu-fixed {
+  flex-shrink: 0;
+}
+
+.gm-menu-scroll-fill {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.gm-column-menu .gm-menu-footer {
+  background: var(--gm-color-bg, #ffffff);
+}
+
+.gm-menu-section-compact {
+  padding-bottom: 6px;
+}
+
+.gm-menu-sort-children {
+  padding: 2px 0 2px 24px;
+}
+
+.gm-menu-sort-children .gm-menu-action {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+/* Floating panel that hangs off a menu item (colour sort / colour filter). */
+.gm-menu-side-panel {
+  max-height: min(88vh, 420px);
+  overflow-y: auto;
+  border: 1px solid var(--gm-color-border, #e2e8f0);
+  border-radius: 12px;
+  background: var(--gm-color-bg, #ffffff);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.gm-color-panel {
+  padding: 8px;
+}
+
+.gm-color-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.gm-color-panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gm-color-text-muted, #64748b);
+}
+
+.gm-color-panel-list {
+  max-height: 192px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.gm-color-swatch {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--gm-color-border-strong, #cbd5e1);
+}
+
+.gm-color-swatch.is-empty {
+  background: var(--gm-color-bg, #ffffff);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.55);
+}
+
+.gm-color-count {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* Date filter tree: an expander button beside a tri-state checkbox row. */
+.gm-menu-tree-row {
+  display: flex;
+  align-items: center;
+}
+
+.gm-menu-tree-row .gm-menu-check-row {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+.gm-menu-tree-toggle,
+.gm-menu-tree-spacer {
+  flex: 0 0 24px;
+  width: 24px;
+}
+
+.gm-menu-tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.gm-menu-tree-toggle:hover {
+  background: var(--gm-color-bg-subtle, #f8fafc);
+}
+
+/* Partially selected tree item (some, not all, descendants selected). */
+.gm-menu-check-row.is-partial {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.gm-menu-check.is-partial {
+  border-color: var(--gm-color-primary, #2563eb);
+  background: var(--gm-color-bg, #ffffff);
+}
+
+.gm-menu-check.is-partial::after {
+  content: "";
+  width: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--gm-color-primary, #2563eb);
 }
 
 .gm-filter-search {

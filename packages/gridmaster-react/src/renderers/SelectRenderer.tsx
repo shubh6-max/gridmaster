@@ -2,7 +2,7 @@ import React from "react";
 import { ChevronDown } from "lucide-react";
 import type { GridCellRendererProps, GridRow } from "../core/types";
 
-export function SelectRenderer<T extends GridRow = GridRow>({
+export function SelectRenderer<T extends object = GridRow>({
   formattedValue,
   column,
   mode,

@@ -1,28 +1,18 @@
-import type { GridCellMeta, GridColumnDef, GridResolvedColumnDef, GridRow } from "../types";
-import { isNil, normalizeValue, toNumber } from "../utils";
+import type {
+  GridColumnValidation,
+  GridResolvedColumnDef,
+  GridRow,
+  GridValidationRule,
+  GridValidations,
+} from "../types";
+import { normalizeValue, toNumber } from "../utils";
 
 /* =========================================================
-   Validation rule types
+   Validation rule types live in ../types (canonical, re-exported from the package root as
+   `GridValidationRule` / `GridColumnValidation` / `GridValidations`). This module is the pure,
+   advisory rule engine for both the record-keyed map (`validateCellValue`) and a resolved column's
+   inline `validations` array (`validateColumnValue`, wired into GridCell — A-061).
    ========================================================= */
-
-export type GridValidationRule =
-  | { type: "required"; message?: string }
-  | { type: "min"; value: number; message?: string }
-  | { type: "max"; value: number; message?: string }
-  | { type: "minLength"; value: number; message?: string }
-  | { type: "maxLength"; value: number; message?: string }
-  | { type: "pattern"; value: string; message?: string }
-  | {
-      type: "custom";
-      message?: string;
-      validator: (value: unknown, row: GridRow) => string | null;
-    };
-
-export type GridColumnValidation = {
-  rules: GridValidationRule[];
-};
-
-export type GridValidations = Record<string, GridColumnValidation>;
 
 export function clearValidations(): GridValidations {
   return {};
@@ -42,7 +32,8 @@ export function setColumnValidation(
   return next;
 }
 
-export function validateCellValue<T extends GridRow>(
+/** Record-keyed lookup. Returns the first failing rule's message for `columnKey`, or null. */
+export function validateCellValue<T extends object>(
   value: unknown,
   row: T,
   columnKey: string,
@@ -50,24 +41,52 @@ export function validateCellValue<T extends GridRow>(
 ): string | null {
   const columnValidation = validations[columnKey];
   if (!columnValidation) return null;
+  return runRules(value, row, columnValidation.rules);
+}
 
-  for (const rule of columnValidation.rules) {
+/**
+ * Render-time validation for a resolved column's inline `validations` array (A-061). Pure and
+ * advisory: returns the first failing rule's message, or null. GridCell wires this alongside
+ * `column.validate` so both produce the same `string | null` error shape; a column that declares
+ * neither validates to null (default behaviour unchanged).
+ */
+export function validateColumnValue<T extends object>(
+  value: unknown,
+  row: T,
+  column: GridResolvedColumnDef<T>
+): string | null {
+  const rules = column.validations;
+  if (!rules?.length) return null;
+  return runRules(value, row, rules);
+}
+
+function runRules<T extends object>(
+  value: unknown,
+  row: T,
+  rules: GridValidationRule[]
+): string | null {
+  for (const rule of rules) {
     const error = validateRule(value, row, rule);
     if (error) return error;
   }
   return null;
 }
 
-function validateRule<T extends GridRow>(
+function validateRule<T extends object>(
   value: unknown,
   row: T,
   rule: GridValidationRule
 ): string | null {
   const normalized = normalizeValue(value);
+  const isBlank = normalized === "";
+
+  // Only `required` flags a blank cell. Every other rule is skipped when empty, so a blank is not
+  // reported as both "required" and "below min / too short" at once (A-061).
+  if (isBlank && rule.type !== "required") return null;
 
   switch (rule.type) {
     case "required":
-      return normalized ? null : (rule.message ?? "Required");
+      return isBlank ? (rule.message ?? "Required") : null;
     case "min": {
       const num = toNumber(value);
       return num !== null && num >= rule.value
@@ -88,10 +107,23 @@ function validateRule<T extends GridRow>(
       return normalized.length <= rule.value
         ? null
         : (rule.message ?? `Max length is ${rule.value}`);
-    case "pattern":
-      return new RegExp(rule.value).test(normalized) ? null : (rule.message ?? "Invalid format");
+    case "pattern": {
+      let regExp: RegExp;
+      try {
+        regExp = new RegExp(rule.value);
+      } catch {
+        // A misconfigured pattern can never match reliably; skip it rather than throw at render.
+        return null;
+      }
+      return regExp.test(normalized) ? null : (rule.message ?? "Invalid format");
+    }
     case "custom":
-      return rule.validator?.(value, row) ?? null;
+      try {
+        return rule.validator?.(value, row as GridRow) ?? null;
+      } catch (error) {
+        // A throwing custom validator is surfaced as a validation error, never a render crash.
+        return rule.message ?? (error instanceof Error ? error.message : "Invalid");
+      }
     default:
       return null;
   }

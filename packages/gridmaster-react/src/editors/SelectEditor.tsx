@@ -1,7 +1,8 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { GridCellEditorProps, GridRow } from "../core/types";
+import { getSelectOptionsWithCurrentValue } from "./selectOptions";
 
-export function SelectEditor<T extends GridRow = GridRow>({
+export function SelectEditor<T extends object = GridRow>({
   value,
   column,
   commit,
@@ -11,6 +12,8 @@ export function SelectEditor<T extends GridRow = GridRow>({
 }: GridCellEditorProps<T>) {
   const [localValue, setLocalValue] = useState<string>(value == null ? "" : String(value));
   const selectRef = useRef<HTMLSelectElement>(null);
+  // Keep a stored value that is outside column.options visible/selectable.
+  const options = getSelectOptionsWithCurrentValue(column.options, localValue);
 
   useEffect(() => {
     setLocalValue(value == null ? "" : String(value));
@@ -41,7 +44,7 @@ export function SelectEditor<T extends GridRow = GridRow>({
         setLocalValue(nextValue);
         updateValue(nextValue);
       }}
-      onBlur={commit}
+      onBlur={() => commit()}
       onKeyDown={(event) => {
         if (event.key === "Enter") {
           event.preventDefault();
@@ -78,7 +81,7 @@ export function SelectEditor<T extends GridRow = GridRow>({
       }}
     >
       <option value="">{column.placeholder ?? "Select..."}</option>
-      {(column.options ?? []).map((option) => (
+      {options.map((option) => (
         <option key={option} value={option}>
           {option}
         </option>

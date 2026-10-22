@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import type { GridCellEditorProps, GridRow } from "../core/types";
 
-export function CheckboxEditor<T extends GridRow = GridRow>({
+export function CheckboxEditor<T extends object = GridRow>({
   value,
   commit,
   cancel,
-  updateValue,
   requestViewportFocusAfterEdit,
 }: GridCellEditorProps<T>) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -29,11 +28,10 @@ export function CheckboxEditor<T extends GridRow = GridRow>({
         ref={inputRef}
         type="checkbox"
         checked={checked}
-        onChange={(e) => {
-          updateValue(e.target.checked);
-          commit();
-        }}
-        onBlur={commit}
+        // A-063: commit the NEW value synchronously — `commit()` alone would read the pre-toggle
+        // draft from state and commit the stale value. One change event = exactly one toggle.
+        onChange={(e) => commit(e.target.checked)}
+        onBlur={() => commit()}
         onKeyDown={(e) => {
           if (e.key === "Escape") {
             e.preventDefault();
@@ -51,8 +49,8 @@ export function CheckboxEditor<T extends GridRow = GridRow>({
 
           if (e.key === " ") {
             e.preventDefault();
-            updateValue(!checked);
-            commit();
+            requestViewportFocusAfterEdit?.();
+            commit(!checked);
             return;
           }
 

@@ -12,11 +12,11 @@ export { LinkRenderer } from "./LinkRenderer";
 export { SelectRenderer } from "./SelectRenderer";
 export { TextRenderer } from "./TextRenderer";
 
-export type GridDefaultCellRenderer<T extends GridRow = GridRow> = ComponentType<
+export type GridDefaultCellRenderer<T extends object = GridRow> = ComponentType<
   GridCellRendererProps<T>
 >;
 
-export const defaultCellRenderers: Record<GridColumnType, GridDefaultCellRenderer<any>> = {
+export const defaultCellRenderers: Record<GridColumnType, GridDefaultCellRenderer<GridRow>> = {
   text: TextRenderer,
   number: TextRenderer,
   select: SelectRenderer,
@@ -26,7 +26,7 @@ export const defaultCellRenderers: Record<GridColumnType, GridDefaultCellRendere
   custom: TextRenderer,
 };
 
-export function getDefaultCellRenderer<T extends GridRow = GridRow>(
+export function getDefaultCellRenderer<T extends object = GridRow>(
   columnType?: GridColumnType
 ): GridDefaultCellRenderer<T> {
   return (defaultCellRenderers[columnType ?? "text"] ??

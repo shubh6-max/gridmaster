@@ -9,7 +9,7 @@ export function isFrozenColumnIndex(columnIndex: number, frozenColumns: number):
   return columnIndex >= 0 && columnIndex < frozenColumns;
 }
 
-export function getFrozenColumnKeys<T extends GridRow>(
+export function getFrozenColumnKeys<T extends object>(
   columns: GridResolvedColumnDef<T>[],
   frozenColumns: number
 ): string[] {

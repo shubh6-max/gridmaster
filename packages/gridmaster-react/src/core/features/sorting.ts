@@ -1,5 +1,5 @@
 import type { GridResolvedColumnDef, GridRow, GridSort, GridSortDirection } from "../types";
-import { compareValues, getRowValue } from "../utils";
+import { sortByDecoratedKeys } from "../utils";
 import { createFormulaEvaluator } from "./formulas";
 
 /* =========================================================
@@ -42,7 +42,7 @@ export function isSortedColumn(sort: GridSort, columnKey: string): boolean {
    Column lookup
    ========================================================= */
 
-export function findSortableColumn<T extends GridRow>(
+export function findSortableColumn<T extends object>(
   columns: GridResolvedColumnDef<T>[],
   columnKey: string
 ): GridResolvedColumnDef<T> | undefined {
@@ -53,7 +53,7 @@ export function findSortableColumn<T extends GridRow>(
    Row sorting
    ========================================================= */
 
-export function sortRows<T extends GridRow>(
+export function sortRows<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
   sort: GridSort
@@ -65,30 +65,21 @@ export function sortRows<T extends GridRow>(
 
   const directionMultiplier = sort.direction === "asc" ? 1 : -1;
   const evaluator = createFormulaEvaluator(rows, columns);
-  const rowIndexes = new Map<T, number>();
 
-  rows.forEach((row, index) => {
-    rowIndexes.set(row, index);
-  });
+  const sortedIndexes = sortByDecoratedKeys(
+    rows.map((_, index) => index),
+    (index) => evaluator.getCellValue(index, column.key),
+    directionMultiplier
+  );
 
-  return [...rows].sort((rowA, rowB) => {
-    const indexA = rowIndexes.get(rowA) ?? -1;
-    const indexB = rowIndexes.get(rowB) ?? -1;
-    const valueA =
-      indexA >= 0 ? evaluator.getCellValue(indexA, column.key) : getRowValue(rowA, column);
-    const valueB =
-      indexB >= 0 ? evaluator.getCellValue(indexB, column.key) : getRowValue(rowB, column);
-
-    const result = compareValues(valueA, valueB);
-    return result * directionMultiplier;
-  });
+  return sortedIndexes.map((index) => rows[index]);
 }
 
 /* =========================================================
    Indexed sorting
    ========================================================= */
 
-export function sortRowIndexes<T extends GridRow>(
+export function sortRowIndexes<T extends object>(
   rows: T[],
   columns: GridResolvedColumnDef<T>[],
   sort: GridSort
@@ -103,15 +94,11 @@ export function sortRowIndexes<T extends GridRow>(
   const directionMultiplier = sort.direction === "asc" ? 1 : -1;
   const evaluator = createFormulaEvaluator(rows, columns);
 
-  indexes.sort((indexA, indexB) => {
-    const valueA = evaluator.getCellValue(indexA, column.key);
-    const valueB = evaluator.getCellValue(indexB, column.key);
-
-    const result = compareValues(valueA, valueB);
-    return result * directionMultiplier;
-  });
-
-  return indexes;
+  return sortByDecoratedKeys(
+    indexes,
+    (index) => evaluator.getCellValue(index, column.key),
+    directionMultiplier
+  );
 }
 
 /* =========================================================

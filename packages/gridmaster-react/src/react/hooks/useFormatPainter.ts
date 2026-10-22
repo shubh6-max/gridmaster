@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   applyFormatPainterToBounds,
   copyFormatFromSelection,
@@ -16,7 +16,7 @@ import type {
 } from "../../core/types";
 import { getSelectionBounds } from "../../core/features/clipboard";
 
-type UseFormatPainterParams<T extends GridRow = GridRow> = {
+type UseFormatPainterParams<T extends object = GridRow> = {
   history: GridHistoryState<T>;
   setHistory: React.Dispatch<React.SetStateAction<GridHistoryState<T>>>;
   selection: GridSelectionState;
@@ -27,16 +27,24 @@ type UseFormatPainterParams<T extends GridRow = GridRow> = {
   focusViewport: () => void;
   historyLimit?: number;
   preserveRowReferences?: boolean;
+  /** False in `mode="readonly"`: the painter cannot be armed or applied. */
+  canFormat?: boolean;
+  /** `enableCellColoring={false}`: painting keeps each target's own fill. */
+  enableCellColoring?: boolean;
+  /** `enableWrapText={false}`: painting keeps each target's own wrap. */
+  enableWrapText?: boolean;
+  /** `enableRangeSelection={false}`: painting never turns the selection into a range. */
+  enableRangeSelection?: boolean;
 };
 
-function pushCellMetaHistory<T extends GridRow = GridRow>(
+function pushCellMetaHistory<T extends object = GridRow>(
   setHistory: React.Dispatch<React.SetStateAction<GridHistoryState<T>>>,
   apply: (state: GridHistoryState<T>) => GridHistoryState<T>
 ) {
   setHistory((prev) => apply(prev));
 }
 
-export function useFormatPainter<T extends GridRow = GridRow>({
+export function useFormatPainter<T extends object = GridRow>({
   history,
   setHistory,
   selection,
@@ -47,12 +55,25 @@ export function useFormatPainter<T extends GridRow = GridRow>({
   focusViewport,
   historyLimit,
   preserveRowReferences,
+  canFormat = true,
+  enableCellColoring = true,
+  enableWrapText = true,
+  enableRangeSelection = true,
 }: UseFormatPainterParams<T>) {
   const [formatPainterClipboard, setFormatPainterClipboard] =
     useState<GridFormatPainterClipboard>(null);
   const [formatPainterMode, setFormatPainterMode] = useState<GridFormatPainterMode>("idle");
 
   const isFormatPainterActive = formatPainterMode !== "idle" && Boolean(formatPainterClipboard);
+
+  // F-012: if the host flips editable → readonly (or otherwise disallows formatting) mid-gesture,
+  // disarm the painter so it cannot keep painting after the next click. Esc already cancels; this
+  // covers the programmatic flip the user never gets a chance to Esc out of.
+  useEffect(() => {
+    if (!canFormat && formatPainterMode !== "idle") {
+      setFormatPainterMode("idle");
+    }
+  }, [canFormat, formatPainterMode]);
 
   const copyFormat = useCallback(() => {
     const clipboard = copyFormatFromSelection(
@@ -75,6 +96,8 @@ export function useFormatPainter<T extends GridRow = GridRow>({
 
   const startFormatPainter = useCallback(
     (locked = false) => {
+      if (!canFormat) return false;
+
       const copied = copyFormat();
       if (!copied) return false;
 
@@ -82,12 +105,12 @@ export function useFormatPainter<T extends GridRow = GridRow>({
       focusViewport();
       return true;
     },
-    [copyFormat, focusViewport]
+    [canFormat, copyFormat, focusViewport]
   );
 
   const applyPainterToBounds = useCallback(
     (bounds: { startRow: number; endRow: number; startCol: number; endCol: number }) => {
-      if (!formatPainterClipboard) return false;
+      if (!formatPainterClipboard || !canFormat) return false;
 
       pushCellMetaHistory(setHistory, (prev) =>
         historyReducer(
@@ -102,7 +125,8 @@ export function useFormatPainter<T extends GridRow = GridRow>({
                 formatPainterClipboard,
                 bounds,
                 displayRowIndexes,
-                visibleColumns
+                visibleColumns,
+                { keepBackground: !enableCellColoring, keepWrap: !enableWrapText }
               ),
               rowMeta: prev.present.rowMeta,
             },
@@ -114,7 +138,10 @@ export function useFormatPainter<T extends GridRow = GridRow>({
         )
       );
 
-      if (bounds.startRow === bounds.endRow && bounds.startCol === bounds.endCol) {
+      if (
+        !enableRangeSelection ||
+        (bounds.startRow === bounds.endRow && bounds.startCol === bounds.endCol)
+      ) {
         setSelection((prev) => setActiveCell(prev, { row: bounds.startRow, col: bounds.startCol }));
       } else {
         setSelection((prev) =>
@@ -134,10 +161,16 @@ export function useFormatPainter<T extends GridRow = GridRow>({
       return true;
     },
     [
+      canFormat,
       displayRowIndexes,
+      enableCellColoring,
+      enableRangeSelection,
+      enableWrapText,
       focusViewport,
       formatPainterClipboard,
       formatPainterMode,
+      historyLimit,
+      preserveRowReferences,
       setHistory,
       setSelection,
       visibleColumns,

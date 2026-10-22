@@ -8,9 +8,14 @@ import type {
   GridRowMeta,
 } from "../types";
 import { MAX_HISTORY_SIZE } from "../constants";
+import { deepEqual } from "../equality";
 import { cloneCellMetaMap, cloneColumns, cloneRowMetaMap, cloneRows } from "../utils";
 
 export type GridHistoryCloneOptions = {
+  /**
+   * Max undo snapshots kept (newest win). Default 50. `0` or a negative value keeps no undo history;
+   * NaN / non-numbers fall back to the default; fractions are floored.
+   */
   historyLimit?: number;
   preserveRowReferences?: boolean;
 };
@@ -19,7 +24,7 @@ export type GridHistoryCloneOptions = {
    Snapshot cloning
    ========================================================= */
 
-export function cloneSnapshot<T extends GridRow = GridRow>(
+export function cloneSnapshot<T extends object = GridRow>(
   snapshot: GridSnapshot<T>,
   options?: GridHistoryCloneOptions
 ): GridSnapshot<T> {
@@ -37,7 +42,7 @@ export function cloneSnapshot<T extends GridRow = GridRow>(
    Empty snapshot
    ========================================================= */
 
-export function createEmptySnapshot<T extends GridRow = GridRow>(): GridSnapshot<T> {
+export function createEmptySnapshot<T extends object = GridRow>(): GridSnapshot<T> {
   return {
     rows: [],
     columns: [],
@@ -50,7 +55,7 @@ export function createEmptySnapshot<T extends GridRow = GridRow>(): GridSnapshot
    Initial history state
    ========================================================= */
 
-export function createInitialHistoryState<T extends GridRow = GridRow>(
+export function createInitialHistoryState<T extends object = GridRow>(
   initialSnapshot?: GridSnapshot<T>,
   options?: GridHistoryCloneOptions
 ): GridHistoryState<T> {
@@ -69,12 +74,31 @@ export function createInitialHistoryState<T extends GridRow = GridRow>(
    History reducer
    ========================================================= */
 
-export function historyReducer<T extends GridRow = GridRow>(
+function resolveHistoryLimit(limit: number | undefined): number {
+  if (typeof limit !== "number" || Number.isNaN(limit)) return MAX_HISTORY_SIZE;
+  return Math.max(0, Math.floor(limit));
+}
+
+/** Newest `limit` entries; `slice(-0)` would return everything, so 0 is handled explicitly. */
+function keepNewest<S>(past: S[], limit: number): S[] {
+  return limit === 0 ? [] : past.slice(-limit);
+}
+
+/** Past stack after archiving `present`; skips the (costly) snapshot clone when nothing is kept. */
+function archivePresent<T extends object>(
+  state: GridHistoryState<T>,
+  limit: number,
+  options?: GridHistoryCloneOptions
+): GridSnapshot<T>[] {
+  return limit === 0 ? [] : keepNewest([...state.past, cloneSnapshot(state.present, options)], limit);
+}
+
+export function historyReducer<T extends object = GridRow>(
   state: GridHistoryState<T>,
   action: GridHistoryAction<T>,
   options?: GridHistoryCloneOptions
 ): GridHistoryState<T> {
-  const historyLimit = options?.historyLimit ?? MAX_HISTORY_SIZE;
+  const historyLimit = resolveHistoryLimit(options?.historyLimit);
 
   switch (action.type) {
     case "RESET": {
@@ -86,10 +110,22 @@ export function historyReducer<T extends GridRow = GridRow>(
     }
 
     case "PUSH": {
-      const past = [...state.past, cloneSnapshot(state.present, options)].slice(-historyLimit);
+      // Re-applying identical formatting must not burn an undo slot or clear redo (A-104). Rows and
+      // columns are compared by reference only (formatting passes the present ones through), so
+      // this stays O(meta) instead of O(rows).
+      const present = state.present;
+      const incoming = action.payload;
+      if (
+        incoming.rows === present.rows &&
+        incoming.columns === present.columns &&
+        deepEqual(incoming.cellMeta, present.cellMeta) &&
+        deepEqual(incoming.rowMeta, present.rowMeta)
+      ) {
+        return state;
+      }
 
       return {
-        past,
+        past: archivePresent(state, historyLimit, options),
         present: cloneSnapshot(action.payload, options),
         future: [],
       };
@@ -114,7 +150,7 @@ export function historyReducer<T extends GridRow = GridRow>(
       const [next, ...restFuture] = state.future;
 
       return {
-        past: [...state.past, cloneSnapshot(state.present, options)].slice(-historyLimit),
+        past: archivePresent(state, historyLimit, options),
         present: cloneSnapshot(next, options),
         future: restFuture.map((snapshot) => cloneSnapshot(snapshot, options)),
       };
@@ -129,15 +165,15 @@ export function historyReducer<T extends GridRow = GridRow>(
    History helpers
    ========================================================= */
 
-export function canUndo<T extends GridRow = GridRow>(state: GridHistoryState<T>): boolean {
+export function canUndo<T extends object = GridRow>(state: GridHistoryState<T>): boolean {
   return state.past.length > 0;
 }
 
-export function canRedo<T extends GridRow = GridRow>(state: GridHistoryState<T>): boolean {
+export function canRedo<T extends object = GridRow>(state: GridHistoryState<T>): boolean {
   return state.future.length > 0;
 }
 
-export function resetHistory<T extends GridRow = GridRow>(
+export function resetHistory<T extends object = GridRow>(
   snapshot: GridSnapshot<T>
 ): GridHistoryAction<T> {
   return {
@@ -146,7 +182,7 @@ export function resetHistory<T extends GridRow = GridRow>(
   };
 }
 
-export function pushHistory<T extends GridRow = GridRow>(
+export function pushHistory<T extends object = GridRow>(
   snapshot: GridSnapshot<T>
 ): GridHistoryAction<T> {
   return {
@@ -155,13 +191,13 @@ export function pushHistory<T extends GridRow = GridRow>(
   };
 }
 
-export function undoHistory<T extends GridRow = GridRow>(): GridHistoryAction<T> {
+export function undoHistory<T extends object = GridRow>(): GridHistoryAction<T> {
   return {
     type: "UNDO",
   };
 }
 
-export function redoHistory<T extends GridRow = GridRow>(): GridHistoryAction<T> {
+export function redoHistory<T extends object = GridRow>(): GridHistoryAction<T> {
   return {
     type: "REDO",
   };
